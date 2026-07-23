@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>LOGIN PAGE</h1>
+    <form action="/login" method="post">
+        USERNAME : <input type="text" name="username"><br/>
+        PASSWORD : <input type="password" name="password"><br/>
+
+        <!--   CSRF 활성화시 hidden 추가     -->
+<!--        <input type="text" name="_csrf" th:value="${_csrf.token}" />-->
+        <input type="submit" value="login" />
+    </form>
+    <hr>
+
+    <a href="/oauth2/authorization/kakao">카카오 로그인</a> <br/>
+    <a href="/oauth2/authorization/naver">네이버 로그인</a> <br/>
+    <a href="/oauth2/authorization/google">구글 로그인</a> <br/>
+
+    
+    <hr>
+    
+    <span th:text="${param.error}"></span>
+    <span th:text="${param.logout}"></span>
+
+</body>
+</html>
