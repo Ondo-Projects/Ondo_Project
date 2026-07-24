@@ -7,10 +7,15 @@
 <body>
     <h1>JOIN PAGE</h1>
     <form action="/join" method="post">
-        USERNAME : <input type="text" name="username"><br/>
-        PASSWORD : <input type="password" name="password"><br/>
+        <input type="text" name="username" placeholder="아이디" required /><br>
+        <input type="password" name="password" placeholder="비밀번호" required /><br>
 
-        <input type="submit" value="join" />
+
+        <label><input type="radio" name="role" value="ROLE_STUDENT" checked> 학생</label>
+        <label><input type="radio" name="role" value="ROLE_TEACHER"> 선생님</label>
+        <label><input type="radio" name="role" value="ROLE_ADMIN"> 관리자</label><br>
+
+        <button type="submit">가입하기</button>
     </form>
 
 </body>
