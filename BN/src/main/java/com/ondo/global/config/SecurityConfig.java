@@ -28,6 +28,7 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(auth -> {
             auth.requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**").permitAll();
+            auth.requestMatchers("/api/schools/**", "/api/auth/email/**", "/api/auth/sms/**").permitAll();
             auth.requestMatchers("/student").hasRole("STUDENT");
             auth.requestMatchers("/teacher").hasRole("TEACHER");
             auth.requestMatchers("/admin").hasRole("ADMIN");

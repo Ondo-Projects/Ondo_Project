@@ -1,65 +1,75 @@
 package com.ondo.domain.user.controller;
 
-import com.ondo.domain.user.dto.UserDTO;
-import com.ondo.domain.user.entity.User;
-import com.ondo.domain.user.repository.UserRepository;
+import com.ondo.domain.user.dto.SignUpRequestDTO;
+import com.ondo.domain.user.service.UserService;
+import com.ondo.global.error.BusinessException;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping; // 추가
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 @Slf4j
+@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
     @GetMapping("/login")
-    public void login(){
+    public String login() {
         log.info("GET /login...");
+        return "login";
     }
-
 
     @GetMapping("/join")
-    public void join() {
+    public String join(@ModelAttribute("signUpRequest") SignUpRequestDTO signUpRequest) {
         log.info("GET /join...");
-
+        return "join";
     }
 
-
     @PostMapping("/join")
-    public String join_post(UserDTO userDTO){
-        log.info("POST /join...{}", userDTO);
+    public String joinPost(
+            @Valid @ModelAttribute("signUpRequest") SignUpRequestDTO signUpRequest,
+            BindingResult bindingResult,
+            Model model
+    ) {
+        log.info("POST /join... username={}, role={}", signUpRequest.getUsername(), signUpRequest.getRole());
 
-        User user = User.builder()
-                .username(userDTO.getUsername())
-                .password(passwordEncoder.encode(userDTO.getPassword()))
-                .role(userDTO.getRole())
-                .build();
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("errorMessage", "입력값을 다시 확인해 주세요.");
+            return "join";
+        }
 
-        userRepository.save(user);
+        try {
+            userService.signUp(signUpRequest);
+        } catch (BusinessException exception) {
+            model.addAttribute("errorMessage", exception.getMessage());
+            return "join";
+        }
 
-        return "redirect:/login";
+        return "redirect:/login?joined=true";
     }
 
     @GetMapping("/student")
-    public void student(){
+    public String student() {
         log.info("GET /student");
+        return "student";
     }
 
     @GetMapping("/teacher")
-    public void teacher(){
+    public String teacher() {
         log.info("GET /teacher");
+        return "teacher";
     }
 
     @GetMapping("/admin")
-    public void admin(){
+    public String admin() {
         log.info("GET /admin");
+        return "admin";
     }
 }

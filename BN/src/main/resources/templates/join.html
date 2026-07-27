@@ -1,22 +1,1163 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입 | 온도 상담웹</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 640px;
+            margin: 40px auto;
+            padding: 0 16px 40px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        }
+        h1 { margin: 0 0 8px; font-size: 28px; }
+        .subtitle { color: #6b7280; margin-bottom: 24px; }
+        section { margin-bottom: 28px; }
+        section h2 {
+            font-size: 18px;
+            margin: 0 0 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        label { display: block; margin-bottom: 8px; font-weight: 600; }
+        input[type="text"], input[type="password"], input[type="email"] {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+        .field { margin-bottom: 14px; }
+        .role-group label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 18px;
+            font-weight: 500;
+        }
+        .search-box { position: relative; }
+        .search-input-wrap {
+            position: relative;
+        }
+        .search-input-wrap input {
+            padding-left: 42px;
+            padding-right: 42px;
+        }
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 16px;
+            pointer-events: none;
+        }
+        .search-clear {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: #e5e7eb;
+            color: #374151;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            font-size: 14px;
+            line-height: 1;
+        }
+        .school-type-filter {
+            display: flex;
+            gap: 8px;
+            margin: 10px 0 12px;
+            flex-wrap: wrap;
+        }
+        .filter-chip {
+            border: 1px solid #d1d5db;
+            background: #fff;
+            color: #374151;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .filter-chip.active {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #fff;
+        }
+        .search-results {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            max-height: 320px;
+            overflow-y: auto;
+            z-index: 20;
+            display: none;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+        }
+        .search-status {
+            padding: 12px 14px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        .filter-hint {
+            margin: 0 0 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #f8fafc;
+            color: #475569;
+            font-size: 13px;
+            display: none;
+        }
+        .search-result-item {
+            width: 100%;
+            text-align: left;
+            border: none;
+            background: #fff;
+            padding: 12px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .search-result-item:last-child { border-bottom: none; }
+        .search-result-item:hover,
+        .search-result-item.active {
+            background: #eff6ff;
+        }
+        .result-name {
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        .result-meta {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            font-size: 13px;
+            color: #6b7280;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-middle { background: #dcfce7; color: #166534; }
+        .badge-high { background: #dbeafe; color: #1d4ed8; }
+        .selected-school {
+            margin-top: 12px;
+            padding: 14px 16px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 12px;
+            color: #1e3a8a;
+            display: none;
+        }
+        .selected-school-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+        .selected-school-name {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        .change-school-btn {
+            border: none;
+            background: #fff;
+            color: #2563eb;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+        .match-highlight {
+            background: #fef08a;
+            border-radius: 3px;
+        }
+        .terms-block {
+            margin-bottom: 10px;
+        }
+        .terms-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+        }
+        .terms-textbox {
+            width: 100%;
+            min-height: 220px;
+            padding: 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            background: #fcfcfd;
+            color: #374151;
+            font-family: "Malgun Gothic", "Segoe UI", sans-serif;
+            font-size: 14px;
+            line-height: 1.7;
+            resize: vertical;
+            white-space: pre-wrap;
+            overflow-y: auto;
+        }
+        .terms-textbox:focus {
+            outline: none;
+            border-color: #94a3b8;
+            box-shadow: inset 0 0 0 1px #e2e8f0;
+        }
+        .terms-item {
+            margin-bottom: 22px;
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            background: #f9fafb;
+        }
+        .terms-item .checkbox-row {
+            margin-top: 12px;
+            margin-bottom: 0;
+        }
+        .checkbox-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        .checkbox-row input { margin-top: 4px; }
+        .teacher-email {
+            display: none;
+            padding: 16px;
+            border-radius: 12px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+        }
+        .student-info, .guardian-section {
+            display: none;
+            padding: 16px;
+            border-radius: 12px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+        .guardian-section {
+            background: #fefce8;
+            border-color: #fde68a;
+        }
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 15px;
+            background: #fff;
+        }
+        input[type="date"] {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+        .inline-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .btn-secondary, .btn-primary, .submit-btn {
+            border: none;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .btn-secondary { background: #e5e7eb; color: #111827; }
+        .btn-primary { background: #2563eb; color: #fff; }
+        .submit-btn {
+            width: 100%;
+            background: #111827;
+            color: #fff;
+            margin-top: 8px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .message {
+            margin-bottom: 16px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+        .success-message {
+            background: #ecfdf5;
+            color: #047857;
+            margin-top: 10px;
+            display: none;
+        }
+        .helper { color: #6b7280; font-size: 13px; margin-top: 6px; }
+        .password-rules { color: #6b7280; font-size: 13px; margin: 6px 0 0; padding-left: 18px; }
+        .password-rules.valid { color: #047857; }
+        .password-error { color: #b91c1c; font-size: 13px; margin-top: 6px; display: none; }
+    </style>
 </head>
 <body>
-    <h1>JOIN PAGE</h1>
-    <form action="/join" method="post">
-        <input type="text" name="username" placeholder="아이디" required /><br>
-        <input type="password" name="password" placeholder="비밀번호" required /><br>
+<div class="container">
+    <div class="card">
+        <h1>회원가입</h1>
+        <p class="subtitle">학교 선택, 계정 정보, 약관 동의 후 가입을 완료해 주세요.</p>
 
+        <div class="message" th:if="${errorMessage}" th:text="${errorMessage}"></div>
 
-        <label><input type="radio" name="role" value="ROLE_STUDENT" checked> 학생</label>
-        <label><input type="radio" name="role" value="ROLE_TEACHER"> 선생님</label>
-        <label><input type="radio" name="role" value="ROLE_ADMIN"> 관리자</label><br>
+        <form action="/join" method="post" id="joinForm">
+            <section>
+                <h2>1. 가입 유형</h2>
+                <div class="role-group">
+                    <label>
+                        <input type="radio" name="role" value="STUDENT" checked>
+                        학생
+                    </label>
+                    <label>
+                        <input type="radio" name="role" value="TEACHER">
+                        교사
+                    </label>
+                </div>
+            </section>
 
-        <button type="submit">가입하기</button>
-    </form>
+            <section>
+                <h2>2. 학교 검색</h2>
+                <p class="helper">전국 중·고등학교를 검색해 선택해 주세요.</p>
+                <div class="field search-box">
+                    <label for="schoolKeyword">학교명</label>
+                    <div class="search-input-wrap">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="schoolKeyword" placeholder="예: 개포중, 경기고, 부산중..." autocomplete="off">
+                        <button type="button" class="search-clear" id="clearSchoolSearch" aria-label="검색어 지우기">×</button>
+                    </div>
+                    <div class="school-type-filter">
+                        <button type="button" class="filter-chip active" data-school-type="">전체</button>
+                        <button type="button" class="filter-chip" data-school-type="중">중학교</button>
+                        <button type="button" class="filter-chip" data-school-type="고">고등학교</button>
+                    </div>
+                    <p class="filter-hint" id="filterHint"></p>
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+                <input type="hidden" name="schoolCode" id="schoolCode">
+                <div class="selected-school" id="selectedSchool">
+                    <div class="selected-school-header">
+                        <div>
+                            <div class="selected-school-name" id="selectedSchoolName"></div>
+                            <div id="selectedSchoolMeta"></div>
+                        </div>
+                        <button type="button" class="change-school-btn" id="changeSchoolBtn">다시 선택</button>
+                    </div>
+                </div>
+            </section>
 
+            <section id="studentInfoSection" class="student-info">
+                <h2>3. 학생 정보</h2>
+                <div class="field">
+                    <label for="name">성명</label>
+                    <input type="text" id="name" name="name" maxlength="50" placeholder="실명을 입력해 주세요">
+                </div>
+                <div class="field">
+                    <label for="birthDate">생년월일</label>
+                    <input type="date" id="birthDate" name="birthDate">
+                    <p class="helper">만 14세 미만인 경우 법정대리인(보호자) SMS 동의가 필요합니다.</p>
+                </div>
+                <div class="field">
+                    <label for="studentEmail">이메일</label>
+                    <input type="email" id="studentEmail" name="email" placeholder="example@gmail.com">
+                    <p class="helper">가입 전 이메일 인증이 필요합니다.</p>
+                </div>
+                <div class="inline-actions">
+                    <button type="button" class="btn-secondary" id="sendStudentCodeBtn">인증번호 발송</button>
+                    <button type="button" class="btn-primary" id="verifyStudentCodeBtn">인증 확인</button>
+                </div>
+                <div class="field" style="margin-top: 14px;">
+                    <label for="studentVerificationCode">인증번호 6자리</label>
+                    <input type="text" id="studentVerificationCode" maxlength="6" placeholder="123456">
+                </div>
+                <div class="success-message" id="studentEmailVerifiedMessage">이메일 인증이 완료되었습니다.</div>
+            </section>
+
+            <section id="guardianSection" class="guardian-section">
+                <h2>4. 법정대리인(보호자) 동의</h2>
+                <p class="helper">만 14세 미만 학생은 보호자 SMS 인증 후 가입할 수 있습니다.</p>
+
+                <div class="field">
+                    <label for="guardianName">보호자 성명</label>
+                    <input type="text" id="guardianName" name="guardianName" maxlength="50" placeholder="법정대리인 성명">
+                </div>
+                <div class="field">
+                    <label for="guardianPhone">보호자 휴대전화</label>
+                    <input type="text" id="guardianPhone" name="guardianPhone" maxlength="20" placeholder="010-1234-5678">
+                </div>
+                <div class="field">
+                    <label for="guardianRelation">학생과의 관계</label>
+                    <select id="guardianRelation" name="guardianRelation">
+                        <option value="">선택해 주세요</option>
+                        <option value="FATHER">부</option>
+                        <option value="MOTHER">모</option>
+                        <option value="OTHER">기타</option>
+                    </select>
+                </div>
+
+                <div class="terms-item" style="margin-top: 16px;">
+                    <div th:replace="~{terms/student/guardian-consent-terms :: content}"></div>
+                </div>
+
+                <label class="checkbox-row">
+                    <input type="checkbox" id="agreeGuardianChildPrivacy" name="agreeGuardianChildPrivacy" value="true">
+                    <span>[필수] 만 14세 미만 아동 개인정보 수집·이용에 동의합니다.</span>
+                </label>
+                <label class="checkbox-row">
+                    <input type="checkbox" id="agreeGuardianChildSensitive" name="agreeGuardianChildSensitive" value="true">
+                    <span>[필수] 만 14세 미만 아동 민감정보(상담 내용) 수집·이용에 동의합니다.</span>
+                </label>
+                <label class="checkbox-row">
+                    <input type="checkbox" id="agreeGuardianIdentity" name="agreeGuardianIdentity" value="true">
+                    <span>[필수] 법정대리인 본인 확인 및 개인정보 수집에 동의합니다.</span>
+                </label>
+
+                <div class="inline-actions" style="margin-top: 12px;">
+                    <button type="button" class="btn-secondary" id="sendSmsBtn">인증번호 발송</button>
+                    <button type="button" class="btn-primary" id="verifySmsBtn">인증 확인</button>
+                </div>
+                <div class="field" style="margin-top: 14px;">
+                    <label for="smsVerificationCode">인증번호 6자리</label>
+                    <input type="text" id="smsVerificationCode" maxlength="6" placeholder="123456">
+                </div>
+                <div class="success-message" id="smsVerifiedMessage">법정대리인 SMS 인증이 완료되었습니다.</div>
+            </section>
+
+            <section id="teacherEmailSection" class="teacher-email">
+                <h2>교사 이메일 인증</h2>
+                <p class="helper">교사 가입은 공직 메일(@korea.kr) 인증이 필요합니다.</p>
+                <div class="field">
+                    <label for="teacherEmail">교사 이메일</label>
+                    <input type="email" id="teacherEmail" name="email" placeholder="example@korea.kr" disabled>
+                </div>
+                <div class="inline-actions">
+                    <button type="button" class="btn-secondary" id="sendCodeBtn">인증번호 발송</button>
+                    <button type="button" class="btn-primary" id="verifyCodeBtn">인증 확인</button>
+                </div>
+                <div class="field" style="margin-top: 14px;">
+                    <label for="verificationCode">인증번호 6자리</label>
+                    <input type="text" id="verificationCode" maxlength="6" placeholder="123456">
+                </div>
+                <div class="success-message" id="emailVerifiedMessage">이메일 인증이 완료되었습니다.</div>
+            </section>
+
+            <section>
+                <h2 id="accountSectionTitle">3. 계정 정보</h2>
+                <div class="field">
+                    <label for="username">아이디</label>
+                    <input type="text" id="username" name="username" minlength="4" maxlength="50" required>
+                </div>
+                <div class="field">
+                    <label for="password">비밀번호</label>
+                    <input type="password" id="password" name="password" minlength="8" maxlength="100" required>
+                    <ul class="password-rules">
+                        <li id="ruleLength">8~100자</li>
+                        <li id="ruleLetter">영문 1자 이상</li>
+                        <li id="ruleDigit">숫자 1자 이상</li>
+                        <li id="ruleSpecial">특수문자 1자 이상</li>
+                        <li id="ruleNoSpace">공백 사용 불가</li>
+                    </ul>
+                    <p class="password-error" id="passwordError"></p>
+                </div>
+                <div class="field">
+                    <label for="passwordConfirm">비밀번호 확인</label>
+                    <input type="password" id="passwordConfirm" name="passwordConfirm" minlength="8" maxlength="100" required>
+                </div>
+            </section>
+
+            <section>
+                <h2 id="termsSectionTitle">4. 약관 동의</h2>
+
+                <div id="studentTerms">
+                    <div class="terms-item">
+                        <div th:replace="~{terms/student/service-terms :: content}"></div>
+                        <label class="checkbox-row">
+                            <input type="checkbox" name="agreeService" value="true">
+                            <span>[필수] 서비스 이용약관 동의</span>
+                        </label>
+                    </div>
+
+                    <div class="terms-item">
+                        <div th:replace="~{terms/student/privacy-terms :: content}"></div>
+                        <label class="checkbox-row">
+                            <input type="checkbox" name="agreePrivacy" value="true">
+                            <span>[필수] 개인정보 수집 및 이용 동의</span>
+                        </label>
+                    </div>
+
+                    <div class="terms-item">
+                        <div th:replace="~{terms/student/sensitive-terms :: content}"></div>
+                        <label class="checkbox-row">
+                            <input type="checkbox" name="agreeSensitive" value="true">
+                            <span>[필수] 민감정보(상담 내용) 수집 및 이용 동의</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="teacherTerms" style="display: none;">
+                    <div class="terms-item">
+                        <div th:replace="~{terms/teacher/service-terms :: content}"></div>
+                        <label class="checkbox-row">
+                            <input type="checkbox" name="agreeService" value="true" disabled>
+                            <span>[필수] 서비스 이용약관 동의</span>
+                        </label>
+                    </div>
+
+                    <div class="terms-item">
+                        <div th:replace="~{terms/teacher/privacy-terms :: content}"></div>
+                        <label class="checkbox-row">
+                            <input type="checkbox" name="agreePrivacy" value="true" disabled>
+                            <span>[필수] 개인정보 수집 및 이용 동의</span>
+                        </label>
+                    </div>
+
+                    <div class="terms-item">
+                        <div th:replace="~{terms/teacher/sensitive-terms :: content}"></div>
+                        <label class="checkbox-row">
+                            <input type="checkbox" name="agreeSensitive" value="true" disabled>
+                            <span>[필수] 학생 민감정보 처리 및 비밀유지 의무 동의</span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <button type="submit" class="submit-btn">가입하기</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const roleInputs = document.querySelectorAll('input[name="role"]');
+    const teacherEmailSection = document.getElementById('teacherEmailSection');
+    const studentInfoSection = document.getElementById('studentInfoSection');
+    const guardianSection = document.getElementById('guardianSection');
+    const studentTerms = document.getElementById('studentTerms');
+    const teacherTerms = document.getElementById('teacherTerms');
+    const accountSectionTitle = document.getElementById('accountSectionTitle');
+    const termsSectionTitle = document.getElementById('termsSectionTitle');
+    const schoolKeywordInput = document.getElementById('schoolKeyword');
+    const searchResults = document.getElementById('searchResults');
+    const clearSchoolSearch = document.getElementById('clearSchoolSearch');
+    const filterChips = document.querySelectorAll('.filter-chip');
+    const schoolCodeInput = document.getElementById('schoolCode');
+    const selectedSchool = document.getElementById('selectedSchool');
+    const selectedSchoolName = document.getElementById('selectedSchoolName');
+    const selectedSchoolMeta = document.getElementById('selectedSchoolMeta');
+    const changeSchoolBtn = document.getElementById('changeSchoolBtn');
+    const filterHint = document.getElementById('filterHint');
+    const usernameInput = document.getElementById('username');
+    const nameInput = document.getElementById('name');
+    const birthDateInput = document.getElementById('birthDate');
+    const guardianNameInput = document.getElementById('guardianName');
+    const guardianPhoneInput = document.getElementById('guardianPhone');
+    const guardianRelationInput = document.getElementById('guardianRelation');
+    const agreeGuardianChildPrivacy = document.getElementById('agreeGuardianChildPrivacy');
+    const agreeGuardianChildSensitive = document.getElementById('agreeGuardianChildSensitive');
+    const agreeGuardianIdentity = document.getElementById('agreeGuardianIdentity');
+    const smsVerificationCodeInput = document.getElementById('smsVerificationCode');
+    const smsVerifiedMessage = document.getElementById('smsVerifiedMessage');
+    const studentEmailInput = document.getElementById('studentEmail');
+    const studentVerificationCodeInput = document.getElementById('studentVerificationCode');
+    const studentEmailVerifiedMessage = document.getElementById('studentEmailVerifiedMessage');
+    const teacherEmailInput = document.getElementById('teacherEmail');
+    const verificationCodeInput = document.getElementById('verificationCode');
+    const emailVerifiedMessage = document.getElementById('emailVerifiedMessage');
+    const passwordInput = document.getElementById('password');
+    const passwordConfirmInput = document.getElementById('passwordConfirm');
+    const passwordError = document.getElementById('passwordError');
+    const joinForm = document.getElementById('joinForm');
+
+    let searchTimer = null;
+    let emailVerified = false;
+    let smsVerified = false;
+    let selectedSchoolTypeFilter = '';
+    let currentSearchResults = [];
+    let activeResultIndex = -1;
+
+    function getSelectedRole() {
+        return document.querySelector('input[name="role"]:checked').value;
+    }
+
+    function isUnder14(birthDateValue) {
+        if (!birthDateValue) {
+            return false;
+        }
+        const birthDate = new Date(birthDateValue);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age < 14;
+    }
+
+    function resetGuardianFields(disabled) {
+        [guardianNameInput, guardianPhoneInput, guardianRelationInput,
+            agreeGuardianChildPrivacy, agreeGuardianChildSensitive, agreeGuardianIdentity].forEach(field => {
+            if (field.type === 'checkbox') {
+                field.checked = false;
+            } else {
+                field.value = '';
+            }
+            field.disabled = disabled;
+        });
+        smsVerificationCodeInput.value = '';
+        smsVerificationCodeInput.disabled = disabled;
+        smsVerified = false;
+        smsVerifiedMessage.style.display = 'none';
+    }
+
+    function resetTermsCheckboxes(container, disabled) {
+        container.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = false;
+            checkbox.disabled = disabled;
+        });
+    }
+
+    function updateSectionTitles(isTeacher, under14) {
+        if (isTeacher) {
+            accountSectionTitle.textContent = '3. 계정 정보';
+            termsSectionTitle.textContent = '4. 약관 동의';
+            return;
+        }
+        if (under14) {
+            accountSectionTitle.textContent = '5. 계정 정보';
+            termsSectionTitle.textContent = '6. 약관 동의';
+        } else {
+            accountSectionTitle.textContent = '4. 계정 정보';
+            termsSectionTitle.textContent = '5. 약관 동의';
+        }
+    }
+
+    function updateGuardianSection() {
+        const isTeacher = getSelectedRole() === 'TEACHER';
+        const under14 = !isTeacher && isUnder14(birthDateInput.value);
+
+        guardianSection.style.display = under14 ? 'block' : 'none';
+        resetGuardianFields(!under14);
+        updateSectionTitles(isTeacher, under14);
+    }
+
+    function resetEmailVerification() {
+        emailVerified = false;
+        emailVerifiedMessage.style.display = 'none';
+        studentEmailVerifiedMessage.style.display = 'none';
+        studentVerificationCodeInput.value = '';
+        verificationCodeInput.value = '';
+    }
+
+    function validatePassword(password, username) {
+        const rules = {
+            length: password.length >= 8 && password.length <= 100,
+            letter: /[A-Za-z]/.test(password),
+            digit: /[0-9]/.test(password),
+            special: /[!@#$%^&*(),.?":{}|<>[\]\-_=+;'/`~\\]/.test(password),
+            noSpace: !password.includes(' '),
+            notUsername: !username || password.toLowerCase() !== username.toLowerCase()
+        };
+        document.getElementById('ruleLength').classList.toggle('valid', rules.length);
+        document.getElementById('ruleLetter').classList.toggle('valid', rules.letter);
+        document.getElementById('ruleDigit').classList.toggle('valid', rules.digit);
+        document.getElementById('ruleSpecial').classList.toggle('valid', rules.special);
+        document.getElementById('ruleNoSpace').classList.toggle('valid', rules.noSpace);
+        return Object.values(rules).every(Boolean);
+    }
+
+    function isPasswordValid() {
+        return validatePassword(passwordInput.value, usernameInput.value.trim());
+    }
+
+    function toggleRoleSections() {
+        const isTeacher = getSelectedRole() === 'TEACHER';
+
+        teacherEmailSection.style.display = isTeacher ? 'block' : 'none';
+        studentInfoSection.style.display = isTeacher ? 'none' : 'block';
+
+        studentEmailInput.disabled = isTeacher;
+        teacherEmailInput.disabled = !isTeacher;
+        studentEmailInput.required = !isTeacher;
+        teacherEmailInput.required = isTeacher;
+        nameInput.required = !isTeacher;
+        birthDateInput.required = !isTeacher;
+
+        studentTerms.style.display = isTeacher ? 'none' : 'block';
+        teacherTerms.style.display = isTeacher ? 'block' : 'none';
+
+        resetTermsCheckboxes(studentTerms, isTeacher);
+        resetTermsCheckboxes(teacherTerms, !isTeacher);
+        resetEmailVerification();
+
+        if (isTeacher) {
+            studentEmailInput.value = '';
+            nameInput.value = '';
+            birthDateInput.value = '';
+            guardianSection.style.display = 'none';
+            resetGuardianFields(true);
+        } else {
+            teacherEmailInput.value = '';
+            updateGuardianSection();
+        }
+
+        updateSectionTitles(isTeacher, !isTeacher && isUnder14(birthDateInput.value));
+    }
+
+    roleInputs.forEach(input => input.addEventListener('change', toggleRoleSections));
+    birthDateInput.addEventListener('change', updateGuardianSection);
+    passwordInput.addEventListener('input', () => {
+        validatePassword(passwordInput.value, usernameInput.value.trim());
+        passwordError.style.display = 'none';
+    });
+    usernameInput.addEventListener('input', () => validatePassword(passwordInput.value, usernameInput.value.trim()));
+    toggleRoleSections();
+
+    document.getElementById('sendStudentCodeBtn').addEventListener('click', async () => {
+        const email = studentEmailInput.value.trim();
+        if (!email) {
+            alert('학생 이메일을 입력해 주세요.');
+            return;
+        }
+
+        const response = await fetch('/api/auth/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, role: 'STUDENT' })
+        });
+        const result = await response.json();
+        if (!response.ok) {
+            alert(result.message || '인증번호 발송에 실패했습니다.');
+            return;
+        }
+        alert(result.message);
+        resetEmailVerification();
+    });
+
+    document.getElementById('verifyStudentCodeBtn').addEventListener('click', async () => {
+        const email = studentEmailInput.value.trim();
+        const code = studentVerificationCodeInput.value.trim();
+        if (!email || !code) {
+            alert('이메일과 인증번호를 입력해 주세요.');
+            return;
+        }
+
+        const response = await fetch('/api/auth/email/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, code, role: 'STUDENT' })
+        });
+        const result = await response.json();
+
+        if (!response.ok) {
+            alert(result.message || '인증에 실패했습니다.');
+            emailVerified = false;
+            studentEmailVerifiedMessage.style.display = 'none';
+            return;
+        }
+
+        emailVerified = true;
+        studentEmailVerifiedMessage.style.display = 'block';
+        alert(result.message);
+    });
+
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function highlightKeyword(text, keyword) {
+        const safeText = escapeHtml(text);
+        if (!keyword) {
+            return safeText;
+        }
+        const lowerText = text.toLowerCase();
+        const lowerKeyword = keyword.toLowerCase();
+        const index = lowerText.indexOf(lowerKeyword);
+        if (index === -1) {
+            return safeText;
+        }
+        const before = escapeHtml(text.slice(0, index));
+        const match = escapeHtml(text.slice(index, index + keyword.length));
+        const after = escapeHtml(text.slice(index + keyword.length));
+        return `${before}<span class="match-highlight">${match}</span>${after}`;
+    }
+
+    function getFilterLabel() {
+        if (selectedSchoolTypeFilter === '중') {
+            return '중학교';
+        }
+        if (selectedSchoolTypeFilter === '고') {
+            return '고등학교';
+        }
+        return '전체';
+    }
+
+    function showFilterHint(message) {
+        filterHint.textContent = message;
+        filterHint.style.display = 'block';
+    }
+
+    function hideFilterHint() {
+        filterHint.style.display = 'none';
+        filterHint.textContent = '';
+    }
+
+    function updateClearButton() {
+        clearSchoolSearch.style.display = schoolKeywordInput.value.trim() ? 'inline-flex' : 'none';
+    }
+
+    function resetSchoolSelection() {
+        schoolCodeInput.value = '';
+        selectedSchool.style.display = 'none';
+        selectedSchoolName.textContent = '';
+        selectedSchoolMeta.textContent = '';
+        schoolKeywordInput.value = '';
+        schoolKeywordInput.disabled = false;
+        hideFilterHint();
+        updateClearButton();
+    }
+
+    function renderSearchResults(schools, keyword) {
+        searchResults.innerHTML = '';
+        currentSearchResults = schools;
+        activeResultIndex = -1;
+
+        if (schools.length === 0) {
+            searchResults.innerHTML = '<div class="search-status">검색 결과가 없습니다. 학교명을 다시 입력해 보세요.</div>';
+            searchResults.style.display = 'block';
+            return;
+        }
+
+        const status = document.createElement('div');
+        status.className = 'search-status';
+        status.textContent = `검색 결과 ${schools.length}건`;
+        searchResults.appendChild(status);
+
+        schools.forEach((school, index) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'search-result-item';
+            button.dataset.index = String(index);
+
+            const badgeClass = school.schoolType === '중' ? 'badge-middle' : 'badge-high';
+            const badgeLabel = school.schoolType === '중' ? '중학교' : '고등학교';
+
+            button.innerHTML = `
+                <div class="result-name">${highlightKeyword(school.schoolName, keyword)}</div>
+                <div class="result-meta">
+                    <span class="badge ${badgeClass}">${badgeLabel}</span>
+                    <span>${escapeHtml(school.region || '지역 정보 없음')}</span>
+                </div>
+            `;
+            button.addEventListener('click', () => selectSchool(school));
+            searchResults.appendChild(button);
+        });
+
+        searchResults.style.display = 'block';
+    }
+
+    async function searchSchools() {
+        const keyword = schoolKeywordInput.value.trim();
+        updateClearButton();
+
+        if (keyword.length < 2) {
+            searchResults.style.display = 'none';
+            searchResults.innerHTML = '';
+            currentSearchResults = [];
+            hideFilterHint();
+            return;
+        }
+
+        hideFilterHint();
+        searchResults.innerHTML = '<div class="search-status">검색 중...</div>';
+        searchResults.style.display = 'block';
+
+        let url = '/api/schools/search?keyword=' + encodeURIComponent(keyword);
+        if (selectedSchoolTypeFilter) {
+            url += '&schoolType=' + encodeURIComponent(selectedSchoolTypeFilter);
+        }
+
+        try {
+            const response = await fetch(url);
+            const schools = await response.json();
+            renderSearchResults(schools, keyword);
+        } catch (error) {
+            searchResults.innerHTML = '<div class="search-status">검색 중 오류가 발생했습니다.</div>';
+        }
+    }
+
+    function selectSchool(school) {
+        schoolCodeInput.value = school.schoolCode;
+        selectedSchoolName.textContent = school.schoolName;
+        selectedSchoolMeta.textContent = `${school.schoolType === '중' ? '중학교' : '고등학교'} · ${school.region || '지역 정보 없음'}`;
+        selectedSchool.style.display = 'block';
+        searchResults.style.display = 'none';
+        schoolKeywordInput.value = school.schoolName;
+        schoolKeywordInput.disabled = true;
+        updateClearButton();
+    }
+
+    schoolKeywordInput.addEventListener('input', () => {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(searchSchools, 250);
+    });
+
+    schoolKeywordInput.addEventListener('keydown', (event) => {
+        const items = searchResults.querySelectorAll('.search-result-item');
+        if (!items.length) {
+            return;
+        }
+
+        if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            activeResultIndex = (activeResultIndex + 1) % items.length;
+        } else if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            activeResultIndex = (activeResultIndex - 1 + items.length) % items.length;
+        } else if (event.key === 'Enter' && activeResultIndex >= 0) {
+            event.preventDefault();
+            selectSchool(currentSearchResults[activeResultIndex]);
+            return;
+        } else if (event.key === 'Escape') {
+            searchResults.style.display = 'none';
+            return;
+        } else {
+            return;
+        }
+
+        items.forEach((item, index) => item.classList.toggle('active', index === activeResultIndex));
+        items[activeResultIndex].scrollIntoView({ block: 'nearest' });
+    });
+
+    filterChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            filterChips.forEach(item => item.classList.remove('active'));
+            chip.classList.add('active');
+            selectedSchoolTypeFilter = chip.dataset.schoolType || '';
+
+            const keyword = schoolKeywordInput.value.trim();
+            if (keyword.length >= 2) {
+                searchSchools();
+                return;
+            }
+
+            showFilterHint(`${getFilterLabel()} 필터가 선택되었습니다. 학교명을 2글자 이상 입력하면 검색됩니다.`);
+            searchResults.style.display = 'none';
+            searchResults.innerHTML = '';
+            schoolKeywordInput.focus();
+        });
+    });
+
+    clearSchoolSearch.addEventListener('click', () => {
+        if (schoolCodeInput.value) {
+            resetSchoolSelection();
+        } else {
+            schoolKeywordInput.value = '';
+            updateClearButton();
+            hideFilterHint();
+            searchResults.style.display = 'none';
+            searchResults.innerHTML = '';
+        }
+        schoolKeywordInput.focus();
+    });
+
+    changeSchoolBtn.addEventListener('click', () => {
+        resetSchoolSelection();
+        schoolKeywordInput.focus();
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!event.target.closest('.search-box')) {
+            searchResults.style.display = 'none';
+        }
+    });
+
+    updateClearButton();
+
+    document.getElementById('sendCodeBtn').addEventListener('click', async () => {
+        const email = teacherEmailInput.value.trim();
+        if (!email) {
+            alert('교사 이메일을 입력해 주세요.');
+            return;
+        }
+
+        const response = await fetch('/api/auth/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, role: 'TEACHER' })
+        });
+        const result = await response.json();
+        if (!response.ok) {
+            alert(result.message || '인증번호 발송에 실패했습니다.');
+            return;
+        }
+        alert(result.message);
+        resetEmailVerification();
+    });
+
+    document.getElementById('verifyCodeBtn').addEventListener('click', async () => {
+        const email = teacherEmailInput.value.trim();
+        const code = verificationCodeInput.value.trim();
+        if (!email || !code) {
+            alert('이메일과 인증번호를 입력해 주세요.');
+            return;
+        }
+
+        const response = await fetch('/api/auth/email/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, code, role: 'TEACHER' })
+        });
+        const result = await response.json();
+
+        if (!response.ok) {
+            alert(result.message || '인증에 실패했습니다.');
+            emailVerified = false;
+            emailVerifiedMessage.style.display = 'none';
+            return;
+        }
+
+        emailVerified = true;
+        emailVerifiedMessage.style.display = 'block';
+        alert(result.message);
+    });
+
+    document.getElementById('sendSmsBtn').addEventListener('click', async () => {
+        const studentName = nameInput.value.trim();
+        const guardianName = guardianNameInput.value.trim();
+        const phone = guardianPhoneInput.value.trim();
+
+        if (!studentName || !guardianName || !phone) {
+            alert('학생 성명, 보호자 성명, 보호자 휴대전화를 입력해 주세요.');
+            return;
+        }
+        if (!agreeGuardianChildPrivacy.checked || !agreeGuardianChildSensitive.checked || !agreeGuardianIdentity.checked) {
+            alert('법정대리인 동의서 3개 항목에 모두 동의해 주세요.');
+            return;
+        }
+
+        const response = await fetch('/api/auth/sms/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ studentName, guardianName, phone })
+        });
+        const result = await response.json();
+        if (!response.ok) {
+            alert(result.message || 'SMS 발송에 실패했습니다.');
+            return;
+        }
+        alert(result.message);
+        smsVerified = false;
+        smsVerifiedMessage.style.display = 'none';
+    });
+
+    document.getElementById('verifySmsBtn').addEventListener('click', async () => {
+        const phone = guardianPhoneInput.value.trim();
+        const code = smsVerificationCodeInput.value.trim();
+        if (!phone || !code) {
+            alert('보호자 휴대전화와 인증번호를 입력해 주세요.');
+            return;
+        }
+
+        const response = await fetch('/api/auth/sms/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, code })
+        });
+        const result = await response.json();
+
+        if (!response.ok) {
+            alert(result.message || 'SMS 인증에 실패했습니다.');
+            smsVerified = false;
+            smsVerifiedMessage.style.display = 'none';
+            return;
+        }
+
+        smsVerified = true;
+        smsVerifiedMessage.style.display = 'block';
+        alert(result.message);
+    });
+
+    joinForm.addEventListener('submit', (event) => {
+        if (!schoolCodeInput.value) {
+            event.preventDefault();
+            alert('학교를 선택해 주세요.');
+            return;
+        }
+
+        if (!isPasswordValid()) {
+            event.preventDefault();
+            passwordError.textContent = '비밀번호 규칙을 확인해 주세요.';
+            passwordError.style.display = 'block';
+            alert('비밀번호 규칙을 확인해 주세요.');
+            return;
+        }
+        if (passwordInput.value !== passwordConfirmInput.value) {
+            event.preventDefault();
+            alert('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+            return;
+        }
+
+        if (getSelectedRole() === 'STUDENT') {
+            if (!nameInput.value.trim() || !birthDateInput.value) {
+                event.preventDefault();
+                alert('학생 성명과 생년월일을 입력해 주세요.');
+                return;
+            }
+            if (!emailVerified) {
+                event.preventDefault();
+                alert('학생 이메일 인증을 완료해 주세요.');
+                return;
+            }
+            if (isUnder14(birthDateInput.value)) {
+                if (!agreeGuardianChildPrivacy.checked || !agreeGuardianChildSensitive.checked || !agreeGuardianIdentity.checked) {
+                    event.preventDefault();
+                    alert('법정대리인 동의서 3개 항목에 모두 동의해 주세요.');
+                    return;
+                }
+                if (!smsVerified) {
+                    event.preventDefault();
+                    alert('법정대리인 SMS 인증을 완료해 주세요.');
+                    return;
+                }
+            }
+        }
+
+        if (getSelectedRole() === 'TEACHER' && !emailVerified) {
+            event.preventDefault();
+            alert('교사 이메일 인증을 완료해 주세요.');
+        }
+    });
+</script>
 </body>
 </html>
