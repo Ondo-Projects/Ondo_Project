@@ -1,4 +1,4 @@
 package com.ondo.global.config;
 
-public class SercurityConfig {
+public class CustomSucessHandler {
 }

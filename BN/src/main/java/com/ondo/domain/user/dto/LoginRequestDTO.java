@@ -1,4 +1,4 @@
 package com.ondo.domain.user.dto;
 
-public class SignUpRequestDto {
+public class LoginRequestDTO {
 }
