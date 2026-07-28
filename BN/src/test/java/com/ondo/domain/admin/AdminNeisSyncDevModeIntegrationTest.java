@@ -1,4 +1,4 @@
-package com.ondo.domain.meal.controller;
+package com.ondo.domain.admin;
 
 import com.ondo.domain.school.entity.School;
 import com.ondo.domain.school.repository.SchoolRepository;
@@ -17,20 +17,22 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(properties = {
         "ondo.school.auto-import=false",
+        "ondo.admin.bootstrap.enabled=false",
         "ondo.jwt.secret=test-secret-key-at-least-32-bytes-long!!",
-        "ondo.neis.dev-mode=true"
+        "ondo.neis.dev-mode=true",
+        "ondo.neis.api-key=test-neis-api-key"
 })
 @AutoConfigureMockMvc
 @Transactional
-class MealControllerTest {
+class AdminNeisSyncDevModeIntegrationTest {
 
-    private static final String STUDENT_USERNAME = "it-meal-student";
+    private static final String ADMIN_USERNAME = "admin-neis-dev";
 
     @Autowired
     private MockMvc mockMvc;
@@ -50,18 +52,18 @@ class MealControllerTest {
     @BeforeEach
     void setUp() {
         School school = schoolRepository.save(School.builder()
-                .schoolCode("ITML001")
-                .schoolName("급식테스트중학교")
-                .region("서울특별시 강남구")
+                .schoolCode("NEIS_DEV_T1")
+                .schoolName("dev모드테스트중학교")
+                .region("서울특별시")
                 .schoolType("중")
                 .build());
 
         userRepository.save(User.builder()
-                .username(STUDENT_USERNAME)
+                .username(ADMIN_USERNAME)
                 .password(passwordEncoder.encode("password"))
-                .role(Role.STUDENT)
+                .role(Role.ADMIN)
                 .school(school)
-                .name("급식학생")
+                .name("dev관리자")
                 .agreeService(true)
                 .agreePrivacy(true)
                 .agreeSensitive(true)
@@ -70,15 +72,10 @@ class MealControllerTest {
     }
 
     @Test
-    void getTodayMeals_returnsSampleMealsInDevMode() throws Exception {
-        String token = jwtProvider.createAccessToken(STUDENT_USERNAME, Role.STUDENT);
-
-        mockMvc.perform(get("/api/student/meals/today")
-                        .header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("OK"))
-                .andExpect(jsonPath("$.schoolName").value("급식테스트중학교"))
-                .andExpect(jsonPath("$.meals").isArray())
-                .andExpect(jsonPath("$.meals[0].mealType").value("중식"));
+    void syncNeisSchoolCodes_rejectsDevMode() throws Exception {
+        mockMvc.perform(post("/api/admin/schools/sync-neis")
+                        .header("Authorization", "Bearer " + jwtProvider.createAccessToken(ADMIN_USERNAME, Role.ADMIN)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("dev-mode")));
     }
 }

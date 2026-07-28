@@ -260,8 +260,9 @@
             <button type="button" class="btn-primary" id="searchSchoolsBtn">검색</button>
             <div class="inline-actions" style="margin-top: 12px;">
                 <button type="button" class="btn-secondary" id="syncSchoolCsvBtn">CSV 동기화 (추가·갱신)</button>
+                <button type="button" class="btn-secondary" id="syncNeisSchoolsBtn">NEIS 코드 일괄 매핑</button>
             </div>
-            <p class="helper">기존 학교는 유지하고 CSV 기준으로 추가·갱신합니다. 담당 학생 연결은 삭제하지 않습니다.</p>
+            <p class="helper">CSV 동기화는 학교 목록 추가·갱신용입니다. NEIS 일괄 매핑은 미매핑 학교 최대 50건씩 NEIS 코드를 조회·저장합니다.</p>
             <div id="schoolTableWrap" style="margin-top: 16px; overflow-x: auto;"></div>
             <div class="pager hidden" id="schoolPager">
                 <span class="helper" id="schoolPagerInfo">-</span>
@@ -824,6 +825,16 @@
         await Promise.all([loadSchools(), loadActivityLogs(), loadDashboard()]);
     }
 
+    async function syncNeisSchools() {
+        if (!confirm('미매핑 학교 NEIS 코드를 최대 50건 일괄 매핑할까요?')) {
+            return;
+        }
+        const result = await apiPost('/api/admin/schools/sync-neis?limit=50');
+        showSuccess(result.message || `NEIS 매핑 완료 (성공 ${result.successCount}건 / 실패 ${result.failedCount}건)`);
+        schoolPage = 0;
+        await Promise.all([loadSchools(), loadActivityLogs(), loadDashboard()]);
+    }
+
     function switchLogTab(tab) {
         currentLogTab = tab;
         document.getElementById('counselingLogPanel').classList.toggle('hidden', tab !== 'counseling');
@@ -891,6 +902,11 @@
     document.getElementById('syncSchoolCsvBtn').addEventListener('click', () => {
         clearMessages();
         syncSchoolCsv().catch(error => showError(error.message));
+    });
+
+    document.getElementById('syncNeisSchoolsBtn').addEventListener('click', () => {
+        clearMessages();
+        syncNeisSchools().catch(error => showError(error.message));
     });
 
     loadCurrentUser().catch(() => {
