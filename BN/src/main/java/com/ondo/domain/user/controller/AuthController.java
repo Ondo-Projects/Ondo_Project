@@ -1,0 +1,58 @@
+package com.ondo.domain.user.controller;
+
+import com.ondo.domain.user.dto.LoginRequestDTO;
+import com.ondo.domain.user.dto.LoginResponseDTO;
+import com.ondo.domain.user.dto.LogoutRequestDTO;
+import com.ondo.domain.user.dto.MeResponseDTO;
+import com.ondo.domain.user.dto.RefreshTokenRequestDTO;
+import com.ondo.domain.user.dto.TokenRefreshResponseDTO;
+import com.ondo.domain.user.service.AuthService;
+import com.ondo.domain.user.service.LogoutService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/auth")
+@RequiredArgsConstructor
+public class AuthController {
+
+    private final AuthService authService;
+    private final LogoutService logoutService;
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
+        return ResponseEntity.ok(authService.login(request));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<MeResponseDTO> me(Authentication authentication) {
+        return ResponseEntity.ok(MeResponseDTO.from(authentication));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenRefreshResponseDTO> refresh(@Valid @RequestBody RefreshTokenRequestDTO request) {
+        return ResponseEntity.ok(authService.refresh(request));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, String>> logout(
+            @RequestBody(required = false) LogoutRequestDTO request,
+            HttpServletRequest httpRequest,
+            HttpServletResponse httpResponse
+    ) {
+        String refreshToken = request != null ? request.getRefreshToken() : null;
+        logoutService.logout(httpRequest, httpResponse, refreshToken);
+        return ResponseEntity.ok(Map.of("message", "로그아웃되었습니다."));
+    }
+}

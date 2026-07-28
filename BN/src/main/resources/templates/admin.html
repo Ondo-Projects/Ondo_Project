@@ -15,5 +15,9 @@
     인증여부 :
     <span sec:authorize="isAuthenticated()">로그인된 상태임</span><br/>
     <span sec:authorize="!isAuthenticated()">로그아웃된 상태임</span><br/>
+    <hr/>
+    <form action="/logout" method="post">
+        <button type="submit">로그아웃</button>
+    </form>
 </body>
 </html>
