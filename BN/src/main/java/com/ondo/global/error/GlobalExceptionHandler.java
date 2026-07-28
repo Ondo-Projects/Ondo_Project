@@ -13,6 +13,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleForbiddenException(ForbiddenException exception) {
+        return ResponseEntity.status(403).body(ErrorResponse.of(exception.getMessage()));
+    }
+
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException exception) {
         return ResponseEntity.badRequest().body(ErrorResponse.of(exception.getMessage()));
