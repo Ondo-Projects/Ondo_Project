@@ -35,3 +35,13 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Local secrets (API keys, Admin bootstrap password) ###
+config/application-local.properties
+**/application-local.properties
+.env
+.env.*
+!.env.example
+# example 템플릿만 커밋 허용 (실제 키·비밀번호 파일은 위 규칙으로 제외)
+!config/application-local.properties.example
+!**/application-local.properties.example

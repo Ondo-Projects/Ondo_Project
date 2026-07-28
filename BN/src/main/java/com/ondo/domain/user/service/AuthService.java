@@ -2,7 +2,7 @@ package com.ondo.domain.user.service;
 
 import com.ondo.domain.user.dto.LoginRequestDTO;
 import com.ondo.domain.user.dto.LoginResponseDTO;
-import com.ondo.domain.user.dto.LogoutRequestDTO;
+import com.ondo.domain.user.dto.MeResponseDTO;
 import com.ondo.domain.user.dto.RefreshTokenRequestDTO;
 import com.ondo.domain.user.dto.TokenRefreshResponseDTO;
 import com.ondo.domain.user.entity.User;
@@ -33,11 +33,21 @@ public class AuthService {
         return loginTokenIssueService.issueLoginTokens(user);
     }
 
+    public MeResponseDTO getMe(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다."));
+        return MeResponseDTO.from(user);
+    }
+
     @Transactional
     public TokenRefreshResponseDTO refresh(RefreshTokenRequestDTO request) {
         String username = refreshTokenService.validateAndGetUsername(request.getRefreshToken());
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new BusinessException("유효하지 않은 Refresh Token입니다."));
+
+        if (!user.isActive()) {
+            throw new BusinessException("비활성화된 계정입니다. 관리자에게 문의해 주세요.");
+        }
 
         refreshTokenService.revoke(request.getRefreshToken());
 
@@ -51,6 +61,10 @@ public class AuthService {
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new BusinessException("아이디 또는 비밀번호가 올바르지 않습니다.");
+        }
+
+        if (!user.isActive()) {
+            throw new BusinessException("비활성화된 계정입니다. 관리자에게 문의해 주세요.");
         }
 
         return user;

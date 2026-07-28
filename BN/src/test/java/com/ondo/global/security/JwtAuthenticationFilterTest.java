@@ -1,6 +1,8 @@
 package com.ondo.global.security;
 
 import com.ondo.domain.user.entity.Role;
+import com.ondo.domain.user.entity.User;
+import com.ondo.domain.user.repository.UserRepository;
 import com.ondo.domain.user.service.AccessTokenBlacklistService;
 import com.ondo.global.util.JwtProvider;
 import jakarta.servlet.FilterChain;
@@ -15,7 +17,10 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,6 +36,9 @@ class JwtAuthenticationFilterTest {
 
     @Mock
     private AccessTokenBlacklistService accessTokenBlacklistService;
+
+    @Mock
+    private UserRepository userRepository;
 
     @Mock
     private FilterChain filterChain;
@@ -60,6 +68,8 @@ class JwtAuthenticationFilterTest {
         when(accessTokenBlacklistService.isBlacklisted("valid-token")).thenReturn(false);
         when(jwtProvider.getUsername("valid-token")).thenReturn("student01");
         when(jwtProvider.getRole("valid-token")).thenReturn(Role.STUDENT);
+        User activeUser = activeUser("student01");
+        when(userRepository.findByUsername("student01")).thenReturn(Optional.of(activeUser));
 
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
@@ -115,10 +125,18 @@ class JwtAuthenticationFilterTest {
         when(accessTokenBlacklistService.isBlacklisted("cookie-token")).thenReturn(false);
         when(jwtProvider.getUsername("cookie-token")).thenReturn("student01");
         when(jwtProvider.getRole("cookie-token")).thenReturn(Role.STUDENT);
+        User activeUser = activeUser("student01");
+        when(userRepository.findByUsername("student01")).thenReturn(Optional.of(activeUser));
 
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNotNull();
         verify(filterChain).doFilter(request, response);
+    }
+
+    private User activeUser(String username) {
+        User user = mock(User.class);
+        when(user.isActive()).thenReturn(true);
+        return user;
     }
 }

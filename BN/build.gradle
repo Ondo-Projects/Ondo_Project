@@ -50,11 +50,8 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.13.0'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.13.0'
 
-	//REDIS
-	//https://github.com/microsoftarchive/redis/releases
-	//https://github.com/qishibo/AnotherRedisDesktopManager/releases
+	//REDIS (JWT refresh, 인증번호, 블랙리스트)
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation 'org.springframework.session:spring-session-data-redis'
 
 
 }

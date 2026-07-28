@@ -49,6 +49,21 @@ public class SchoolCsvImportService {
     }
 
     @Transactional
+    public int syncFromCsv() {
+        List<School> schools = new ArrayList<>();
+        schools.addAll(parseCsv("data/schools/middle_schools.csv", "중"));
+        schools.addAll(parseCsv("data/schools/high_schools.csv", "고"));
+
+        for (int i = 0; i < schools.size(); i += BATCH_SIZE) {
+            int end = Math.min(i + BATCH_SIZE, schools.size());
+            schoolRepository.saveAll(schools.subList(i, end));
+        }
+
+        log.info("학교 CSV 동기화 완료: {}건", schools.size());
+        return schools.size();
+    }
+
+    @Transactional
     public int importAll() {
         List<School> schools = new ArrayList<>();
         schools.addAll(parseCsv("data/schools/middle_schools.csv", "중"));

@@ -31,11 +31,27 @@ public class School {
     @Column(length = 20)
     private String schoolType;
 
+    @Column(length = 10)
+    private String neisOfficeCode;
+
+    @Column(length = 20)
+    private String neisSchoolCode;
+
     @Builder
     public School(String schoolCode, String schoolName, String region, String schoolType) {
         this.schoolCode = schoolCode;
         this.schoolName = schoolName;
         this.region = region;
         this.schoolType = schoolType;
+    }
+
+    public void updateNeisCodes(String neisOfficeCode, String neisSchoolCode) {
+        this.neisOfficeCode = neisOfficeCode;
+        this.neisSchoolCode = neisSchoolCode;
+    }
+
+    public boolean hasNeisCodes() {
+        return neisOfficeCode != null && !neisOfficeCode.isBlank()
+                && neisSchoolCode != null && !neisSchoolCode.isBlank();
     }
 }

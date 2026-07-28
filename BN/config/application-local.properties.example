@@ -1,0 +1,21 @@
+# 로컬 API 키 설정 예시
+# 사용 방법:
+# 1. 이 파일을 application-local.properties 로 복사
+# 2. 아래 값을 실제 발급받은 키로 교체
+#
+#   copy application-local.properties.example application-local.properties   (Windows)
+#   cp application-local.properties.example application-local.properties   (macOS/Linux)
+
+# NEIS (나이스) Open API - 급식 등
+ondo.neis.dev-mode=false
+ondo.neis.api-key=your-neis-api-key
+
+# 기상청 단기예보 (data.go.kr)
+ondo.weather.dev-mode=false
+ondo.weather.api-key=your-weather-api-key
+
+# Admin 최초 계정 (서버 기동 시 1회 생성, username이 없을 때만)
+ondo.admin.bootstrap.enabled=true
+ondo.admin.bootstrap.username=admin
+ondo.admin.bootstrap.password=change-me-admin-password
+ondo.admin.bootstrap.name=시스템관리자

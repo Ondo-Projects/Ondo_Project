@@ -1,25 +1,32 @@
 package com.ondo.domain.user.dto;
 
-import lombok.AllArgsConstructor;
+import com.ondo.domain.user.entity.User;
 import lombok.Getter;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 
 @Getter
-@AllArgsConstructor
 public class MeResponseDTO {
 
-    private String username;
-    private String role;
+    private final String username;
+    private final String role;
+    private final String name;
+    private final String schoolName;
+    private final String schoolRegion;
 
-    public static MeResponseDTO from(Authentication authentication) {
-        String role = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .filter(authority -> authority.startsWith("ROLE_"))
-                .map(authority -> authority.substring("ROLE_".length()))
-                .findFirst()
-                .orElse("");
+    public MeResponseDTO(String username, String role, String name, String schoolName, String schoolRegion) {
+        this.username = username;
+        this.role = role;
+        this.name = name;
+        this.schoolName = schoolName;
+        this.schoolRegion = schoolRegion;
+    }
 
-        return new MeResponseDTO(authentication.getName(), role);
+    public static MeResponseDTO from(User user) {
+        return new MeResponseDTO(
+                user.getUsername(),
+                user.getRole().name(),
+                user.getName(),
+                user.getSchool().getSchoolName(),
+                user.getSchool().getRegion()
+        );
     }
 }
