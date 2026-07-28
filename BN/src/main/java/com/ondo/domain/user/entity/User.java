@@ -81,6 +81,9 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime agreedAt;
 
+    @Column(nullable = false, columnDefinition = "bit(1) not null default b'1'")
+    private boolean active = true;
+
     @Builder
     public User(
             String username,
@@ -100,7 +103,8 @@ public class User {
             boolean agreeService,
             boolean agreePrivacy,
             boolean agreeSensitive,
-            LocalDateTime agreedAt
+            LocalDateTime agreedAt,
+            Boolean active
     ) {
         this.username = username;
         this.password = password;
@@ -120,5 +124,17 @@ public class User {
         this.agreePrivacy = agreePrivacy;
         this.agreeSensitive = agreeSensitive;
         this.agreedAt = agreedAt;
+        this.active = active != null ? active : true;
+    }
+
+    public void changeSchool(School school) {
+        if (school == null) {
+            throw new IllegalArgumentException("school must not be null");
+        }
+        this.school = school;
+    }
+
+    public void updateActive(boolean active) {
+        this.active = active;
     }
 }

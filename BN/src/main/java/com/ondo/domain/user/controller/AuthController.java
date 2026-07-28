@@ -37,7 +37,7 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<MeResponseDTO> me(Authentication authentication) {
-        return ResponseEntity.ok(MeResponseDTO.from(authentication));
+        return ResponseEntity.ok(authService.getMe(authentication.getName()));
     }
 
     @PostMapping("/refresh")

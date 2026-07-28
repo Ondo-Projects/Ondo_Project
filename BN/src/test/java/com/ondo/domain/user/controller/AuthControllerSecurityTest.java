@@ -1,12 +1,20 @@
 package com.ondo.domain.user.controller;
 
+import com.ondo.domain.school.entity.School;
+import com.ondo.domain.school.repository.SchoolRepository;
 import com.ondo.domain.user.entity.Role;
+import com.ondo.domain.user.entity.User;
+import com.ondo.domain.user.repository.UserRepository;
 import com.ondo.global.util.JwtProvider;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -29,6 +37,37 @@ class AuthControllerSecurityTest {
     @Autowired
     private JwtProvider jwtProvider;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private SchoolRepository schoolRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @BeforeEach
+    void setUp() {
+        School school = schoolRepository.save(School.builder()
+                .schoolCode("TEST001")
+                .schoolName("테스트중학교")
+                .region("서울")
+                .schoolType("중학교")
+                .build());
+
+        userRepository.save(User.builder()
+                .username("student01")
+                .password(passwordEncoder.encode("password"))
+                .role(Role.STUDENT)
+                .school(school)
+                .name("테스트학생")
+                .agreeService(true)
+                .agreePrivacy(true)
+                .agreeSensitive(true)
+                .agreedAt(LocalDateTime.now())
+                .build());
+    }
+
     @Test
     void me_returnsUnauthorizedWhenTokenMissing() throws Exception {
         mockMvc.perform(get("/api/auth/me"))
@@ -44,7 +83,10 @@ class AuthControllerSecurityTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("student01"))
-                .andExpect(jsonPath("$.role").value("STUDENT"));
+                .andExpect(jsonPath("$.role").value("STUDENT"))
+                .andExpect(jsonPath("$.name").value("테스트학생"))
+                .andExpect(jsonPath("$.schoolName").value("테스트중학교"))
+                .andExpect(jsonPath("$.schoolRegion").value("서울"));
     }
 
     @Test

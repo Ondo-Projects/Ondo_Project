@@ -46,6 +46,7 @@ public class SecurityConfig {
                             "/api/auth/logout",
                             "/api/auth/email/**",
                             "/api/auth/sms/**",
+                            "/api/auth/username/**",
                             "/api/schools/**"
                     ).permitAll();
                     auth.requestMatchers("/api/teacher/**").hasRole("TEACHER");
@@ -70,6 +71,7 @@ public class SecurityConfig {
                     return uri == null || !uri.startsWith("/api/");
                 })
                 .csrf(c -> c.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**").permitAll();
                     auth.requestMatchers("/student").hasRole("STUDENT");
@@ -92,7 +94,6 @@ public class SecurityConfig {
                         .logoutUrl("/logout")
                         .addLogoutHandler(tokenCookieLogoutHandler)
                         .logoutSuccessUrl("/login?logout=true")
-                        .invalidateHttpSession(true)
                 );
 
         return http.build();

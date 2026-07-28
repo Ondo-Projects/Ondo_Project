@@ -1,6 +1,8 @@
 package com.ondo.global.security;
 
 import com.ondo.domain.user.entity.Role;
+import com.ondo.domain.user.entity.User;
+import com.ondo.domain.user.repository.UserRepository;
 import com.ondo.domain.user.service.AccessTokenBlacklistService;
 import com.ondo.global.util.JwtProvider;
 import jakarta.servlet.FilterChain;
@@ -25,6 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
     private final TokenCookieService tokenCookieService;
     private final AccessTokenBlacklistService accessTokenBlacklistService;
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(
@@ -48,6 +51,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             String username = jwtProvider.getUsername(token);
             Role role = jwtProvider.getRole(token);
+
+            User user = userRepository.findByUsername(username).orElse(null);
+            if (user == null || !user.isActive()) {
+                writeUnauthorized(response, "비활성화되었거나 존재하지 않는 계정입니다.");
+                return;
+            }
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     username,

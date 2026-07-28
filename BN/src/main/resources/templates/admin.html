@@ -1,23 +1,911 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 | 온도 상담웹</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 960px;
+            margin: 32px auto;
+            padding: 0 16px 40px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+            margin-bottom: 20px;
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .page-header h1 { margin: 0; font-size: 26px; }
+        .user-greeting {
+            margin: 0 0 4px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e40af;
+        }
+        .subtitle { color: #6b7280; margin: 6px 0 0; font-size: 14px; }
+        section h2 {
+            font-size: 18px;
+            margin: 0 0 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .today-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+        }
+        .today-summary-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px;
+        }
+        .today-summary-item.highlight {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+        .today-summary-label { font-size: 12px; color: #64748b; margin-bottom: 6px; }
+        .today-summary-value { font-size: 24px; font-weight: 700; color: #0f172a; }
+        .helper { color: #6b7280; font-size: 13px; margin-top: 6px; }
+        .filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+        .filter-chip {
+            border: 1px solid #d1d5db;
+            background: #fff;
+            color: #374151;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .filter-chip.active {
+            background: #111827;
+            border-color: #111827;
+            color: #fff;
+        }
+        .field { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; }
+        input[type="text"], select {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        .inline-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .btn-secondary, .btn-primary, .btn-muted {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .btn-secondary { background: #e5e7eb; color: #111827; }
+        .btn-primary { background: #111827; color: #fff; }
+        .btn-muted { background: #f3f4f6; color: #374151; }
+        .btn-muted:disabled { opacity: 0.45; cursor: not-allowed; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .data-table th, .data-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: top;
+        }
+        .data-table th { color: #6b7280; font-weight: 600; font-size: 13px; }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .badge-student { background: #dbeafe; color: #1d4ed8; }
+        .badge-teacher { background: #dcfce7; color: #166534; }
+        .badge-admin { background: #fef3c7; color: #92400e; }
+        .badge-mapped { background: #dcfce7; color: #166534; }
+        .badge-unmapped { background: #fee2e2; color: #b91c1c; }
+        .badge-inactive { background: #f3f4f6; color: #6b7280; }
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+        .stat-item { background: #f9fafb; border-radius: 10px; padding: 12px; font-size: 14px; }
+        .stat-item strong { display: block; font-size: 18px; margin-top: 4px; }
+        .action-row { display: flex; gap: 6px; flex-wrap: wrap; }
+        .btn-danger { background: #fee2e2; color: #b91c1c; border: none; border-radius: 8px; padding: 6px 10px; font-size: 12px; cursor: pointer; }
+        .btn-success { background: #dcfce7; color: #166534; border: none; border-radius: 8px; padding: 6px 10px; font-size: 12px; cursor: pointer; }
+        .management-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-top: 14px; }
+        .empty-state { text-align: center; color: #6b7280; padding: 24px 12px; }
+        .message, .success-message {
+            padding: 12px 14px;
+            border-radius: 10px;
+            margin-bottom: 14px;
+            display: none;
+        }
+        .message { background: #fef2f2; color: #b91c1c; }
+        .success-message { background: #ecfdf5; color: #047857; }
+        .hidden { display: none !important; }
+        .log-tab-row { margin-bottom: 14px; }
+        .pager { margin-top: 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+        @media (max-width: 640px) {
+            .container { margin: 20px auto; }
+            .page-header { flex-direction: column; align-items: flex-start; }
+            .data-table { font-size: 13px; }
+            .data-table th, .data-table td { padding: 8px 4px; }
+        }
+    </style>
 </head>
 <body>
+<div class="container">
+    <div class="page-header">
+        <div>
+            <p class="user-greeting" id="userGreeting">불러오는 중...</p>
+            <h1>관리자 콘솔</h1>
+            <p class="subtitle">회원·학교 현황과 민감정보 접근 기록을 조회합니다.</p>
+        </div>
+        <form action="/logout" method="post">
+            <button type="submit" class="btn-secondary">로그아웃</button>
+        </form>
+    </div>
 
-    <h1>ADMIN PAGE</h1>
-    PRINCIPAL:   <span sec:authentication="principal"></span><br/>
-    <hr/>
-    이름 :   <span sec:authentication="name"></span><br/>
-    이메일 :   <span sec:authentication="principal.username"></span><br/>
-    권한여부 : <span sec:authentication="principal.authorities"></span><br/>
-    인증여부 :
-    <span sec:authorize="isAuthenticated()">로그인된 상태임</span><br/>
-    <span sec:authorize="!isAuthenticated()">로그아웃된 상태임</span><br/>
-    <hr/>
-    <form action="/logout" method="post">
-        <button type="submit">로그아웃</button>
-    </form>
+    <div class="message" id="pageError"></div>
+    <div class="success-message" id="pageSuccess"></div>
+
+    <div class="card">
+        <section>
+            <h2>운영 현황</h2>
+            <div class="today-summary-grid" id="dashboardGrid">
+                <div class="today-summary-item highlight">
+                    <div class="today-summary-label">전체 회원</div>
+                    <div class="today-summary-value" id="statTotalUsers">-</div>
+                </div>
+                <div class="today-summary-item">
+                    <div class="today-summary-label">학생</div>
+                    <div class="today-summary-value" id="statStudents">-</div>
+                </div>
+                <div class="today-summary-item">
+                    <div class="today-summary-label">교사</div>
+                    <div class="today-summary-value" id="statTeachers">-</div>
+                </div>
+                <div class="today-summary-item">
+                    <div class="today-summary-label">학교</div>
+                    <div class="today-summary-value" id="statSchools">-</div>
+                </div>
+                <div class="today-summary-item">
+                    <div class="today-summary-label">NEIS 매핑</div>
+                    <div class="today-summary-value" id="statNeisMapped">-</div>
+                </div>
+                <div class="today-summary-item">
+                    <div class="today-summary-label">상담 게시글</div>
+                    <div class="today-summary-value" id="statCounseling">-</div>
+                </div>
+                <div class="today-summary-item highlight">
+                    <div class="today-summary-label">오늘 상담 접근</div>
+                    <div class="today-summary-value" id="statCounselingAccessToday">-</div>
+                </div>
+                <div class="today-summary-item highlight">
+                    <div class="today-summary-label">오늘 사전상담 접근</div>
+                    <div class="today-summary-value" id="statPreCounselAccessToday">-</div>
+                </div>
+            </div>
+            <p class="helper">상담·사전상담 본문은 표시하지 않으며, 접근 기록(감사)만 조회합니다.</p>
+        </section>
+    </div>
+
+    <div class="card">
+        <section>
+            <h2>1. 회원 조회</h2>
+            <div class="inline-actions" style="margin-bottom: 12px;">
+                <div class="field" style="flex:1; min-width: 160px; margin:0;">
+                    <label for="userKeyword">아이디·이름</label>
+                    <input type="text" id="userKeyword" placeholder="검색어">
+                </div>
+                <div class="field" style="flex:1; min-width: 140px; margin:0;">
+                    <label for="userSchoolCode">학교 코드</label>
+                    <input type="text" id="userSchoolCode" placeholder="선택">
+                </div>
+            </div>
+            <div class="filter-row" id="userRoleFilter">
+                <button type="button" class="filter-chip active" data-role="">전체</button>
+                <button type="button" class="filter-chip" data-role="STUDENT">학생</button>
+                <button type="button" class="filter-chip" data-role="TEACHER">교사</button>
+                <button type="button" class="filter-chip" data-role="ADMIN">관리자</button>
+            </div>
+            <button type="button" class="btn-primary" id="searchUsersBtn">검색</button>
+            <div class="management-box hidden" id="userManageBox">
+                <p class="helper" style="margin-top:0;">선택한 회원: <strong id="selectedUserLabel">-</strong></p>
+                <div class="inline-actions">
+                    <input type="text" id="manageSchoolCode" placeholder="변경할 학교 코드" style="flex:1; min-width:160px;">
+                    <button type="button" class="btn-secondary" id="changeUserSchoolBtn">학교 변경</button>
+                    <button type="button" class="btn-danger" id="deactivateUserBtn">비활성화</button>
+                    <button type="button" class="btn-success" id="activateUserBtn">활성화</button>
+                </div>
+            </div>
+            <div id="userTableWrap" style="margin-top: 16px; overflow-x: auto;"></div>
+            <div class="pager hidden" id="userPager">
+                <span class="helper" id="userPagerInfo">-</span>
+                <div class="inline-actions">
+                    <button type="button" class="btn-muted" id="userPrevBtn">이전</button>
+                    <button type="button" class="btn-muted" id="userNextBtn">다음</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="card">
+        <section>
+            <h2>2. 학교 조회</h2>
+            <div class="field">
+                <label for="schoolKeyword">학교명·지역·코드</label>
+                <input type="text" id="schoolKeyword" placeholder="예: 개포중, 서울">
+            </div>
+            <div class="filter-row" id="schoolMappedFilter">
+                <button type="button" class="filter-chip active" data-mapped="">전체</button>
+                <button type="button" class="filter-chip" data-mapped="true">NEIS 매핑됨</button>
+                <button type="button" class="filter-chip" data-mapped="false">미매핑</button>
+            </div>
+            <button type="button" class="btn-primary" id="searchSchoolsBtn">검색</button>
+            <div class="inline-actions" style="margin-top: 12px;">
+                <button type="button" class="btn-secondary" id="syncSchoolCsvBtn">CSV 동기화 (추가·갱신)</button>
+            </div>
+            <p class="helper">기존 학교는 유지하고 CSV 기준으로 추가·갱신합니다. 담당 학생 연결은 삭제하지 않습니다.</p>
+            <div id="schoolTableWrap" style="margin-top: 16px; overflow-x: auto;"></div>
+            <div class="pager hidden" id="schoolPager">
+                <span class="helper" id="schoolPagerInfo">-</span>
+                <div class="inline-actions">
+                    <button type="button" class="btn-muted" id="schoolPrevBtn">이전</button>
+                    <button type="button" class="btn-muted" id="schoolNextBtn">다음</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="card">
+        <section>
+            <h2>3. 시스템 상태</h2>
+            <div class="stat-grid" id="systemStatusGrid">
+                <div class="stat-item">NEIS dev-mode<strong id="statusNeisDev">-</strong></div>
+                <div class="stat-item">NEIS API 키<strong id="statusNeisKey">-</strong></div>
+                <div class="stat-item">날씨 dev-mode<strong id="statusWeatherDev">-</strong></div>
+                <div class="stat-item">날씨 API 키<strong id="statusWeatherKey">-</strong></div>
+                <div class="stat-item">암호화 dev-mode<strong id="statusEncryptionDev">-</strong></div>
+                <div class="stat-item">암호화 키<strong id="statusEncryptionKey">-</strong></div>
+            </div>
+        </section>
+    </div>
+
+    <div class="card">
+        <section>
+            <h2>4. 서비스 통계</h2>
+            <h3 style="font-size:15px; margin:0 0 10px;">상담 상태</h3>
+            <div class="stat-grid" id="counselingStatsGrid"></div>
+            <h3 style="font-size:15px; margin:20px 0 10px;">마음 날씨 (최근 7일)</h3>
+            <div class="stat-grid" id="moodStatsGrid"></div>
+        </section>
+    </div>
+
+    <div class="card">
+        <section>
+            <h2>5. 관리자 활동 로그</h2>
+            <div id="activityLogTableWrap" style="overflow-x: auto;"></div>
+            <div class="pager hidden" id="activityLogPager">
+                <span class="helper" id="activityLogPagerInfo">-</span>
+                <div class="inline-actions">
+                    <button type="button" class="btn-muted" id="activityLogPrevBtn">이전</button>
+                    <button type="button" class="btn-muted" id="activityLogNextBtn">다음</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="card">
+        <section>
+            <h2>6. 민감정보 접근 로그</h2>
+            <div class="filter-row log-tab-row" id="logTabRow">
+                <button type="button" class="filter-chip active" data-log-tab="counseling">상담 열람</button>
+                <button type="button" class="filter-chip" data-log-tab="pre-counsel">사전상담 열람</button>
+            </div>
+            <div id="counselingLogPanel">
+                <div id="counselingLogTableWrap" style="overflow-x: auto;"></div>
+                <div class="pager hidden" id="counselingLogPager">
+                    <span class="helper" id="counselingLogPagerInfo">-</span>
+                    <div class="inline-actions">
+                        <button type="button" class="btn-muted" id="counselingLogPrevBtn">이전</button>
+                        <button type="button" class="btn-muted" id="counselingLogNextBtn">다음</button>
+                    </div>
+                </div>
+            </div>
+            <div id="preCounselLogPanel" class="hidden">
+                <div id="preCounselLogTableWrap" style="overflow-x: auto;"></div>
+                <div class="pager hidden" id="preCounselLogPager">
+                    <span class="helper" id="preCounselLogPagerInfo">-</span>
+                    <div class="inline-actions">
+                        <button type="button" class="btn-muted" id="preCounselLogPrevBtn">이전</button>
+                        <button type="button" class="btn-muted" id="preCounselLogNextBtn">다음</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<script>
+    const ROLE_LABELS = { STUDENT: '학생', TEACHER: '교사', ADMIN: '관리자' };
+    const COUNSELING_STATUS_LABELS = {
+        WAITING: '대기',
+        CONFIRMED: '확정',
+        COMPLETED: '완료',
+        CANCELLED: '취소'
+    };
+    const MOOD_LEVEL_LABELS = {
+        SUNNY: '맑음',
+        FAIR: '약간 흐림',
+        CLOUDY: '흐림',
+        RAINY: '비',
+        STORMY: '폭풍'
+    };
+    const ACTION_LABELS = {
+        USER_ACTIVATE: '회원 활성화',
+        USER_DEACTIVATE: '회원 비활성화',
+        USER_SCHOOL_CHANGE: '학교 변경',
+        SCHOOL_CSV_SYNC: '학교 CSV 동기화'
+    };
+
+    let userRoleFilter = '';
+    let userPage = 0;
+    let schoolMappedFilter = '';
+    let schoolPage = 0;
+    let counselingLogPage = 0;
+    let preCounselLogPage = 0;
+    let activityLogPage = 0;
+    let currentLogTab = 'counseling';
+    let selectedUser = null;
+
+    const pageError = document.getElementById('pageError');
+    const pageSuccess = document.getElementById('pageSuccess');
+    const userGreeting = document.getElementById('userGreeting');
+
+    function showError(message) {
+        pageSuccess.style.display = 'none';
+        pageError.textContent = message;
+        pageError.style.display = 'block';
+    }
+
+    function showSuccess(message) {
+        pageError.style.display = 'none';
+        pageSuccess.textContent = message;
+        pageSuccess.style.display = 'block';
+    }
+
+    function clearMessages() {
+        pageError.style.display = 'none';
+        pageSuccess.style.display = 'none';
+    }
+
+    async function api(url, options = {}) {
+        const response = await fetch(url, {
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                ...(options.headers || {})
+            },
+            ...options
+        });
+        if (response.status === 401) {
+            window.location.href = '/login?sessionExpired=true';
+            throw new Error('로그인이 필요합니다.');
+        }
+        if (response.status === 403) {
+            throw new Error('관리자 권한이 필요합니다.');
+        }
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(data.message || '요청에 실패했습니다.');
+        }
+        return data;
+    }
+
+    function apiPatch(url, body) {
+        return api(url, { method: 'PATCH', body: JSON.stringify(body) });
+    }
+
+    function apiPost(url, body) {
+        return api(url, { method: 'POST', body: body ? JSON.stringify(body) : undefined });
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function formatDateTime(value) {
+        if (!value) return '-';
+        return String(value).replace('T', ' ').slice(0, 16);
+    }
+
+    function roleBadge(role) {
+        const cls = role === 'STUDENT' ? 'badge-student' : role === 'TEACHER' ? 'badge-teacher' : 'badge-admin';
+        return `<span class="badge ${cls}">${ROLE_LABELS[role] || escapeHtml(role)}</span>`;
+    }
+
+    function renderPager(containerId, infoId, prevBtnId, nextBtnId, pageData, onPageChange) {
+        const pager = document.getElementById(containerId);
+        const info = document.getElementById(infoId);
+        const prevBtn = document.getElementById(prevBtnId);
+        const nextBtn = document.getElementById(nextBtnId);
+
+        if (!pageData.totalElements) {
+            pager.classList.add('hidden');
+            return;
+        }
+
+        pager.classList.remove('hidden');
+        const totalPages = Math.max(1, Math.ceil(pageData.totalElements / pageData.size));
+        info.textContent = `${pageData.page + 1} / ${totalPages} 페이지 · 총 ${pageData.totalElements}건`;
+
+        prevBtn.disabled = pageData.page <= 0;
+        nextBtn.disabled = pageData.page + 1 >= totalPages;
+
+        prevBtn.onclick = () => onPageChange(pageData.page - 1);
+        nextBtn.onclick = () => onPageChange(pageData.page + 1);
+    }
+
+    function renderUserGreeting(me) {
+        const displayName = me.name && me.name.trim() ? me.name.trim() : me.username;
+        userGreeting.textContent = `${displayName} · 시스템 관리`;
+    }
+
+    async function loadCurrentUser() {
+        const me = await api('/api/auth/me');
+        renderUserGreeting(me);
+    }
+
+    function renderDashboard(data) {
+        document.getElementById('statTotalUsers').textContent = data.totalUsers;
+        document.getElementById('statStudents').textContent = data.studentCount;
+        document.getElementById('statTeachers').textContent = data.teacherCount;
+        document.getElementById('statSchools').textContent = data.totalSchools;
+        document.getElementById('statNeisMapped').textContent = data.neisMappedSchools;
+        document.getElementById('statCounseling').textContent = data.totalCounselingPosts;
+        document.getElementById('statCounselingAccessToday').textContent = data.counselingAccessLogsToday;
+        document.getElementById('statPreCounselAccessToday').textContent = data.preCounselAccessLogsToday;
+    }
+
+    async function loadDashboard() {
+        const data = await api('/api/admin/dashboard');
+        renderDashboard(data);
+    }
+
+    function renderSystemStatus(data) {
+        document.getElementById('statusNeisDev').textContent = data.neisDevMode ? 'ON' : 'OFF';
+        document.getElementById('statusNeisKey').textContent = data.neisApiKeyConfigured ? '설정됨' : '미설정';
+        document.getElementById('statusWeatherDev').textContent = data.weatherDevMode ? 'ON' : 'OFF';
+        document.getElementById('statusWeatherKey').textContent = data.weatherApiKeyConfigured ? '설정됨' : '미설정';
+        document.getElementById('statusEncryptionDev').textContent = data.encryptionDevMode ? 'ON' : 'OFF';
+        document.getElementById('statusEncryptionKey').textContent = data.encryptionKeyConfigured ? '설정됨' : '미설정';
+    }
+
+    async function loadSystemStatus() {
+        const data = await api('/api/admin/system-status');
+        renderSystemStatus(data);
+    }
+
+    function renderStatGrid(containerId, entries, labelMap) {
+        const container = document.getElementById(containerId);
+        const keys = Object.keys(entries || {});
+        if (!keys.length) {
+            container.innerHTML = '<div class="empty-state">데이터가 없습니다.</div>';
+            return;
+        }
+        container.innerHTML = keys.map(key => `
+            <div class="stat-item">
+                ${escapeHtml(labelMap[key] || key)}
+                <strong>${entries[key]}</strong>
+            </div>
+        `).join('');
+    }
+
+    async function loadStatistics() {
+        const data = await api('/api/admin/statistics');
+        renderStatGrid('counselingStatsGrid', data.counselingByStatus, COUNSELING_STATUS_LABELS);
+        renderStatGrid('moodStatsGrid', data.moodByLevelLast7Days, MOOD_LEVEL_LABELS);
+    }
+
+    function selectUser(user) {
+        selectedUser = user;
+        document.getElementById('userManageBox').classList.remove('hidden');
+        document.getElementById('selectedUserLabel').textContent =
+            `${user.name || user.username} (${user.username}) · ${ROLE_LABELS[user.role] || user.role}`;
+        document.getElementById('manageSchoolCode').value = user.schoolCode || '';
+    }
+
+    function renderUserTable(pageData) {
+        const wrap = document.getElementById('userTableWrap');
+        if (!pageData.items.length) {
+            wrap.innerHTML = '<div class="empty-state">검색 결과가 없습니다.</div>';
+            document.getElementById('userPager').classList.add('hidden');
+            return;
+        }
+
+        wrap.innerHTML = `
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>아이디</th>
+                        <th>이름</th>
+                        <th>역할</th>
+                        <th>상태</th>
+                        <th>학교</th>
+                        <th>지역</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${pageData.items.map(user => `
+                        <tr>
+                            <td>${escapeHtml(user.username)}</td>
+                            <td>${escapeHtml(user.name || '-')}</td>
+                            <td>${roleBadge(user.role)}</td>
+                            <td>
+                                <span class="badge ${user.active ? 'badge-mapped' : 'badge-inactive'}">
+                                    ${user.active ? '활성' : '비활성'}
+                                </span>
+                            </td>
+                            <td>${escapeHtml(user.schoolName)}</td>
+                            <td>${escapeHtml(user.schoolRegion || '-')}</td>
+                            <td>
+                                <button type="button" class="btn-muted select-user-btn" data-username="${escapeHtml(user.username)}">관리</button>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+
+        wrap.querySelectorAll('.select-user-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const user = pageData.items.find(item => item.username === btn.dataset.username);
+                if (user) {
+                    clearMessages();
+                    selectUser(user);
+                }
+            });
+        });
+
+        renderPager('userPager', 'userPagerInfo', 'userPrevBtn', 'userNextBtn', pageData, (page) => {
+            userPage = page;
+            loadUsers().catch(error => showError(error.message));
+        });
+    }
+
+    async function loadUsers() {
+        const params = new URLSearchParams({ page: String(userPage), size: '20' });
+        const keyword = document.getElementById('userKeyword').value.trim();
+        const schoolCode = document.getElementById('userSchoolCode').value.trim();
+        if (keyword) params.set('keyword', keyword);
+        if (schoolCode) params.set('schoolCode', schoolCode);
+        if (userRoleFilter) params.set('role', userRoleFilter);
+
+        const data = await api(`/api/admin/users?${params.toString()}`);
+        renderUserTable(data);
+    }
+
+    function renderSchoolTable(pageData) {
+        const wrap = document.getElementById('schoolTableWrap');
+        if (!pageData.items.length) {
+            wrap.innerHTML = '<div class="empty-state">검색 결과가 없습니다.</div>';
+            document.getElementById('schoolPager').classList.add('hidden');
+            return;
+        }
+
+        wrap.innerHTML = `
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>코드</th>
+                        <th>학교명</th>
+                        <th>지역</th>
+                        <th>구분</th>
+                        <th>NEIS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${pageData.items.map(school => `
+                        <tr>
+                            <td>${escapeHtml(school.schoolCode)}</td>
+                            <td>${escapeHtml(school.schoolName)}</td>
+                            <td>${escapeHtml(school.region || '-')}</td>
+                            <td>${escapeHtml(school.schoolType || '-')}</td>
+                            <td>
+                                <span class="badge ${school.neisMapped ? 'badge-mapped' : 'badge-unmapped'}">
+                                    ${school.neisMapped ? '매핑됨' : '미매핑'}
+                                </span>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+
+        renderPager('schoolPager', 'schoolPagerInfo', 'schoolPrevBtn', 'schoolNextBtn', pageData, (page) => {
+            schoolPage = page;
+            loadSchools().catch(error => showError(error.message));
+        });
+    }
+
+    async function loadSchools() {
+        const params = new URLSearchParams({ page: String(schoolPage), size: '20' });
+        const keyword = document.getElementById('schoolKeyword').value.trim();
+        if (keyword) params.set('keyword', keyword);
+        if (schoolMappedFilter === 'true') params.set('mapped', 'true');
+        if (schoolMappedFilter === 'false') params.set('mapped', 'false');
+
+        const data = await api(`/api/admin/schools?${params.toString()}`);
+        renderSchoolTable(data);
+    }
+
+    function renderCounselingLogTable(pageData) {
+        const wrap = document.getElementById('counselingLogTableWrap');
+        if (!pageData.items.length) {
+            wrap.innerHTML = '<div class="empty-state">상담 접근 기록이 없습니다.</div>';
+            document.getElementById('counselingLogPager').classList.add('hidden');
+            return;
+        }
+
+        wrap.innerHTML = `
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>시각</th>
+                        <th>교사</th>
+                        <th>학생</th>
+                        <th>상담 ID</th>
+                        <th>제목</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${pageData.items.map(log => `
+                        <tr>
+                            <td>${formatDateTime(log.accessedAt)}</td>
+                            <td>${escapeHtml(log.teacherName || log.teacherUsername)}</td>
+                            <td>${escapeHtml(log.studentName || log.studentUsername)}</td>
+                            <td>${escapeHtml(log.counselingPostId)}</td>
+                            <td>${escapeHtml(log.counselingTitle)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+
+        renderPager('counselingLogPager', 'counselingLogPagerInfo', 'counselingLogPrevBtn', 'counselingLogNextBtn', pageData, (page) => {
+            counselingLogPage = page;
+            loadCounselingLogs().catch(error => showError(error.message));
+        });
+    }
+
+    function renderPreCounselLogTable(pageData) {
+        const wrap = document.getElementById('preCounselLogTableWrap');
+        if (!pageData.items.length) {
+            wrap.innerHTML = '<div class="empty-state">사전상담 접근 기록이 없습니다.</div>';
+            document.getElementById('preCounselLogPager').classList.add('hidden');
+            return;
+        }
+
+        wrap.innerHTML = `
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>시각</th>
+                        <th>교사</th>
+                        <th>학생</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${pageData.items.map(log => `
+                        <tr>
+                            <td>${formatDateTime(log.accessedAt)}</td>
+                            <td>${escapeHtml(log.teacherName || log.teacherUsername)}</td>
+                            <td>${escapeHtml(log.studentName || log.studentUsername)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+
+        renderPager('preCounselLogPager', 'preCounselLogPagerInfo', 'preCounselLogPrevBtn', 'preCounselLogNextBtn', pageData, (page) => {
+            preCounselLogPage = page;
+            loadPreCounselLogs().catch(error => showError(error.message));
+        });
+    }
+
+    async function loadCounselingLogs() {
+        const data = await api(`/api/admin/access-logs/counseling?page=${counselingLogPage}&size=20`);
+        renderCounselingLogTable(data);
+    }
+
+    async function loadPreCounselLogs() {
+        const data = await api(`/api/admin/access-logs/pre-counseling?page=${preCounselLogPage}&size=20`);
+        renderPreCounselLogTable(data);
+    }
+
+    function renderActivityLogTable(pageData) {
+        const wrap = document.getElementById('activityLogTableWrap');
+        if (!pageData.items.length) {
+            wrap.innerHTML = '<div class="empty-state">관리자 활동 기록이 없습니다.</div>';
+            document.getElementById('activityLogPager').classList.add('hidden');
+            return;
+        }
+
+        wrap.innerHTML = `
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>시각</th>
+                        <th>관리자</th>
+                        <th>작업</th>
+                        <th>대상</th>
+                        <th>내용</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${pageData.items.map(log => `
+                        <tr>
+                            <td>${formatDateTime(log.createdAt)}</td>
+                            <td>${escapeHtml(log.adminUsername)}</td>
+                            <td>${escapeHtml(ACTION_LABELS[log.action] || log.action)}</td>
+                            <td>${escapeHtml(log.targetUsername || '-')}</td>
+                            <td>${escapeHtml(log.detail || '-')}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+
+        renderPager('activityLogPager', 'activityLogPagerInfo', 'activityLogPrevBtn', 'activityLogNextBtn', pageData, (page) => {
+            activityLogPage = page;
+            loadActivityLogs().catch(error => showError(error.message));
+        });
+    }
+
+    async function loadActivityLogs() {
+        const data = await api(`/api/admin/activity-logs?page=${activityLogPage}&size=20`);
+        renderActivityLogTable(data);
+    }
+
+    async function updateSelectedUserStatus(active) {
+        if (!selectedUser) {
+            throw new Error('관리할 회원을 먼저 선택해 주세요.');
+        }
+        const updated = await apiPatch(`/api/admin/users/${encodeURIComponent(selectedUser.username)}/status`, { active });
+        selectedUser = updated;
+        selectUser(updated);
+        showSuccess(active ? '회원을 활성화했습니다.' : '회원을 비활성화했습니다.');
+        await Promise.all([loadUsers(), loadActivityLogs(), loadDashboard()]);
+    }
+
+    async function changeSelectedUserSchool() {
+        if (!selectedUser) {
+            throw new Error('관리할 회원을 먼저 선택해 주세요.');
+        }
+        const schoolCode = document.getElementById('manageSchoolCode').value.trim();
+        if (!schoolCode) {
+            throw new Error('변경할 학교 코드를 입력해 주세요.');
+        }
+        const updated = await apiPatch(`/api/admin/users/${encodeURIComponent(selectedUser.username)}/school`, { schoolCode });
+        selectedUser = updated;
+        selectUser(updated);
+        showSuccess('회원 학교를 변경했습니다.');
+        await Promise.all([loadUsers(), loadActivityLogs(), loadDashboard()]);
+    }
+
+    async function syncSchoolCsv() {
+        if (!confirm('CSV 기준으로 학교 데이터를 동기화할까요? (추가·갱신만, 삭제 없음)')) {
+            return;
+        }
+        const result = await apiPost('/api/admin/schools/sync-csv');
+        showSuccess(result.message || `학교 ${result.syncedCount}건 동기화 완료`);
+        schoolPage = 0;
+        await Promise.all([loadSchools(), loadActivityLogs(), loadDashboard()]);
+    }
+
+    function switchLogTab(tab) {
+        currentLogTab = tab;
+        document.getElementById('counselingLogPanel').classList.toggle('hidden', tab !== 'counseling');
+        document.getElementById('preCounselLogPanel').classList.toggle('hidden', tab !== 'pre-counsel');
+        document.querySelectorAll('#logTabRow .filter-chip').forEach(chip => {
+            chip.classList.toggle('active', chip.dataset.logTab === tab);
+        });
+        if (tab === 'counseling') {
+            loadCounselingLogs().catch(error => showError(error.message));
+        } else {
+            loadPreCounselLogs().catch(error => showError(error.message));
+        }
+    }
+
+    document.getElementById('searchUsersBtn').addEventListener('click', () => {
+        clearMessages();
+        userPage = 0;
+        loadUsers().catch(error => showError(error.message));
+    });
+
+    document.getElementById('searchSchoolsBtn').addEventListener('click', () => {
+        clearMessages();
+        schoolPage = 0;
+        loadSchools().catch(error => showError(error.message));
+    });
+
+    document.getElementById('userRoleFilter').addEventListener('click', (event) => {
+        const chip = event.target.closest('.filter-chip');
+        if (!chip) return;
+        document.querySelectorAll('#userRoleFilter .filter-chip').forEach(item => item.classList.remove('active'));
+        chip.classList.add('active');
+        userRoleFilter = chip.dataset.role || '';
+    });
+
+    document.getElementById('schoolMappedFilter').addEventListener('click', (event) => {
+        const chip = event.target.closest('.filter-chip');
+        if (!chip) return;
+        document.querySelectorAll('#schoolMappedFilter .filter-chip').forEach(item => item.classList.remove('active'));
+        chip.classList.add('active');
+        schoolMappedFilter = chip.dataset.mapped || '';
+    });
+
+    document.getElementById('logTabRow').addEventListener('click', (event) => {
+        const chip = event.target.closest('[data-log-tab]');
+        if (!chip) return;
+        clearMessages();
+        switchLogTab(chip.dataset.logTab);
+    });
+
+    document.getElementById('deactivateUserBtn').addEventListener('click', () => {
+        clearMessages();
+        updateSelectedUserStatus(false).catch(error => showError(error.message));
+    });
+
+    document.getElementById('activateUserBtn').addEventListener('click', () => {
+        clearMessages();
+        updateSelectedUserStatus(true).catch(error => showError(error.message));
+    });
+
+    document.getElementById('changeUserSchoolBtn').addEventListener('click', () => {
+        clearMessages();
+        changeSelectedUserSchool().catch(error => showError(error.message));
+    });
+
+    document.getElementById('syncSchoolCsvBtn').addEventListener('click', () => {
+        clearMessages();
+        syncSchoolCsv().catch(error => showError(error.message));
+    });
+
+    loadCurrentUser().catch(() => {
+        userGreeting.textContent = '관리자';
+    });
+
+    Promise.all([
+        loadDashboard(),
+        loadUsers(),
+        loadSchools(),
+        loadSystemStatus(),
+        loadStatistics(),
+        loadActivityLogs(),
+        loadCounselingLogs()
+    ]).catch(error => showError(error.message));
+</script>
 </body>
 </html>
