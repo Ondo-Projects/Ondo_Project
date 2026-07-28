@@ -6,6 +6,10 @@
     <title>관리자 | 온도 상담웹</title>
     <style>
         * { box-sizing: border-box; }
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
         body {
             margin: 0;
             font-family: "Segoe UI", sans-serif;
@@ -16,20 +20,33 @@
             max-width: 960px;
             margin: 32px auto;
             padding: 0 16px 40px;
+            min-width: 0;
         }
+        img, table, pre { max-width: 100%; }
         .card {
             background: #fff;
             border-radius: 16px;
             padding: 24px;
             box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
             margin-bottom: 20px;
+            min-width: 0;
         }
         .page-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
+            flex-wrap: wrap;
             gap: 12px;
             margin-bottom: 20px;
+        }
+        .page-header > div:first-child {
+            min-width: 0;
+            flex: 1 1 180px;
+        }
+        .page-header > form {
+            display: inline-flex;
+            margin: 0;
+            flex-shrink: 0;
         }
         .page-header h1 { margin: 0; font-size: 26px; }
         .user-greeting {
@@ -37,6 +54,8 @@
             font-size: 15px;
             font-weight: 600;
             color: #1e40af;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
         }
         .subtitle { color: #6b7280; margin: 6px 0 0; font-size: 14px; }
         section h2 {
@@ -68,10 +87,15 @@
             border: 1px solid #d1d5db;
             background: #fff;
             color: #374151;
-            padding: 8px 14px;
+            padding: 10px 16px;
             border-radius: 999px;
             font-size: 13px;
             cursor: pointer;
+            min-height: 44px;
+            min-width: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
         .filter-chip.active {
             background: #111827;
@@ -95,6 +119,10 @@
             padding: 10px 14px;
             font-size: 14px;
             cursor: pointer;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
         .btn-secondary { background: #e5e7eb; color: #111827; }
         .btn-primary { background: #111827; color: #fff; }
@@ -108,6 +136,20 @@
             vertical-align: top;
         }
         .data-table th { color: #6b7280; font-weight: 600; font-size: 13px; }
+        .table-scroll-wrap {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 0 -4px;
+            padding: 0 4px;
+        }
+        .table-scroll-wrap .data-table {
+            min-width: 640px;
+        }
+        .data-table .select-user-btn,
+        .data-table .btn-muted {
+            min-height: 44px;
+            min-width: 64px;
+        }
         .badge {
             display: inline-block;
             padding: 3px 8px;
@@ -125,8 +167,8 @@
         .stat-item { background: #f9fafb; border-radius: 10px; padding: 12px; font-size: 14px; }
         .stat-item strong { display: block; font-size: 18px; margin-top: 4px; }
         .action-row { display: flex; gap: 6px; flex-wrap: wrap; }
-        .btn-danger { background: #fee2e2; color: #b91c1c; border: none; border-radius: 8px; padding: 6px 10px; font-size: 12px; cursor: pointer; }
-        .btn-success { background: #dcfce7; color: #166534; border: none; border-radius: 8px; padding: 6px 10px; font-size: 12px; cursor: pointer; }
+        .btn-danger { background: #fee2e2; color: #b91c1c; border: none; border-radius: 8px; padding: 6px 10px; font-size: 12px; cursor: pointer; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+        .btn-success { background: #dcfce7; color: #166534; border: none; border-radius: 8px; padding: 6px 10px; font-size: 12px; cursor: pointer; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
         .management-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-top: 14px; }
         .empty-state { text-align: center; color: #6b7280; padding: 24px 12px; }
         .message, .success-message {
@@ -140,11 +182,145 @@
         .hidden { display: none !important; }
         .log-tab-row { margin-bottom: 14px; }
         .pager { margin-top: 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .pager-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .search-actions .btn-primary {
+            width: auto;
+        }
         @media (max-width: 640px) {
-            .container { margin: 20px auto; }
-            .page-header { flex-direction: column; align-items: flex-start; }
-            .data-table { font-size: 13px; }
-            .data-table th, .data-table td { padding: 8px 4px; }
+            .container { margin: 16px auto; padding: 0 12px 32px; }
+            .page-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .page-header > div:first-child { flex-basis: auto; }
+            .page-header > form {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            .user-greeting {
+                white-space: normal;
+                line-height: 1.4;
+            }
+            .card { padding: 18px; border-radius: 14px; }
+            .today-summary-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+            .today-summary-value { font-size: 20px; }
+            .stat-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 8px;
+            }
+            .stat-item { padding: 10px; font-size: 13px; }
+            .stat-item strong { font-size: 16px; }
+            .filter-row {
+                width: 100%;
+            }
+            #userRoleFilter .filter-chip,
+            #schoolMappedFilter .filter-chip {
+                flex: 1 1 calc(50% - 4px);
+                justify-content: center;
+            }
+            #userRoleFilter .filter-chip[data-role=""],
+            #schoolMappedFilter .filter-chip[data-mapped=""] {
+                flex: 1 1 100%;
+            }
+            #logTabRow .filter-chip {
+                flex: 1 1 calc(50% - 4px);
+                justify-content: center;
+            }
+            .search-actions .btn-primary,
+            #searchUsersBtn,
+            #searchSchoolsBtn {
+                width: 100%;
+            }
+            .search-fields {
+                flex-direction: column;
+                width: 100%;
+            }
+            .search-fields .field {
+                flex: 1 1 100% !important;
+                min-width: 0 !important;
+                width: 100%;
+            }
+            .management-box .inline-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+            .management-box .inline-actions input,
+            .management-box .inline-actions button {
+                width: 100%;
+            }
+            .sync-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+            .sync-actions .btn-secondary {
+                width: 100%;
+            }
+            .pager {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            .pager-actions,
+            .pager .inline-actions {
+                width: 100%;
+            }
+            .pager-actions button,
+            .pager .inline-actions button {
+                flex: 1 1 calc(50% - 4px);
+            }
+            .table-scroll-wrap {
+                overflow-x: visible;
+                margin: 0;
+                padding: 0;
+            }
+            .table-scroll-wrap .data-table {
+                min-width: 0;
+            }
+            .data-table--responsive thead {
+                display: none;
+            }
+            .data-table--responsive tbody tr {
+                display: block;
+                border: 1px solid #e5e7eb;
+                border-radius: 12px;
+                padding: 12px 14px;
+                margin-bottom: 10px;
+                background: #fff;
+            }
+            .data-table--responsive tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                gap: 12px;
+                border-bottom: none;
+                padding: 7px 0;
+                font-size: 14px;
+            }
+            .data-table--responsive tbody td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #6b7280;
+                font-size: 12px;
+                flex-shrink: 0;
+                min-width: 72px;
+            }
+            .data-table--responsive tbody td.is-actions {
+                justify-content: stretch;
+                padding-top: 10px;
+            }
+            .data-table--responsive tbody td.is-actions::before {
+                display: none;
+            }
+            .data-table--responsive tbody td.is-actions .btn-muted {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -208,7 +384,7 @@
     <div class="card">
         <section>
             <h2>1. 회원 조회</h2>
-            <div class="inline-actions" style="margin-bottom: 12px;">
+            <div class="inline-actions search-fields" style="margin-bottom: 12px;">
                 <div class="field" style="flex:1; min-width: 160px; margin:0;">
                     <label for="userKeyword">아이디·이름</label>
                     <input type="text" id="userKeyword" placeholder="검색어">
@@ -224,7 +400,9 @@
                 <button type="button" class="filter-chip" data-role="TEACHER">교사</button>
                 <button type="button" class="filter-chip" data-role="ADMIN">관리자</button>
             </div>
+            <div class="search-actions">
             <button type="button" class="btn-primary" id="searchUsersBtn">검색</button>
+            </div>
             <div class="management-box hidden" id="userManageBox">
                 <p class="helper" style="margin-top:0;">선택한 회원: <strong id="selectedUserLabel">-</strong></p>
                 <div class="inline-actions">
@@ -234,10 +412,10 @@
                     <button type="button" class="btn-success" id="activateUserBtn">활성화</button>
                 </div>
             </div>
-            <div id="userTableWrap" style="margin-top: 16px; overflow-x: auto;"></div>
+            <div id="userTableWrap" style="margin-top: 16px;"></div>
             <div class="pager hidden" id="userPager">
                 <span class="helper" id="userPagerInfo">-</span>
-                <div class="inline-actions">
+                <div class="pager-actions inline-actions">
                     <button type="button" class="btn-muted" id="userPrevBtn">이전</button>
                     <button type="button" class="btn-muted" id="userNextBtn">다음</button>
                 </div>
@@ -257,16 +435,18 @@
                 <button type="button" class="filter-chip" data-mapped="true">NEIS 매핑됨</button>
                 <button type="button" class="filter-chip" data-mapped="false">미매핑</button>
             </div>
+            <div class="search-actions">
             <button type="button" class="btn-primary" id="searchSchoolsBtn">검색</button>
-            <div class="inline-actions" style="margin-top: 12px;">
+            </div>
+            <div class="inline-actions sync-actions" style="margin-top: 12px;">
                 <button type="button" class="btn-secondary" id="syncSchoolCsvBtn">CSV 동기화 (추가·갱신)</button>
                 <button type="button" class="btn-secondary" id="syncNeisSchoolsBtn">NEIS 코드 일괄 매핑</button>
             </div>
             <p class="helper">CSV 동기화는 학교 목록 추가·갱신용입니다. NEIS 일괄 매핑은 미매핑 학교 최대 50건씩 NEIS 코드를 조회·저장합니다.</p>
-            <div id="schoolTableWrap" style="margin-top: 16px; overflow-x: auto;"></div>
+            <div id="schoolTableWrap" style="margin-top: 16px;"></div>
             <div class="pager hidden" id="schoolPager">
                 <span class="helper" id="schoolPagerInfo">-</span>
-                <div class="inline-actions">
+                <div class="pager-actions inline-actions">
                     <button type="button" class="btn-muted" id="schoolPrevBtn">이전</button>
                     <button type="button" class="btn-muted" id="schoolNextBtn">다음</button>
                 </div>
@@ -301,10 +481,10 @@
     <div class="card">
         <section>
             <h2>5. 관리자 활동 로그</h2>
-            <div id="activityLogTableWrap" style="overflow-x: auto;"></div>
+            <div id="activityLogTableWrap"></div>
             <div class="pager hidden" id="activityLogPager">
                 <span class="helper" id="activityLogPagerInfo">-</span>
-                <div class="inline-actions">
+                <div class="pager-actions inline-actions">
                     <button type="button" class="btn-muted" id="activityLogPrevBtn">이전</button>
                     <button type="button" class="btn-muted" id="activityLogNextBtn">다음</button>
                 </div>
@@ -320,20 +500,20 @@
                 <button type="button" class="filter-chip" data-log-tab="pre-counsel">사전상담 열람</button>
             </div>
             <div id="counselingLogPanel">
-                <div id="counselingLogTableWrap" style="overflow-x: auto;"></div>
+                <div id="counselingLogTableWrap"></div>
                 <div class="pager hidden" id="counselingLogPager">
                     <span class="helper" id="counselingLogPagerInfo">-</span>
-                    <div class="inline-actions">
+                    <div class="pager-actions inline-actions">
                         <button type="button" class="btn-muted" id="counselingLogPrevBtn">이전</button>
                         <button type="button" class="btn-muted" id="counselingLogNextBtn">다음</button>
                     </div>
                 </div>
             </div>
             <div id="preCounselLogPanel" class="hidden">
-                <div id="preCounselLogTableWrap" style="overflow-x: auto;"></div>
+                <div id="preCounselLogTableWrap"></div>
                 <div class="pager hidden" id="preCounselLogPager">
                     <span class="helper" id="preCounselLogPagerInfo">-</span>
-                    <div class="inline-actions">
+                    <div class="pager-actions inline-actions">
                         <button type="button" class="btn-muted" id="preCounselLogPrevBtn">이전</button>
                         <button type="button" class="btn-muted" id="preCounselLogNextBtn">다음</button>
                     </div>
@@ -528,6 +708,10 @@
         renderStatGrid('moodStatsGrid', data.moodByLevelLast7Days, MOOD_LEVEL_LABELS);
     }
 
+    function wrapTableHtml(tableHtml) {
+        return `<div class="table-scroll-wrap">${tableHtml}</div>`;
+    }
+
     function selectUser(user) {
         selectedUser = user;
         document.getElementById('userManageBox').classList.remove('hidden');
@@ -544,8 +728,8 @@
             return;
         }
 
-        wrap.innerHTML = `
-            <table class="data-table">
+        wrap.innerHTML = wrapTableHtml(`
+            <table class="data-table data-table--responsive">
                 <thead>
                     <tr>
                         <th>아이디</th>
@@ -560,24 +744,24 @@
                 <tbody>
                     ${pageData.items.map(user => `
                         <tr>
-                            <td>${escapeHtml(user.username)}</td>
-                            <td>${escapeHtml(user.name || '-')}</td>
-                            <td>${roleBadge(user.role)}</td>
-                            <td>
+                            <td data-label="아이디">${escapeHtml(user.username)}</td>
+                            <td data-label="이름">${escapeHtml(user.name || '-')}</td>
+                            <td data-label="역할">${roleBadge(user.role)}</td>
+                            <td data-label="상태">
                                 <span class="badge ${user.active ? 'badge-mapped' : 'badge-inactive'}">
                                     ${user.active ? '활성' : '비활성'}
                                 </span>
                             </td>
-                            <td>${escapeHtml(user.schoolName)}</td>
-                            <td>${escapeHtml(user.schoolRegion || '-')}</td>
-                            <td>
+                            <td data-label="학교">${escapeHtml(user.schoolName)}</td>
+                            <td data-label="지역">${escapeHtml(user.schoolRegion || '-')}</td>
+                            <td class="is-actions">
                                 <button type="button" class="btn-muted select-user-btn" data-username="${escapeHtml(user.username)}">관리</button>
                             </td>
                         </tr>
                     `).join('')}
                 </tbody>
             </table>
-        `;
+        `);
 
         wrap.querySelectorAll('.select-user-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -615,8 +799,8 @@
             return;
         }
 
-        wrap.innerHTML = `
-            <table class="data-table">
+        wrap.innerHTML = wrapTableHtml(`
+            <table class="data-table data-table--responsive">
                 <thead>
                     <tr>
                         <th>코드</th>
@@ -629,11 +813,11 @@
                 <tbody>
                     ${pageData.items.map(school => `
                         <tr>
-                            <td>${escapeHtml(school.schoolCode)}</td>
-                            <td>${escapeHtml(school.schoolName)}</td>
-                            <td>${escapeHtml(school.region || '-')}</td>
-                            <td>${escapeHtml(school.schoolType || '-')}</td>
-                            <td>
+                            <td data-label="코드">${escapeHtml(school.schoolCode)}</td>
+                            <td data-label="학교명">${escapeHtml(school.schoolName)}</td>
+                            <td data-label="지역">${escapeHtml(school.region || '-')}</td>
+                            <td data-label="구분">${escapeHtml(school.schoolType || '-')}</td>
+                            <td data-label="NEIS">
                                 <span class="badge ${school.neisMapped ? 'badge-mapped' : 'badge-unmapped'}">
                                     ${school.neisMapped ? '매핑됨' : '미매핑'}
                                 </span>
@@ -642,7 +826,7 @@
                     `).join('')}
                 </tbody>
             </table>
-        `;
+        `);
 
         renderPager('schoolPager', 'schoolPagerInfo', 'schoolPrevBtn', 'schoolNextBtn', pageData, (page) => {
             schoolPage = page;
@@ -669,8 +853,8 @@
             return;
         }
 
-        wrap.innerHTML = `
-            <table class="data-table">
+        wrap.innerHTML = wrapTableHtml(`
+            <table class="data-table data-table--responsive">
                 <thead>
                     <tr>
                         <th>시각</th>
@@ -683,16 +867,16 @@
                 <tbody>
                     ${pageData.items.map(log => `
                         <tr>
-                            <td>${formatDateTime(log.accessedAt)}</td>
-                            <td>${escapeHtml(log.teacherName || log.teacherUsername)}</td>
-                            <td>${escapeHtml(log.studentName || log.studentUsername)}</td>
-                            <td>${escapeHtml(log.counselingPostId)}</td>
-                            <td>${escapeHtml(log.counselingTitle)}</td>
+                            <td data-label="시각">${formatDateTime(log.accessedAt)}</td>
+                            <td data-label="교사">${escapeHtml(log.teacherName || log.teacherUsername)}</td>
+                            <td data-label="학생">${escapeHtml(log.studentName || log.studentUsername)}</td>
+                            <td data-label="상담 ID">${escapeHtml(log.counselingPostId)}</td>
+                            <td data-label="제목">${escapeHtml(log.counselingTitle)}</td>
                         </tr>
                     `).join('')}
                 </tbody>
             </table>
-        `;
+        `);
 
         renderPager('counselingLogPager', 'counselingLogPagerInfo', 'counselingLogPrevBtn', 'counselingLogNextBtn', pageData, (page) => {
             counselingLogPage = page;
@@ -708,8 +892,8 @@
             return;
         }
 
-        wrap.innerHTML = `
-            <table class="data-table">
+        wrap.innerHTML = wrapTableHtml(`
+            <table class="data-table data-table--responsive">
                 <thead>
                     <tr>
                         <th>시각</th>
@@ -720,14 +904,14 @@
                 <tbody>
                     ${pageData.items.map(log => `
                         <tr>
-                            <td>${formatDateTime(log.accessedAt)}</td>
-                            <td>${escapeHtml(log.teacherName || log.teacherUsername)}</td>
-                            <td>${escapeHtml(log.studentName || log.studentUsername)}</td>
+                            <td data-label="시각">${formatDateTime(log.accessedAt)}</td>
+                            <td data-label="교사">${escapeHtml(log.teacherName || log.teacherUsername)}</td>
+                            <td data-label="학생">${escapeHtml(log.studentName || log.studentUsername)}</td>
                         </tr>
                     `).join('')}
                 </tbody>
             </table>
-        `;
+        `);
 
         renderPager('preCounselLogPager', 'preCounselLogPagerInfo', 'preCounselLogPrevBtn', 'preCounselLogNextBtn', pageData, (page) => {
             preCounselLogPage = page;
@@ -753,8 +937,8 @@
             return;
         }
 
-        wrap.innerHTML = `
-            <table class="data-table">
+        wrap.innerHTML = wrapTableHtml(`
+            <table class="data-table data-table--responsive">
                 <thead>
                     <tr>
                         <th>시각</th>
@@ -767,16 +951,16 @@
                 <tbody>
                     ${pageData.items.map(log => `
                         <tr>
-                            <td>${formatDateTime(log.createdAt)}</td>
-                            <td>${escapeHtml(log.adminUsername)}</td>
-                            <td>${escapeHtml(ACTION_LABELS[log.action] || log.action)}</td>
-                            <td>${escapeHtml(log.targetUsername || '-')}</td>
-                            <td>${escapeHtml(log.detail || '-')}</td>
+                            <td data-label="시각">${formatDateTime(log.createdAt)}</td>
+                            <td data-label="관리자">${escapeHtml(log.adminUsername)}</td>
+                            <td data-label="작업">${escapeHtml(ACTION_LABELS[log.action] || log.action)}</td>
+                            <td data-label="대상">${escapeHtml(log.targetUsername || '-')}</td>
+                            <td data-label="내용">${escapeHtml(log.detail || '-')}</td>
                         </tr>
                     `).join('')}
                 </tbody>
             </table>
-        `;
+        `);
 
         renderPager('activityLogPager', 'activityLogPagerInfo', 'activityLogPrevBtn', 'activityLogNextBtn', pageData, (page) => {
             activityLogPage = page;

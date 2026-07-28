@@ -6,6 +6,10 @@
     <title>온도 상담웹</title>
     <style>
         * { box-sizing: border-box; }
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
         body {
             margin: 0;
             font-family: "Segoe UI", sans-serif;
@@ -17,6 +21,7 @@
             max-width: 720px;
             margin: 0 auto;
             padding: 48px 16px 64px;
+            min-width: 0;
         }
         .hero {
             text-align: center;
@@ -38,6 +43,15 @@
         @media (min-width: 640px) {
             .cards { grid-template-columns: 1fr 1fr; }
         }
+        @media (max-width: 640px) {
+            .container { padding: 32px 12px 48px; }
+            .hero h1 { font-size: 28px; }
+            .actions { width: 100%; }
+            .actions .btn {
+                flex: 1 1 calc(50% - 5px);
+                text-align: center;
+            }
+        }
         .card {
             background: #fff;
             border-radius: 16px;
@@ -55,7 +69,10 @@
             font-size: 14px;
         }
         .btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
             padding: 11px 16px;
             border-radius: 10px;
             text-decoration: none;

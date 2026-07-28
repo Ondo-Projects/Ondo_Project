@@ -6,6 +6,10 @@
     <title>학생 홈 | 온도 상담웹</title>
     <style>
         * { box-sizing: border-box; }
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
         body {
             margin: 0;
             font-family: "Segoe UI", sans-serif;
@@ -16,20 +20,28 @@
             max-width: 760px;
             margin: 32px auto;
             padding: 0 16px 40px;
+            min-width: 0;
         }
+        img, table, pre { max-width: 100%; }
         .card {
             background: #fff;
             border-radius: 16px;
             padding: 24px;
             box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
             margin-bottom: 20px;
+            min-width: 0;
         }
         .page-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
+            flex-wrap: wrap;
             gap: 12px;
             margin-bottom: 20px;
+        }
+        .page-header > div:first-child {
+            min-width: 0;
+            flex: 1 1 180px;
         }
         .page-header h1 {
             margin: 0;
@@ -41,12 +53,19 @@
             font-size: 15px;
             font-weight: 600;
             color: #1e3a8a;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
         }
         .header-actions {
             display: flex;
             align-items: center;
             gap: 8px;
             flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        .header-actions form {
+            display: inline-flex;
+            margin: 0;
         }
         .btn-link {
             border: none;
@@ -55,12 +74,23 @@
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            padding: 0;
+            min-height: 44px;
+            min-width: 44px;
+            padding: 10px 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
         .dashboard-widgets {
             display: grid;
             grid-template-columns: 1.2fr 0.8fr;
             gap: 16px;
+        }
+        @media (max-width: 640px) {
+            .dashboard-widgets {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
         }
         .dashboard-widget {
             border: 1px solid #e5e7eb;
@@ -104,6 +134,10 @@
             padding: 11px 16px;
             font-size: 14px;
             cursor: pointer;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
         .btn-secondary { background: #e5e7eb; color: #111827; }
         .btn-primary { background: #2563eb; color: #fff; }
@@ -160,13 +194,18 @@
         .post-item {
             border: 1px solid #e5e7eb;
             border-radius: 12px;
-            padding: 14px 16px;
+            padding: 16px;
+            min-height: 56px;
             cursor: pointer;
-            transition: border-color 0.15s, box-shadow 0.15s;
+            transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+            -webkit-tap-highlight-color: rgba(37, 99, 235, 0.12);
         }
         .post-item:hover, .post-item.active {
             border-color: #2563eb;
             box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12);
+        }
+        .post-item:active {
+            background: #f8fafc;
         }
         .post-item-header {
             display: flex;
@@ -202,6 +241,25 @@
             border-top: 1px solid #e5e7eb;
         }
         .detail-panel.open { display: block; }
+        #detailCard {
+            scroll-margin-top: 12px;
+        }
+        .detail-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .detail-card-header h2 {
+            margin: 0;
+            font-size: 18px;
+            flex: 1;
+            min-width: 0;
+        }
+        .detail-close-btn {
+            flex-shrink: 0;
+        }
         .detail-content {
             background: #f9fafb;
             border-radius: 10px;
@@ -249,16 +307,45 @@
             grid-template-columns: repeat(5, minmax(0, 1fr));
             gap: 8px;
         }
+        .mood-option {
+            border: 1px solid #d1d5db;
+            background: #fff;
+            border-radius: 12px;
+            padding: 12px 8px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 13px;
+            min-height: 44px;
+            -webkit-tap-highlight-color: rgba(37, 99, 235, 0.12);
+        }
+        .mood-option.active {
+            border-color: #2563eb;
+            background: #eff6ff;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+        }
+        .mood-option .emoji { display: block; font-size: 24px; margin-bottom: 6px; }
         @media (max-width: 640px) {
             .container { margin: 16px auto; padding: 0 12px 32px; }
             .page-header {
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: stretch;
+            }
+            .page-header > div:first-child { flex-basis: auto; }
+            .header-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            .user-greeting {
+                white-space: normal;
+                line-height: 1.4;
             }
             .page-header h1 { font-size: 22px; }
             .card { padding: 18px; border-radius: 14px; }
-            .mood-picker { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .weather-box {
+            .mood-picker { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+            .mood-option { padding: 14px 6px; font-size: 12px; }
+            .mood-option .emoji { font-size: 22px; }
+            .weather-box,
+            .weather-box-compact {
                 flex-direction: column;
                 align-items: flex-start;
             }
@@ -273,23 +360,26 @@
             }
             .inline-actions { width: 100%; }
             .inline-actions button { flex: 1 1 calc(50% - 4px); }
-            .dashboard-widgets { grid-template-columns: 1fr; }
+            #detailActions {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+            }
+            #detailActions button {
+                width: 100%;
+            }
+            .pre-counsel-nav {
+                position: sticky;
+                top: 0;
+                z-index: 5;
+                background: #fff;
+                padding: 8px 0 12px;
+                margin: 0 -4px 12px;
+            }
         }
-        .mood-option {
-            border: 1px solid #d1d5db;
-            background: #fff;
-            border-radius: 12px;
-            padding: 12px 8px;
-            cursor: pointer;
-            text-align: center;
-            font-size: 13px;
+        @media (max-width: 360px) {
+            .mood-picker { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
-        .mood-option.active {
-            border-color: #2563eb;
-            background: #eff6ff;
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
-        }
-        .mood-option .emoji { display: block; font-size: 24px; margin-bottom: 6px; }
         .notice-item {
             border: 1px solid #e5e7eb;
             border-radius: 12px;
@@ -385,9 +475,14 @@
             border: 1px solid #d1d5db;
             background: #fff;
             border-radius: 999px;
-            padding: 7px 12px;
+            padding: 10px 16px;
             font-size: 13px;
             cursor: pointer;
+            min-height: 44px;
+            min-width: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
         .filter-chip.active {
             background: #2563eb;
@@ -435,6 +530,77 @@
             margin-top: 0;
             padding-top: 0;
             border-top: none;
+        }
+        .pre-counsel-nav {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+        .pre-counsel-nav a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: #f3f4f6;
+            color: #374151;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .pre-counsel-nav a:active,
+        .pre-counsel-nav a:focus-visible {
+            background: #dbeafe;
+            color: #1d4ed8;
+            outline: none;
+        }
+        .form-section {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            scroll-margin-top: 72px;
+        }
+        .form-section summary.form-section-title {
+            margin: 0;
+            padding: 14px 40px 14px 16px;
+            border-top: none;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f8fafc;
+            cursor: pointer;
+            list-style: none;
+            position: relative;
+        }
+        .form-section summary.form-section-title::-webkit-details-marker {
+            display: none;
+        }
+        .form-section summary.form-section-title::after {
+            content: '▼';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 11px;
+            color: #6b7280;
+            transition: transform 0.2s;
+        }
+        .form-section[open] summary.form-section-title::after {
+            transform: translateY(-50%) rotate(180deg);
+        }
+        .form-section-body {
+            padding: 16px 16px 4px;
+        }
+        @media (min-width: 641px) {
+            .pre-counsel-nav { display: none; }
+            .form-section summary.form-section-title {
+                pointer-events: none;
+                padding-right: 16px;
+            }
+            .form-section summary.form-section-title::after {
+                display: none;
+            }
         }
         .readonly-field {
             background: #f9fafb;
@@ -574,7 +740,15 @@
             <p class="helper">상담 전에 나를 소개하는 카드를 작성합니다. 담당 교사만 열람할 수 있습니다.</p>
             <span class="profile-status" id="preCounselStatus">작성 전</span>
             <form id="preCounselForm">
-                <div class="form-section-title">인적 사항 및 기본 정보</div>
+                <nav class="pre-counsel-nav" id="preCounselNav" aria-label="사전 상담 섹션">
+                    <a href="#preCounselSection1">기본 정보</a>
+                    <a href="#preCounselSection2">자기 이해</a>
+                    <a href="#preCounselSection3">학교생활</a>
+                </nav>
+
+                <details class="form-section" id="preCounselSection1" open>
+                    <summary class="form-section-title">인적 사항 및 기본 정보</summary>
+                    <div class="form-section-body">
                 <div class="field">
                     <label>이름</label>
                     <input type="text" id="preCounselName" class="readonly-field" readonly>
@@ -603,8 +777,12 @@
                     <label for="preCounselFavoriteWords">좌우명이나 좋아하는 단어</label>
                     <textarea id="preCounselFavoriteWords" required placeholder="나를 표현하는 문장이나 단어"></textarea>
                 </div>
+                    </div>
+                </details>
 
-                <div class="form-section-title">자기 이해 및 성향 (나를 소개합니다)</div>
+                <details class="form-section" id="preCounselSection2">
+                    <summary class="form-section-title">자기 이해 및 성향 (나를 소개합니다)</summary>
+                    <div class="form-section-body">
                 <div class="field">
                     <label for="preCounselStrength">내가 생각하는 나의 장점</label>
                     <textarea id="preCounselStrength" required placeholder="장점 하나"></textarea>
@@ -629,8 +807,12 @@
                     <label for="preCounselStressRelief">스트레스를 해소하는 나만의 방법</label>
                     <textarea id="preCounselStressRelief" required></textarea>
                 </div>
+                    </div>
+                </details>
 
-                <div class="form-section-title">교우 관계 및 학교생활</div>
+                <details class="form-section" id="preCounselSection3">
+                    <summary class="form-section-title">교우 관계 및 학교생활</summary>
+                    <div class="form-section-body">
                 <div class="field">
                     <label for="preCounselMemorable">작년 학교생활 중 가장 기억에 남는 일이나 즐거웠던 점</label>
                     <textarea id="preCounselMemorable" required></textarea>
@@ -643,6 +825,8 @@
                     <label for="preCounselClassRole">올해 학급에서 내가 꼭 해보고 싶은 역할</label>
                     <textarea id="preCounselClassRole" required placeholder="1인 1역, 부서 활동 등"></textarea>
                 </div>
+                    </div>
+                </details>
 
                 <button type="submit" class="submit-btn" id="preCounselSubmitBtn">사전 상담 카드 저장</button>
             </form>
@@ -697,7 +881,10 @@
 
     <div class="card hidden" id="detailCard">
         <section>
-            <h2>상담 상세</h2>
+            <div class="detail-card-header">
+                <h2>상담 상세</h2>
+                <button type="button" class="btn-secondary detail-close-btn" id="closeDetailBtn" aria-label="상담 상세 닫기">닫기</button>
+            </div>
             <div id="detailBody"></div>
             <div class="inline-actions" style="margin-top: 16px;" id="detailActions"></div>
             <div class="detail-panel open hidden" id="editPanel">
@@ -800,6 +987,8 @@
     const confirmSchoolChangeBtn = document.getElementById('confirmSchoolChangeBtn');
     const preCounselForm = document.getElementById('preCounselForm');
     const preCounselStatus = document.getElementById('preCounselStatus');
+    const preCounselNav = document.getElementById('preCounselNav');
+    const closeDetailBtn = document.getElementById('closeDetailBtn');
 
     let profileSchoolTypeFilter = '';
     let profileSearchTimer = null;
@@ -1343,6 +1532,13 @@
         }
     }
 
+    function closeDetail() {
+        selectedPostId = null;
+        editPanel.classList.add('hidden');
+        detailCard.classList.add('hidden');
+        renderPosts();
+    }
+
     function openEditForm(post) {
         document.getElementById('editId').value = post.id;
         document.getElementById('editTitle').value = post.title;
@@ -1487,6 +1683,37 @@
     preCounselForm.addEventListener('submit', (event) => {
         savePreCounselingProfile(event).catch(error => showError(error.message));
     });
+
+    if (preCounselNav) {
+        preCounselNav.addEventListener('click', (event) => {
+            const link = event.target.closest('a[href^="#"]');
+            if (!link) return;
+            event.preventDefault();
+            const section = document.getElementById(link.getAttribute('href').slice(1));
+            if (!section) return;
+            section.open = true;
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    }
+
+    const preCounselSections = [
+        document.getElementById('preCounselSection1'),
+        document.getElementById('preCounselSection2'),
+        document.getElementById('preCounselSection3')
+    ].filter(Boolean);
+    const preCounselDesktopQuery = window.matchMedia('(min-width: 641px)');
+
+    function syncPreCounselSections() {
+        const expandAll = preCounselDesktopQuery.matches;
+        preCounselSections.forEach((section, index) => {
+            section.open = expandAll || index === 0;
+        });
+    }
+
+    syncPreCounselSections();
+    preCounselDesktopQuery.addEventListener('change', syncPreCounselSections);
+
+    closeDetailBtn.addEventListener('click', closeDetail);
 
     loadCurrentUser().catch(() => {
         userGreeting.textContent = '학생 홈';

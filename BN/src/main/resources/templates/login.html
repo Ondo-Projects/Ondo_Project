@@ -6,6 +6,10 @@
     <title>로그인 | 온도 상담웹</title>
     <style>
         * { box-sizing: border-box; }
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
         body {
             margin: 0;
             font-family: "Segoe UI", sans-serif;
@@ -16,6 +20,7 @@
             max-width: 480px;
             margin: 48px auto;
             padding: 0 16px 40px;
+            min-width: 0;
         }
         .card {
             background: #fff;
@@ -45,6 +50,10 @@
             color: #fff;
             cursor: pointer;
             margin-top: 8px;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
         .message {
             margin-bottom: 16px;
@@ -70,8 +79,17 @@
             color: #2563eb;
             text-decoration: none;
             font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            min-height: 44px;
+            padding: 8px 4px;
         }
         .footer-links a:hover { text-decoration: underline; }
+        @media (max-width: 640px) {
+            .container { margin: 24px auto; padding: 0 12px 32px; }
+            .card { padding: 22px; }
+            h1 { font-size: 24px; }
+        }
     </style>
 </head>
 <body>
