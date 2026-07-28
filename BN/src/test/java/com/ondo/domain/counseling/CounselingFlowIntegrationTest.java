@@ -180,13 +180,24 @@ class CounselingFlowIntegrationTest {
     }
 
     @Test
-    void getPost_nonAssignedTeacher_returnsBadRequest() throws Exception {
+    void getPost_nonAssignedTeacher_returnsForbidden() throws Exception {
         Long postId = createAssignedPost(STUDENT1_USERNAME);
         String otherTeacherToken = bearerToken(OTHER_TEACHER_USERNAME, Role.TEACHER);
 
         mockMvc.perform(get("/api/counseling/{id}", postId)
                         .header("Authorization", "Bearer " + otherTeacherToken))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("접근 권한이 없습니다."));
+    }
+
+    @Test
+    void getPost_otherStudent_returnsForbidden() throws Exception {
+        Long postId = createAssignedPost(STUDENT1_USERNAME);
+        String otherStudentToken = bearerToken(STUDENT2_USERNAME, Role.STUDENT);
+
+        mockMvc.perform(get("/api/counseling/{id}", postId)
+                        .header("Authorization", "Bearer " + otherStudentToken))
+                .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("접근 권한이 없습니다."));
     }
 

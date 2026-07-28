@@ -16,6 +16,7 @@ import com.ondo.domain.user.entity.Role;
 import com.ondo.domain.user.entity.User;
 import com.ondo.domain.user.repository.UserRepository;
 import com.ondo.global.error.BusinessException;
+import com.ondo.global.error.ForbiddenException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -213,7 +214,7 @@ public class CounselingService {
         if (user.getRole() == Role.TEACHER && post.isAssignedTo(user)) {
             return;
         }
-        throw new BusinessException("접근 권한이 없습니다.");
+        throw new ForbiddenException("접근 권한이 없습니다.");
     }
 
     private void assertAssignedTeacher(CounselingPost post, User teacher) {

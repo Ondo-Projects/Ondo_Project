@@ -20,7 +20,7 @@ class JwtAccessDeniedHandlerTest {
         accessDeniedHandler.handle(request, response, new AccessDeniedException("denied"));
 
         assertThat(response.getStatus()).isEqualTo(403);
-        assertThat(response.getContentAsString()).contains("접근 권한이 없습니다.");
+        assertThat(response.getContentAsString()).isEqualTo("{\"message\":\"접근 권한이 없습니다.\"}");
     }
 
     @Test
