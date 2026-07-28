@@ -6,7 +6,9 @@ import com.ondo.domain.meal.dto.NeisSchoolCodeDTO;
 import com.ondo.domain.school.entity.School;
 import com.ondo.domain.school.repository.SchoolRepository;
 import com.ondo.global.error.BusinessException;
+import com.ondo.global.error.NeisMappingException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +20,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional(readOnly = true)
 public class NeisSchoolMappingService {
 
@@ -44,14 +47,43 @@ public class NeisSchoolMappingService {
         }
 
         JsonNode rows = neisApiClient.searchSchoolForMapping(school);
-        NeisSchoolCodeDTO matched = pickBestMatch(rows, school)
-                .orElseThrow(() -> new BusinessException(
-                        "NEIS에서 학교 코드를 찾을 수 없습니다. 학교명: " + school.getSchoolName()));
+        int candidateCount = countRows(rows);
+        Optional<NeisSchoolCodeDTO> matchedOptional = pickBestMatch(rows, school);
+
+        if (matchedOptional.isEmpty()) {
+            log.warn(
+                    "NEIS 학교 코드 매핑 실패: schoolCode={}, schoolName={}, region={}, schoolType={}, candidateCount={}",
+                    school.getSchoolCode(),
+                    school.getSchoolName(),
+                    school.getRegion(),
+                    school.getSchoolType(),
+                    candidateCount
+            );
+            throw new NeisMappingException(
+                    "NEIS에서 학교 코드를 찾을 수 없습니다. 학교명: " + school.getSchoolName());
+        }
+
+        NeisSchoolCodeDTO matched = matchedOptional.get();
 
         School managedSchool = schoolRepository.findById(school.getSchoolCode())
                 .orElseThrow(() -> new BusinessException("학교 정보를 찾을 수 없습니다."));
         managedSchool.updateNeisCodes(matched.getOfficeCode(), matched.getSchoolCode());
+
+        log.debug(
+                "NEIS 학교 코드 매핑 성공: schoolCode={}, schoolName={}, officeCode={}, neisSchoolCode={}",
+                school.getSchoolCode(),
+                school.getSchoolName(),
+                matched.getOfficeCode(),
+                matched.getSchoolCode()
+        );
         return matched;
+    }
+
+    private static int countRows(JsonNode rows) {
+        if (rows == null || !rows.isArray()) {
+            return 0;
+        }
+        return rows.size();
     }
 
     static Optional<NeisSchoolCodeDTO> pickBestMatch(JsonNode rows, School school) {
