@@ -43,4 +43,12 @@ public interface SchoolRepository extends JpaRepository<School, String> {
             @Param("mapped") Boolean mapped,
             Pageable pageable
     );
+
+    @Query("""
+            SELECT s FROM School s
+            WHERE (s.neisOfficeCode IS NULL OR s.neisOfficeCode = ''
+                OR s.neisSchoolCode IS NULL OR s.neisSchoolCode = '')
+            ORDER BY s.schoolName ASC
+            """)
+    List<School> findUnmappedSchools(Pageable pageable);
 }

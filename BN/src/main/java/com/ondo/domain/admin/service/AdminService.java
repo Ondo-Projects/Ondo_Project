@@ -6,6 +6,7 @@ import com.ondo.domain.admin.dto.AdminDashboardResponseDTO;
 import com.ondo.domain.admin.dto.AdminPageResponseDTO;
 import com.ondo.domain.admin.dto.AdminPreCounselAccessLogDTO;
 import com.ondo.domain.admin.dto.AdminSchoolSummaryDTO;
+import com.ondo.domain.admin.dto.AdminNeisSyncResponseDTO;
 import com.ondo.domain.admin.dto.AdminSchoolSyncResponseDTO;
 import com.ondo.domain.admin.dto.AdminStatisticsResponseDTO;
 import com.ondo.domain.admin.dto.AdminSystemStatusResponseDTO;
@@ -23,6 +24,7 @@ import com.ondo.domain.precounseling.repository.PreCounselingProfileAccessLogRep
 import com.ondo.domain.school.entity.School;
 import com.ondo.domain.school.repository.SchoolRepository;
 import com.ondo.domain.school.service.SchoolCsvImportService;
+import com.ondo.domain.meal.service.NeisSchoolMappingService;
 import com.ondo.domain.user.entity.Role;
 import com.ondo.domain.user.entity.User;
 import com.ondo.domain.user.repository.UserRepository;
@@ -51,6 +53,8 @@ public class AdminService {
 
     private static final int DEFAULT_PAGE_SIZE = 20;
     private static final int MAX_PAGE_SIZE = 100;
+    private static final int DEFAULT_NEIS_SYNC_LIMIT = 50;
+    private static final int MAX_NEIS_SYNC_LIMIT = 100;
 
     private final UserRepository userRepository;
     private final SchoolRepository schoolRepository;
@@ -60,6 +64,7 @@ public class AdminService {
     private final MoodRecordRepository moodRecordRepository;
     private final StudentTeacherAssignmentRepository assignmentRepository;
     private final SchoolCsvImportService schoolCsvImportService;
+    private final NeisSchoolMappingService neisSchoolMappingService;
     private final AdminActivityLogRepository adminActivityLogRepository;
     private final NeisProperties neisProperties;
     private final WeatherProperties weatherProperties;
@@ -182,6 +187,41 @@ public class AdminService {
         );
     }
 
+    @Transactional
+    public AdminNeisSyncResponseDTO syncNeisSchoolCodes(String adminUsername, int limit) {
+        if (neisProperties.isDevMode()) {
+            throw new BusinessException("NEIS dev-mode가 활성화되어 있어 일괄 매핑을 실행할 수 없습니다.");
+        }
+        if (!isConfigured(neisProperties.getApiKey())) {
+            throw new BusinessException("NEIS API 키가 설정되지 않았습니다.");
+        }
+
+        int syncLimit = normalizeNeisSyncLimit(limit);
+        List<School> targets = schoolRepository.findUnmappedSchools(PageRequest.of(0, syncLimit));
+
+        int successCount = 0;
+        int failedCount = 0;
+
+        for (School school : targets) {
+            try {
+                neisSchoolMappingService.resolveNeisCodes(school);
+                successCount++;
+            } catch (BusinessException exception) {
+                failedCount++;
+            }
+        }
+
+        String detail = "처리 " + targets.size() + "건 / 성공 " + successCount + "건 / 실패 " + failedCount + "건";
+        saveActivity(adminUsername, "SCHOOL_NEIS_SYNC", null, detail);
+
+        return new AdminNeisSyncResponseDTO(
+                targets.size(),
+                successCount,
+                failedCount,
+                "NEIS 학교 코드 일괄 매핑이 완료되었습니다. (" + detail + ")"
+        );
+    }
+
     public AdminPageResponseDTO<AdminSchoolSummaryDTO> searchSchools(String keyword, Boolean mapped, int page, int size) {
         Pageable pageable = PageRequest.of(page, normalizeSize(size));
         Page<AdminSchoolSummaryDTO> result = schoolRepository.searchForAdmin(
@@ -255,6 +295,13 @@ public class AdminService {
             return DEFAULT_PAGE_SIZE;
         }
         return Math.min(size, MAX_PAGE_SIZE);
+    }
+
+    private int normalizeNeisSyncLimit(int limit) {
+        if (limit <= 0) {
+            return DEFAULT_NEIS_SYNC_LIMIT;
+        }
+        return Math.min(limit, MAX_NEIS_SYNC_LIMIT);
     }
 
     private <T> AdminPageResponseDTO<T> toPageResponse(Page<T> page) {

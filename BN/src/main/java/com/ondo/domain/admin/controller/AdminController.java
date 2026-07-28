@@ -7,6 +7,7 @@ import com.ondo.domain.admin.dto.AdminDashboardResponseDTO;
 import com.ondo.domain.admin.dto.AdminPageResponseDTO;
 import com.ondo.domain.admin.dto.AdminPreCounselAccessLogDTO;
 import com.ondo.domain.admin.dto.AdminSchoolSummaryDTO;
+import com.ondo.domain.admin.dto.AdminNeisSyncResponseDTO;
 import com.ondo.domain.admin.dto.AdminSchoolSyncResponseDTO;
 import com.ondo.domain.admin.dto.AdminStatisticsResponseDTO;
 import com.ondo.domain.admin.dto.AdminSystemStatusResponseDTO;
@@ -99,6 +100,14 @@ public class AdminController {
     @PostMapping("/schools/sync-csv")
     public ResponseEntity<AdminSchoolSyncResponseDTO> syncSchools(Authentication authentication) {
         return ResponseEntity.ok(adminService.syncSchoolsFromCsv(authentication.getName()));
+    }
+
+    @PostMapping("/schools/sync-neis")
+    public ResponseEntity<AdminNeisSyncResponseDTO> syncNeisSchoolCodes(
+            Authentication authentication,
+            @RequestParam(defaultValue = "50") int limit
+    ) {
+        return ResponseEntity.ok(adminService.syncNeisSchoolCodes(authentication.getName(), limit));
     }
 
     @GetMapping("/access-logs/counseling")
