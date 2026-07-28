@@ -1696,6 +1696,23 @@
         });
     }
 
+    const preCounselSections = [
+        document.getElementById('preCounselSection1'),
+        document.getElementById('preCounselSection2'),
+        document.getElementById('preCounselSection3')
+    ].filter(Boolean);
+    const preCounselDesktopQuery = window.matchMedia('(min-width: 641px)');
+
+    function syncPreCounselSections() {
+        const expandAll = preCounselDesktopQuery.matches;
+        preCounselSections.forEach((section, index) => {
+            section.open = expandAll || index === 0;
+        });
+    }
+
+    syncPreCounselSections();
+    preCounselDesktopQuery.addEventListener('change', syncPreCounselSections);
+
     closeDetailBtn.addEventListener('click', closeDetail);
 
     loadCurrentUser().catch(() => {
