@@ -30,6 +30,19 @@ public class NeisApiClient {
             "3", "석식"
     );
 
+    private static final Map<String, String> PROVINCE_ALIASES = Map.ofEntries(
+            Map.entry("충청북도", "충북"),
+            Map.entry("충청남도", "충남"),
+            Map.entry("경상북도", "경북"),
+            Map.entry("경상남도", "경남"),
+            Map.entry("전라북도", "전북"),
+            Map.entry("전라남도", "전남"),
+            Map.entry("제주특별자치도", "제주"),
+            Map.entry("세종특별자치시", "세종"),
+            Map.entry("강원특별자치도", "강원"),
+            Map.entry("전북특별자치도", "전북")
+    );
+
     private final NeisProperties neisProperties;
     private final ObjectMapper objectMapper;
     private final RestClient restClient = RestClient.create();
@@ -114,11 +127,24 @@ public class NeisApiClient {
         String[] parts = trimmed.split("\\s+");
         if (parts.length > 0) {
             keywords.add(parts[0]);
+            addProvinceKeywordVariants(keywords, parts[0]);
         }
         if (parts.length > 1) {
             keywords.add(parts[parts.length - 1]);
         }
         return java.util.List.copyOf(keywords);
+    }
+
+    private static void addProvinceKeywordVariants(java.util.Set<String> keywords, String province) {
+        String alias = PROVINCE_ALIASES.get(province);
+        if (alias != null) {
+            keywords.add(alias);
+        }
+        for (Map.Entry<String, String> entry : PROVINCE_ALIASES.entrySet()) {
+            if (entry.getValue().equals(province)) {
+                keywords.add(entry.getKey());
+            }
+        }
     }
 
     public List<MealItemResponseDTO> fetchMeals(String officeCode, String standardSchoolCode, LocalDate date) {

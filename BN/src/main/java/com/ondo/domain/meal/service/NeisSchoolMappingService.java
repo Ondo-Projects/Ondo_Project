@@ -88,8 +88,8 @@ public class NeisSchoolMappingService {
         }
 
         JsonNode selected = candidates.stream()
-                .max(Comparator.comparingInt(row -> scoreCandidate(row, school)))
-                .orElse(candidates.get(0));
+                .max(candidateComparator(school))
+                .orElse(candidates.getFirst());
 
         String officeCode = text(selected, "ATPT_OFCDC_SC_CODE");
         String standardCode = text(selected, "SD_SCHUL_CODE");
@@ -125,6 +125,14 @@ public class NeisSchoolMappingService {
         };
     }
 
+    private static Comparator<JsonNode> candidateComparator(School school) {
+        String region = school.getRegion() != null ? school.getRegion() : "";
+        return Comparator
+                .comparingInt((JsonNode row) -> scoreCandidate(row, school))
+                .thenComparingInt(row -> regionMatchScore(row, region))
+                .thenComparing(row -> text(row, "SD_SCHUL_CODE"), Comparator.nullsLast(String::compareTo));
+    }
+
     static int regionMatchScore(JsonNode row, String region) {
         String normalizedRegion = normalizeRegionText(region);
         String address = normalizeRegionText(text(row, "ORG_RDNMA"));
@@ -143,6 +151,9 @@ public class NeisSchoolMappingService {
         if (!location.isBlank()) {
             if (normalizedRegion.contains(location) || location.contains(province)) {
                 score += 25;
+            }
+            if (!province.isBlank() && location.contains(province)) {
+                score += 15;
             }
         }
         if (!normalizedRegion.isBlank() && address.contains(normalizedRegion)) {
