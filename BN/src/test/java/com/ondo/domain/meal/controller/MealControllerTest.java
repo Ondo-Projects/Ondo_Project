@@ -76,6 +76,7 @@ class MealControllerTest {
         mockMvc.perform(get("/api/student/meals/today")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("OK"))
                 .andExpect(jsonPath("$.schoolName").value("급식테스트중학교"))
                 .andExpect(jsonPath("$.meals").isArray())
                 .andExpect(jsonPath("$.meals[0].mealType").value("중식"));
