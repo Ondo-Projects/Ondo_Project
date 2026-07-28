@@ -221,6 +221,17 @@
             color: #6b7280;
             padding: 28px 12px;
         }
+        .meal-status-info {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+        }
+        .meal-status-warn {
+            color: #92400e;
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 10px;
+        }
         .hidden { display: none !important; }
         .unread-badge {
             display: none;
@@ -1011,13 +1022,51 @@
         }
     }
 
+    function resolveMealStatus(data) {
+        if (data.status) {
+            return data.status;
+        }
+        if (data.meals && data.meals.length) {
+            return 'OK';
+        }
+        return 'NO_MEALS';
+    }
+
+    function mealDisplayMessage(data, status) {
+        if (data.message) {
+            return data.message;
+        }
+        switch (status) {
+            case 'NO_MEALS':
+                return '오늘 등록된 급식 정보가 없습니다. 방학·주말·공휴일에는 급식이 등록되지 않을 수 있습니다.';
+            case 'MAPPING_FAILED':
+                return '급식 정보 연동 준비 중입니다. 학교 급식 정보가 곧 표시됩니다.';
+            case 'UNAVAILABLE':
+                return '급식 정보를 일시적으로 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.';
+            default:
+                return '오늘 등록된 급식 정보가 없습니다.';
+        }
+    }
+
+    function mealStatusClass(status) {
+        if (status === 'MAPPING_FAILED' || status === 'UNAVAILABLE') {
+            return 'empty-state meal-status-warn';
+        }
+        if (status === 'NO_MEALS') {
+            return 'empty-state meal-status-info';
+        }
+        return 'empty-state';
+    }
+
     function renderMeals(data) {
         if (data.schoolName) {
             mealSchoolHint.textContent = `${data.schoolName} 오늘 급식입니다.`;
         }
 
-        if (!data.meals || !data.meals.length) {
-            mealList.innerHTML = `<div class="empty-state">${escapeHtml(data.message || '오늘 등록된 급식 정보가 없습니다.')}</div>`;
+        const status = resolveMealStatus(data);
+
+        if (status !== 'OK' || !data.meals || !data.meals.length) {
+            mealList.innerHTML = `<div class="${mealStatusClass(status)}">${escapeHtml(mealDisplayMessage(data, status))}</div>`;
             return;
         }
 
