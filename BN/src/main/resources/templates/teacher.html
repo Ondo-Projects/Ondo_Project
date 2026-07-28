@@ -193,6 +193,10 @@
             gap: 8px;
             flex-wrap: wrap;
             margin-bottom: 14px;
+            width: 100%;
+        }
+        #filterRow .filter-chip {
+            flex: 0 1 auto;
         }
         .filter-chip {
             border: 1px solid #d1d5db;
@@ -217,12 +221,18 @@
         .post-item {
             border: 1px solid #e5e7eb;
             border-radius: 12px;
-            padding: 14px 16px;
+            padding: 16px;
+            min-height: 56px;
             cursor: pointer;
+            -webkit-tap-highlight-color: rgba(37, 99, 235, 0.12);
+            transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
         }
         .post-item:hover, .post-item.active {
             border-color: #2563eb;
             box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12);
+        }
+        .post-item:active {
+            background: #f8fafc;
         }
         .post-item-header {
             display: flex;
@@ -244,6 +254,25 @@
         .badge-COMPLETED { background: #dcfce7; color: #166534; }
         .badge-CANCELLED { background: #f3f4f6; color: #4b5563; }
         .post-meta { color: #6b7280; font-size: 13px; margin-top: 8px; }
+        #detailCard {
+            scroll-margin-top: 12px;
+        }
+        .detail-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .detail-card-header h2 {
+            margin: 0;
+            font-size: 18px;
+            flex: 1;
+            min-width: 0;
+        }
+        .detail-close-btn {
+            flex-shrink: 0;
+        }
         .detail-content {
             background: #f9fafb;
             border-radius: 10px;
@@ -383,6 +412,12 @@
         }
         .weekly-student-header strong { font-size: 15px; }
         .weekly-student-meta { color: #6b7280; font-size: 13px; }
+        .weekly-day-scroll {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 0 -4px;
+            padding: 0 4px 6px;
+        }
         .weekly-day-row {
             display: grid;
             grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -444,10 +479,57 @@
                 grid-template-columns: 72px 1fr 28px;
                 font-size: 13px;
             }
-            .weekly-day-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+            .weekly-day-scroll {
+                margin: 0 -8px;
+                padding: 0 8px 8px;
+            }
+            .weekly-day-row {
+                display: flex;
+                gap: 8px;
+                width: max-content;
+                min-width: 100%;
+            }
+            .weekly-day-cell {
+                flex: 0 0 68px;
+                min-width: 68px;
+            }
+            .weekly-day-label {
+                font-size: 10px;
+                line-height: 1.3;
+            }
+            .weekly-student-header {
+                flex-wrap: wrap;
+            }
+            #filterRow .filter-chip {
+                flex: 1 1 calc(50% - 4px);
+                justify-content: center;
+            }
+            #filterRow .filter-chip[data-status=""] {
+                flex: 1 1 100%;
+            }
+            #detailCard .inline-actions,
+            #statusActions {
+                flex-direction: column;
+                width: 100%;
+            }
+            #detailCard .inline-actions button,
+            #statusActions button {
+                width: 100%;
+            }
             .mood-summary-item {
                 flex-direction: column;
                 align-items: flex-start;
+            }
+            .pre-counsel-item {
+                min-height: 56px;
+            }
+            .pre-counsel-item-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .pre-counsel-detail-panel {
+                scroll-margin-top: 12px;
             }
         }
         .school-current {
@@ -505,12 +587,17 @@
         .pre-counsel-item {
             border: 1px solid #e5e7eb;
             border-radius: 12px;
-            padding: 14px 16px;
+            padding: 16px;
             cursor: pointer;
+            -webkit-tap-highlight-color: rgba(37, 99, 235, 0.12);
+            transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
         }
         .pre-counsel-item:hover, .pre-counsel-item.active {
             border-color: #2563eb;
             box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12);
+        }
+        .pre-counsel-item:active {
+            background: #f8fafc;
         }
         .pre-counsel-item-header {
             display: flex;
@@ -528,6 +615,34 @@
         }
         .pre-counsel-badge.done { background: #dcfce7; color: #166534; }
         .pre-counsel-badge.pending { background: #fef3c7; color: #92400e; }
+        .pre-counsel-detail-panel {
+            margin-top: 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px;
+            background: #fff;
+            scroll-margin-top: 12px;
+        }
+        .pre-counsel-detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .pre-counsel-detail-header h3 {
+            margin: 0;
+            font-size: 16px;
+            flex: 1;
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+        #preCounselDetailBody {
+            display: grid;
+            gap: 12px;
+        }
         .pre-counsel-detail {
             display: grid;
             gap: 12px;
@@ -655,7 +770,10 @@
 
         <div class="card hidden" id="detailCard">
             <section>
-                <h2>상담 상세</h2>
+                <div class="detail-card-header">
+                    <h2>상담 상세</h2>
+                    <button type="button" class="btn-secondary detail-close-btn" id="closeDetailBtn" aria-label="상담 상세 닫기">닫기</button>
+                </div>
                 <div id="detailBody"></div>
                 <div class="inline-actions" style="margin-top: 16px;" id="statusActions"></div>
                 <div class="reply-box">
@@ -700,7 +818,11 @@
             <div class="pre-counsel-list" id="preCounselSummaryList">
                 <div class="empty-state">등록된 학생이 없습니다.</div>
             </div>
-            <div class="pre-counsel-detail hidden" id="preCounselDetailPanel" style="margin-top: 16px;">
+            <div class="pre-counsel-detail-panel hidden" id="preCounselDetailPanel">
+                <div class="pre-counsel-detail-header">
+                    <h3 id="preCounselDetailTitle">사전 상담 카드</h3>
+                    <button type="button" class="btn-secondary detail-close-btn" id="closePreCounselDetailBtn" aria-label="사전 상담 닫기">닫기</button>
+                </div>
                 <div id="preCounselDetailBody"></div>
             </div>
         </section>
@@ -770,6 +892,9 @@
     const preCounselSummaryList = document.getElementById('preCounselSummaryList');
     const preCounselDetailPanel = document.getElementById('preCounselDetailPanel');
     const preCounselDetailBody = document.getElementById('preCounselDetailBody');
+    const preCounselDetailTitle = document.getElementById('preCounselDetailTitle');
+    const closePreCounselDetailBtn = document.getElementById('closePreCounselDetailBtn');
+    const closeDetailBtn = document.getElementById('closeDetailBtn');
     const weeklyMoodPeriod = document.getElementById('weeklyMoodPeriod');
     const weeklyMoodDistribution = document.getElementById('weeklyMoodDistribution');
     const weeklyMoodStudents = document.getElementById('weeklyMoodStudents');
@@ -950,8 +1075,11 @@
 
         preCounselSummaryList.querySelectorAll('.pre-counsel-item').forEach(item => {
             item.addEventListener('click', () => {
-                openPreCounselProfile(item.dataset.username, item.dataset.completed === 'true')
-                    .catch(error => showError(error.message));
+                openPreCounselProfile(
+                    item.dataset.username,
+                    item.dataset.completed === 'true',
+                    item.querySelector('strong')?.textContent?.trim()
+                ).catch(error => showError(error.message));
             });
         });
     }
@@ -988,18 +1116,36 @@
         preCounselDetailPanel.classList.remove('hidden');
     }
 
-    async function openPreCounselProfile(studentUsername, completed) {
+    function closePreCounselDetail() {
+        selectedPreCounselStudent = null;
+        preCounselDetailPanel.classList.add('hidden');
+        preCounselDetailBody.innerHTML = '';
+        preCounselSummaryList.querySelectorAll('.pre-counsel-item').forEach(item => {
+            item.classList.remove('active');
+        });
+    }
+
+    function scrollPreCounselDetailIntoView() {
+        if (window.innerWidth < 900) {
+            preCounselDetailPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    async function openPreCounselProfile(studentUsername, completed, studentName) {
         selectedPreCounselStudent = studentUsername;
         preCounselSummaryList.querySelectorAll('.pre-counsel-item').forEach(item => {
             item.classList.toggle('active', item.dataset.username === studentUsername);
         });
+        preCounselDetailTitle.textContent = `사전 상담 · ${studentName || studentUsername}`;
         if (!completed) {
             preCounselDetailPanel.classList.remove('hidden');
             preCounselDetailBody.innerHTML = '<div class="empty-state">아직 사전 상담 카드를 작성하지 않았습니다.</div>';
+            scrollPreCounselDetailIntoView();
             return;
         }
         const profile = await api(`/api/teacher/pre-counseling-profiles/${encodeURIComponent(studentUsername)}`);
         renderPreCounselDetail(profile);
+        scrollPreCounselDetailIntoView();
     }
 
     async function loadPreCounselSummaries() {
@@ -1071,7 +1217,9 @@
                         <strong>${name}</strong>
                         <span class="weekly-student-meta">${student.recordCount}일 기록</span>
                     </div>
-                    <div class="weekly-day-row">${dayCells}</div>
+                    <div class="weekly-day-scroll">
+                        <div class="weekly-day-row">${dayCells}</div>
+                    </div>
                 </div>
             `;
         }).join('');
@@ -1340,6 +1488,13 @@
         }
     }
 
+    function closeDetail() {
+        selectedPost = null;
+        detailCard.classList.add('hidden');
+        mainLayout.classList.remove('has-detail');
+        renderPosts();
+    }
+
     async function updateStatus(id, status) {
         clearMessages();
         try {
@@ -1446,6 +1601,9 @@
         loadPosts(),
         loadUnreadCount()
     ]).catch(error => showError(error.message));
+
+    closeDetailBtn.addEventListener('click', closeDetail);
+    closePreCounselDetailBtn.addEventListener('click', closePreCounselDetail);
 
     loadCurrentUser().catch(() => {
         userGreeting.textContent = '교사 홈';
