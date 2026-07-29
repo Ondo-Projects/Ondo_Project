@@ -8,7 +8,7 @@ import com.ondo.domain.user.entity.Role;
 import com.ondo.domain.user.entity.User;
 import com.ondo.domain.user.repository.UserRepository;
 import com.ondo.global.error.BusinessException;
-import com.ondo.global.sms.NcpSensSmsSender;
+import com.ondo.global.sms.SmsPhoneUtils;
 import com.ondo.global.util.AgePolicy;
 import com.ondo.global.util.PasswordValidator;
 import lombok.RequiredArgsConstructor;
@@ -72,7 +72,7 @@ public class UserService {
             if (AgePolicy.isUnder14(birthDate)) {
                 validateGuardianSignup(request);
                 guardianName = request.getGuardianName().trim();
-                guardianPhone = NcpSensSmsSender.normalizePhone(request.getGuardianPhone());
+                guardianPhone = SmsPhoneUtils.normalizePhone(request.getGuardianPhone());
                 agreeGuardianChildPrivacy = request.isAgreeGuardianChildPrivacy();
                 agreeGuardianChildSensitive = request.isAgreeGuardianChildSensitive();
                 agreeGuardianIdentity = request.isAgreeGuardianIdentity();
@@ -163,7 +163,7 @@ public class UserService {
         if (request.getGuardianPhone() == null || request.getGuardianPhone().isBlank()) {
             throw new BusinessException("법정대리인 휴대전화번호를 입력해 주세요.");
         }
-        NcpSensSmsSender.validatePhone(request.getGuardianPhone());
+        SmsPhoneUtils.validatePhone(request.getGuardianPhone());
         if (request.getGuardianRelation() == null) {
             throw new BusinessException("법정대리인과의 관계를 선택해 주세요.");
         }
