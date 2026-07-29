@@ -55,6 +55,12 @@ public class UserController {
         return "redirect:/login?joined=true";
     }
 
+    @GetMapping("/home")
+    public String home() {
+        log.info("GET /home");
+        return "home";
+    }
+
     @GetMapping("/student")
     public String student() {
         log.info("GET /student");

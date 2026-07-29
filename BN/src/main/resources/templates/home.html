@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학교 홈 | 온도 상담웹</title>
+    <style>
+        * { box-sizing: border-box; }
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 760px;
+            margin: 32px auto;
+            padding: 0 16px 40px;
+            min-width: 0;
+        }
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+            margin-bottom: 20px;
+            min-width: 0;
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .page-header > div:first-child {
+            min-width: 0;
+            flex: 1 1 180px;
+        }
+        .page-header h1 {
+            margin: 0;
+            font-size: 26px;
+        }
+        .subtitle { color: #6b7280; margin: 6px 0 0; font-size: 14px; }
+        .user-greeting {
+            margin: 0 0 6px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e3a8a;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        .header-actions form {
+            display: inline-flex;
+            margin: 0;
+        }
+        .btn-secondary, .btn-primary {
+            border: none;
+            border-radius: 10px;
+            padding: 11px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .btn-secondary { background: #e5e7eb; color: #111827; }
+        .btn-primary { background: #2563eb; color: #fff; }
+        .role-block h2 {
+            font-size: 18px;
+            margin: 0 0 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .role-block p {
+            margin: 0 0 16px;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+        .role-block-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .common-strip {
+            display: grid;
+            gap: 8px;
+        }
+        .today-date {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 600;
+            color: #374151;
+        }
+        .helper {
+            margin: 0;
+            color: #6b7280;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .message {
+            margin-bottom: 16px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+        .hidden { display: none !important; }
+        @media (max-width: 640px) {
+            .container { margin: 24px auto; padding: 0 12px 32px; }
+            .card { padding: 20px; }
+            .page-header h1 { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <div>
+            <p class="user-greeting" id="userGreeting">불러오는 중...</p>
+            <h1>학교 홈</h1>
+            <p class="subtitle">오늘의 학교 생활을 한곳에서 시작하세요.</p>
+        </div>
+        <div class="header-actions">
+            <form action="/logout" method="post">
+                <button type="submit" class="btn-secondary">로그아웃</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="message hidden" id="pageError"></div>
+
+    <div class="card common-strip" id="commonStrip">
+        <p class="today-date" id="todayDate"></p>
+        <p class="helper">공통 정보(학교명·날씨)는 다음 단계에서 연결됩니다.</p>
+    </div>
+
+    <div class="card role-block hidden" id="studentBlock">
+        <h2>학생</h2>
+        <p>급식, 마음 날씨, 알림, 상담 기능은 학생 홈에서 이용할 수 있습니다.</p>
+        <div class="role-block-actions">
+            <a class="btn-primary" href="/student">학생 홈 전체 보기</a>
+        </div>
+    </div>
+
+    <div class="card role-block hidden" id="teacherBlock">
+        <h2>교사</h2>
+        <p>상담 대기, 마음 날씨, 사전상담 확인은 교사 홈에서 이용할 수 있습니다.</p>
+        <div class="role-block-actions">
+            <a class="btn-primary" href="/teacher">교사 홈 전체 보기</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const userGreeting = document.getElementById('userGreeting');
+    const pageError = document.getElementById('pageError');
+    const studentBlock = document.getElementById('studentBlock');
+    const teacherBlock = document.getElementById('teacherBlock');
+    const todayDate = document.getElementById('todayDate');
+
+    todayDate.textContent = new Intl.DateTimeFormat('ko-KR', { dateStyle: 'full' }).format(new Date());
+
+    async function api(url, options = {}) {
+        const response = await fetch(url, {
+            ...options,
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                ...(options.headers || {})
+            }
+        });
+        if (response.status === 401) {
+            window.location.href = '/login?sessionExpired=true';
+            throw new Error('로그인이 필요합니다.');
+        }
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(data.message || data.error || '요청에 실패했습니다.');
+        }
+        return data;
+    }
+
+    function showPageError(message) {
+        pageError.textContent = message;
+        pageError.classList.remove('hidden');
+    }
+
+    function renderUserGreeting(me) {
+        const displayName = me.name && me.name.trim() ? me.name.trim() : me.username;
+        const schoolLabel = me.schoolName && me.schoolName.trim() ? me.schoolName.trim() : '학교 미등록';
+        userGreeting.textContent = `${displayName} · ${schoolLabel}`;
+    }
+
+    function renderRoleBlocks(role) {
+        studentBlock.classList.add('hidden');
+        teacherBlock.classList.add('hidden');
+
+        if (role === 'STUDENT') {
+            studentBlock.classList.remove('hidden');
+            return;
+        }
+        if (role === 'TEACHER') {
+            teacherBlock.classList.remove('hidden');
+        }
+    }
+
+    async function loadPage() {
+        try {
+            const me = await api('/api/auth/me');
+            renderUserGreeting(me);
+            renderRoleBlocks(me.role);
+        } catch (error) {
+            showPageError(error.message || '페이지 정보를 불러오지 못했습니다.');
+        }
+    }
+
+    loadPage();
+</script>
+</body>
+</html>

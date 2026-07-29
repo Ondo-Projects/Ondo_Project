@@ -44,9 +44,9 @@ public class CustomSucessHandler implements AuthenticationSuccessHandler {
         for (GrantedAuthority authority : authentication.getAuthorities()) {
             switch (authority.getAuthority()) {
                 case "ROLE_STUDENT":
-                    return "/student";
+                    return "/home";
                 case "ROLE_TEACHER":
-                    return "/teacher";
+                    return "/home";
                 case "ROLE_ADMIN":
                     return "/admin";
                 default:
