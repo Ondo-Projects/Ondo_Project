@@ -253,8 +253,26 @@
         .badge-CONFIRMED { background: #dbeafe; color: #1d4ed8; }
         .badge-COMPLETED { background: #dcfce7; color: #166534; }
         .badge-CANCELLED { background: #f3f4f6; color: #4b5563; }
+        .badge-OPEN { background: #fef3c7; color: #92400e; }
+        .badge-IN_REVIEW { background: #dbeafe; color: #1d4ed8; }
+        .badge-RESOLVED { background: #dcfce7; color: #166534; }
+        .badge-CLOSED { background: #f3f4f6; color: #4b5563; }
+        .badge-suggestion-cat {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        .detail-panel {
+            display: none;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .detail-panel.open { display: block; }
         .post-meta { color: #6b7280; font-size: 13px; margin-top: 8px; }
         #detailCard {
+            scroll-margin-top: 12px;
+        }
+        #section-suggestion {
             scroll-margin-top: 12px;
         }
         .detail-card-header {
@@ -666,6 +684,168 @@
         .pre-counsel-label {
             font-weight: 700;
             color: #374151;
+        }
+        .suggestion-subheading {
+            font-size: 16px;
+            font-weight: 700;
+            color: #374151;
+            margin: 24px 0 12px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .suggestion-subheading--compact {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+        #section-suggestion .field {
+            margin-bottom: 10px;
+        }
+        #section-suggestion label {
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        #section-suggestion input[type="text"],
+        #section-suggestion select,
+        #section-suggestion textarea {
+            padding: 10px 12px;
+            font-size: 14px;
+        }
+        #section-suggestion select {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-family: inherit;
+            background: #fff;
+        }
+        #section-suggestion textarea {
+            min-height: 96px;
+        }
+        #section-suggestion .btn-primary#suggestionSubmitBtn {
+            font-size: 14px;
+            padding: 10px 16px;
+            min-height: 44px;
+        }
+        #suggestionDetail {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+        #suggestionDetail .detail-card-header h3 {
+            margin: 0;
+            font-size: 16px;
+            flex: 1;
+            min-width: 0;
+        }
+        #suggestionDetailActions {
+            margin-top: 16px;
+        }
+        #suggestionEditHint {
+            margin-top: 12px;
+        }
+        #suggestionDetailBody .suggestion-detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        #suggestionDetailBody .suggestion-detail-header h3 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 700;
+            flex: 1;
+            min-width: 0;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+        #suggestionDetailBody .suggestion-detail-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        #suggestionDetailBody .detail-content {
+            margin-top: 12px;
+        }
+        #suggestionDetailReply {
+            margin-top: 12px;
+            padding: 14px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
+        }
+        .suggestion-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 14px 16px;
+            min-height: 56px;
+            cursor: pointer;
+            transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+            -webkit-tap-highlight-color: rgba(37, 99, 235, 0.12);
+        }
+        .suggestion-item:hover,
+        .suggestion-item.active {
+            border-color: #2563eb;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12);
+        }
+        .suggestion-item:active {
+            background: #f8fafc;
+        }
+        .suggestion-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .suggestion-item-title {
+            margin: 0;
+            font-size: 16px;
+            flex: 1;
+            min-width: 0;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+        .suggestion-item-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .suggestion-item-meta {
+            color: #6b7280;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+        @media (max-width: 640px) {
+            #section-suggestion .inline-actions {
+                width: 100%;
+            }
+            #section-suggestion .inline-actions button {
+                flex: 1 1 calc(50% - 4px);
+            }
+            #suggestionDetailActions {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+            }
+            #suggestionDetailActions button {
+                width: 100%;
+            }
+            .suggestion-item-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .suggestion-item-badges {
+                width: 100%;
+            }
+            #suggestionDetailBody .suggestion-detail-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            #suggestionDetailBody .suggestion-detail-badges {
+                width: 100%;
+            }
         }
     </style>
 </head>
