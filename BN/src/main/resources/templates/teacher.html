@@ -851,6 +851,81 @@
             </div>
         </section>
     </div>
+
+    <div class="card" id="section-suggestion" style="margin-bottom: 20px;">
+        <section>
+            <h2>6. 운영 건의</h2>
+            <p class="helper">서비스 버그, 기능 개선, 운영 문의를 운영팀에 남길 수 있습니다. 담당 관리자만 확인합니다.</p>
+
+            <form id="suggestionForm">
+                <div class="field">
+                    <label for="suggestionCategory">분류</label>
+                    <select id="suggestionCategory" required>
+                        <option value="">선택해 주세요</option>
+                        <option value="BUG">버그 / 오류</option>
+                        <option value="FEATURE">기능 개선</option>
+                        <option value="OPERATION">운영 문의</option>
+                        <option value="OTHER">기타</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="suggestionTitle">제목</label>
+                    <input type="text" id="suggestionTitle" maxlength="100" required placeholder="건의 제목을 입력해 주세요.">
+                </div>
+                <div class="field">
+                    <label for="suggestionContent">내용</label>
+                    <textarea id="suggestionContent" maxlength="2000" required placeholder="어떤 문제인지, 어떤 점이 불편했는지 구체적으로 적어 주세요."></textarea>
+                </div>
+                <button type="submit" class="btn-primary" id="suggestionSubmitBtn">건의 등록하기</button>
+            </form>
+
+            <h3 class="suggestion-subheading">내 건의</h3>
+            <div class="post-list" id="suggestionList">
+                <div class="empty-state">불러오는 중...</div>
+            </div>
+
+            <div class="hidden" id="suggestionDetail">
+                <div class="detail-card-header">
+                    <h3>건의 상세</h3>
+                    <button type="button" class="btn-secondary detail-close-btn" id="closeSuggestionDetailBtn" aria-label="건의 상세 닫기">닫기</button>
+                </div>
+                <div id="suggestionDetailBody"></div>
+                <div class="reply-box hidden" id="suggestionDetailReply"></div>
+                <p class="helper hidden" id="suggestionEditHint">검토 중이거나 처리된 건의는 수정할 수 없습니다.</p>
+                <div class="inline-actions hidden" id="suggestionDetailActions">
+                    <button type="button" class="btn-primary" id="editSuggestionBtn">수정</button>
+                    <button type="button" class="btn-danger" id="deleteSuggestionBtn">삭제</button>
+                </div>
+                <div class="detail-panel open hidden" id="suggestionEditPanel">
+                    <h3 class="suggestion-subheading suggestion-subheading--compact">건의 수정</h3>
+                    <form id="suggestionEditForm">
+                        <input type="hidden" id="suggestionEditId">
+                        <div class="field">
+                            <label for="suggestionEditCategory">분류</label>
+                            <select id="suggestionEditCategory" required>
+                                <option value="BUG">버그 / 오류</option>
+                                <option value="FEATURE">기능 개선</option>
+                                <option value="OPERATION">운영 문의</option>
+                                <option value="OTHER">기타</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="suggestionEditTitle">제목</label>
+                            <input type="text" id="suggestionEditTitle" maxlength="100" required>
+                        </div>
+                        <div class="field">
+                            <label for="suggestionEditContent">내용</label>
+                            <textarea id="suggestionEditContent" maxlength="2000" required></textarea>
+                        </div>
+                        <div class="inline-actions">
+                            <button type="submit" class="btn-primary" id="suggestionEditSaveBtn">저장</button>
+                            <button type="button" class="btn-secondary" id="cancelSuggestionEditBtn">취소</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
 </div>
 
 <script>
