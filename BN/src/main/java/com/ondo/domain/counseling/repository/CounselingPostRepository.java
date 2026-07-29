@@ -34,4 +34,13 @@ public interface CounselingPostRepository extends JpaRepository<CounselingPost, 
             GROUP BY p.status
             """)
     List<Object[]> countGroupByStatus();
+
+    @Query("""
+            SELECT COUNT(p)
+            FROM CounselingPost p
+            WHERE p.student IN :students
+              AND p.deletedAt IS NULL
+              AND (p.readByTeacherAt IS NULL OR p.updatedAt > p.readByTeacherAt)
+            """)
+    long countUnreadByStudents(List<User> students);
 }

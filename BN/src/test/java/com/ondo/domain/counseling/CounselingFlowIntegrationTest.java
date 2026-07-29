@@ -202,6 +202,26 @@ class CounselingFlowIntegrationTest {
     }
 
     @Test
+    void getUnreadCount_beforeAndAfterTeacherRead() throws Exception {
+        Long postId = createAssignedPost(STUDENT1_USERNAME);
+        String teacherToken = bearerToken(TEACHER_USERNAME, Role.TEACHER);
+
+        mockMvc.perform(get("/api/counseling/unread-count")
+                        .header("Authorization", "Bearer " + teacherToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.count").value(1));
+
+        mockMvc.perform(get("/api/counseling/{id}", postId)
+                        .header("Authorization", "Bearer " + teacherToken))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/counseling/unread-count")
+                        .header("Authorization", "Bearer " + teacherToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.count").value(0));
+    }
+
+    @Test
     void getTeacherPosts_studentRole_returnsBadRequest() throws Exception {
         String studentToken = bearerToken(STUDENT1_USERNAME, Role.STUDENT);
 
