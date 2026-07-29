@@ -146,6 +146,42 @@
             background: #e5e7eb;
             color: #111827;
         }
+        .today-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 4px;
+        }
+        .today-summary-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            min-width: 0;
+        }
+        .today-summary-item.highlight {
+            background: #fff7ed;
+            border-color: #fed7aa;
+        }
+        .today-summary-label {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 6px;
+            overflow-wrap: anywhere;
+        }
+        .today-summary-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.1;
+        }
+        .today-summary-item.highlight .today-summary-value { color: #c2410c; }
+        .today-summary-hint {
+            font-size: 12px;
+            color: #94a3b8;
+            margin: 6px 0 0;
+            line-height: 1.4;
+        }
         .common-strip {
             display: grid;
             gap: 8px;
@@ -234,6 +270,9 @@
                 flex-wrap: wrap;
             }
             .weather-temp { font-size: 24px; }
+            .today-summary-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -281,8 +320,29 @@
     </div>
 
     <div class="card role-block hidden" id="teacherBlock">
-        <h2>교사</h2>
-        <p>상담 대기, 마음 날씨, 사전상담 확인은 교사 홈에서 이용할 수 있습니다.</p>
+        <h2>오늘 확인할 것</h2>
+        <div class="today-summary-grid" id="teacherSummaryGrid">
+            <div class="today-summary-item highlight">
+                <div class="today-summary-label">미확인 상담</div>
+                <div class="today-summary-value" id="teacherUnreadCount">-</div>
+                <p class="today-summary-hint">학생 답변·상태 변경 알림</p>
+            </div>
+            <div class="today-summary-item">
+                <div class="today-summary-label">대기 중 상담</div>
+                <div class="today-summary-value" id="teacherWaitingCount">-</div>
+                <p class="today-summary-hint">확정 전 상담 신청</p>
+            </div>
+            <div class="today-summary-item">
+                <div class="today-summary-label">사전상담 미작성</div>
+                <div class="today-summary-value" id="teacherPreCounselPendingCount">-</div>
+                <p class="today-summary-hint">담당 학생 중 미작성</p>
+            </div>
+        </div>
+        <div class="quick-links" id="teacherQuickLinks">
+            <a class="btn-quick" href="/teacher#postList">상담</a>
+            <a class="btn-quick" href="/teacher#moodSummaryList">마음</a>
+            <a class="btn-quick" href="/teacher#preCounselSummaryList">사전카드</a>
+        </div>
         <div class="role-block-actions">
             <a class="btn-primary" href="/teacher">교사 홈 전체 보기</a>
         </div>
@@ -299,6 +359,10 @@
     const weatherRegionHint = document.getElementById('weatherRegionHint');
     const weatherBox = document.getElementById('weatherBox');
     const studentMealSummary = document.getElementById('studentMealSummary');
+    const teacherSummaryGrid = document.getElementById('teacherSummaryGrid');
+    const teacherUnreadCount = document.getElementById('teacherUnreadCount');
+    const teacherWaitingCount = document.getElementById('teacherWaitingCount');
+    const teacherPreCounselPendingCount = document.getElementById('teacherPreCounselPendingCount');
 
     todayDate.textContent = new Intl.DateTimeFormat('ko-KR', { dateStyle: 'full' }).format(new Date());
 
@@ -451,6 +515,30 @@
         });
     }
 
+    function renderTeacherSummary(unreadCount, waitingCount, preCounselPendingCount) {
+        teacherUnreadCount.textContent = unreadCount;
+        teacherWaitingCount.textContent = waitingCount;
+        teacherPreCounselPendingCount.textContent = preCounselPendingCount;
+    }
+
+    async function loadTeacherSummary() {
+        const [unreadData, posts, preCounselSummaries] = await Promise.all([
+            api('/api/counseling/unread-count'),
+            api('/api/counseling/teacher'),
+            api('/api/teacher/pre-counseling-profiles')
+        ]);
+
+        const waitingCount = posts.filter(post => post.status === 'WAITING').length;
+        const preCounselPendingCount = preCounselSummaries.filter(item => !item.completed).length;
+        renderTeacherSummary(unreadData.count, waitingCount, preCounselPendingCount);
+    }
+
+    function loadTeacherBlock() {
+        loadTeacherSummary().catch(error => {
+            teacherSummaryGrid.innerHTML = `<div class="empty-state">${escapeHtml(error.message || '교사 요약 정보를 불러올 수 없습니다.')}</div>`;
+        });
+    }
+
     function formatSchoolTypeLabel(schoolType) {
         if (schoolType === '중') return '중학교';
         if (schoolType === '고') return '고등학교';
@@ -531,6 +619,9 @@
 
             if (me.role === 'STUDENT') {
                 loadStudentBlock();
+            }
+            if (me.role === 'TEACHER') {
+                loadTeacherBlock();
             }
         } catch (error) {
             showPageError(error.message || '페이지 정보를 불러오지 못했습니다.');

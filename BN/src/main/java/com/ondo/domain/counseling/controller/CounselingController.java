@@ -55,6 +55,12 @@ public class CounselingController {
         return ResponseEntity.ok(counselingService.getTeacherPosts(authentication.getName(), status));
     }
 
+    @GetMapping("/unread-count")
+    public ResponseEntity<Map<String, Long>> getUnreadCount(Authentication authentication) {
+        long count = counselingService.getTeacherUnreadCount(authentication.getName());
+        return ResponseEntity.ok(Map.of("count", count));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<CounselingResponseDTO> getPost(
             Authentication authentication,

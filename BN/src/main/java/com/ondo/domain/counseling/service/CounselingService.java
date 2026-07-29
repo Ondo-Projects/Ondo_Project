@@ -89,6 +89,21 @@ public class CounselingService {
                 .toList();
     }
 
+    public long getTeacherUnreadCount(String username) {
+        User teacher = getUser(username);
+        assertRole(teacher, Role.TEACHER);
+
+        List<User> students = assignmentRepository.findByTeacher(teacher).stream()
+                .map(StudentTeacherAssignment::getStudent)
+                .toList();
+
+        if (students.isEmpty()) {
+            return 0L;
+        }
+
+        return counselingPostRepository.countUnreadByStudents(students);
+    }
+
     @Transactional
     public CounselingResponseDTO getPost(String username, Long id) {
         User user = getUser(username);
