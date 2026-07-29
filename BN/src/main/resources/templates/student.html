@@ -1067,30 +1067,36 @@
             margin: 0;
             font-size: 16px;
         }
-        #suggestionDetailBody {
-            background: #f9fafb;
-            border-radius: 10px;
-            padding: 14px;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            overflow-wrap: anywhere;
-            word-break: keep-all;
+        #suggestionDetailActions {
+            margin-top: 16px;
         }
-        #suggestionDetailBody .suggestion-detail-meta {
-            color: #6b7280;
-            font-size: 13px;
-            margin-bottom: 10px;
+        #suggestionEditHint {
+            margin-top: 12px;
         }
-        #suggestionDetailBody .suggestion-detail-title {
+        #suggestionDetailBody .suggestion-detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        #suggestionDetailBody .suggestion-detail-header h3 {
+            margin: 0;
             font-size: 17px;
             font-weight: 700;
-            margin: 0 0 10px;
+            flex: 1;
+            min-width: 0;
             overflow-wrap: anywhere;
             word-break: keep-all;
         }
-        #suggestionDetailBody .suggestion-detail-content {
-            margin: 0;
-            color: #374151;
+        #suggestionDetailBody .suggestion-detail-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        #suggestionDetailBody .detail-content {
+            margin-top: 12px;
         }
         #suggestionDetailReply {
             margin-top: 12px;
@@ -1157,6 +1163,13 @@
                 align-items: flex-start;
             }
             .suggestion-item-badges {
+                width: 100%;
+            }
+            #suggestionDetailBody .suggestion-detail-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            #suggestionDetailBody .suggestion-detail-badges {
                 width: 100%;
             }
         }
@@ -1593,7 +1606,7 @@
                     <button type="button" class="btn-primary" id="editSuggestionBtn">수정</button>
                     <button type="button" class="btn-danger" id="deleteSuggestionBtn">삭제</button>
                 </div>
-                <div class="detail-panel hidden" id="suggestionEditPanel">
+                <div class="detail-panel open hidden" id="suggestionEditPanel">
                     <h3 class="suggestion-subheading suggestion-subheading--compact">건의 수정</h3>
                     <form id="suggestionEditForm">
                         <input type="hidden" id="suggestionEditId">
@@ -2936,23 +2949,29 @@
         }
     }
 
+    function isSuggestionOpen(post) {
+        return post && String(post.status).toUpperCase() === 'OPEN';
+    }
+
     async function openSuggestionDetail(id, scroll = true) {
         selectedSuggestionId = id;
         renderSuggestionList();
-        document.getElementById('suggestionEditPanel')?.classList.add('hidden');
+        suggestionEditPanel?.classList.add('hidden');
 
         try {
             const post = await api(`/api/student/suggestions/${id}`);
             suggestionDetail.classList.remove('hidden');
 
             suggestionDetailBody.innerHTML = `
-                <div class="suggestion-detail-meta">
-                    <span class="badge badge-suggestion-cat">${SUGGESTION_CATEGORY_LABELS[post.category] || post.category}</span>
-                    <span class="badge badge-${post.status}">${SUGGESTION_STATUS_LABELS[post.status] || post.status}</span>
+                <div class="suggestion-detail-header">
+                    <h3>${escapeHtml(post.title)}</h3>
+                    <div class="suggestion-detail-badges">
+                        <span class="badge badge-suggestion-cat">${SUGGESTION_CATEGORY_LABELS[post.category] || post.category}</span>
+                        <span class="badge badge-${post.status}">${SUGGESTION_STATUS_LABELS[post.status] || post.status}</span>
+                    </div>
                 </div>
-                <h3 class="suggestion-detail-title">${escapeHtml(post.title)}</h3>
-                <p class="suggestion-detail-meta">작성 ${formatDateTime(post.createdAt)}${post.updatedAt && post.updatedAt !== post.createdAt ? ` · 수정 ${formatDateTime(post.updatedAt)}` : ''}</p>
-                <p class="suggestion-detail-content">${escapeHtml(post.content)}</p>
+                <p class="post-meta">작성 ${formatDateTime(post.createdAt)}${post.updatedAt && post.updatedAt !== post.createdAt ? ` · 수정 ${formatDateTime(post.updatedAt)}` : ''}</p>
+                <div class="detail-content">${escapeHtml(post.content)}</div>
             `;
 
             if (post.adminReply) {
@@ -2968,7 +2987,7 @@
             }
 
             currentSuggestionPost = post;
-            if (post.status === 'OPEN') {
+            if (isSuggestionOpen(post)) {
                 suggestionDetailActions?.classList.remove('hidden');
                 suggestionEditHint?.classList.add('hidden');
             } else {
@@ -2994,6 +3013,7 @@
         document.getElementById('suggestionEditTitle').value = post.title;
         document.getElementById('suggestionEditContent').value = post.content;
         suggestionEditPanel?.classList.remove('hidden');
+        suggestionEditPanel?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     async function deleteSuggestion(id) {
@@ -3247,13 +3267,13 @@
     }
 
     document.getElementById('editSuggestionBtn')?.addEventListener('click', () => {
-        if (currentSuggestionPost?.status === 'OPEN') {
+        if (isSuggestionOpen(currentSuggestionPost)) {
             openSuggestionEditForm(currentSuggestionPost);
         }
     });
 
     document.getElementById('deleteSuggestionBtn')?.addEventListener('click', () => {
-        if (currentSuggestionPost?.status === 'OPEN') {
+        if (isSuggestionOpen(currentSuggestionPost)) {
             deleteSuggestion(currentSuggestionPost.id).catch(error => showError(error.message));
         }
     });
