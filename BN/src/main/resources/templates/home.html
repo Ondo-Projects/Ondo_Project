@@ -10,6 +10,7 @@
             overflow-x: hidden;
             max-width: 100%;
         }
+        img, table, pre { max-width: 100%; }
         body {
             margin: 0;
             font-family: "Segoe UI", sans-serif;
@@ -96,6 +97,9 @@
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
+        }
+        .role-block-actions .btn-primary {
+            flex: 1 1 auto;
         }
         .student-meal-summary {
             margin-bottom: 4px;
@@ -191,6 +195,7 @@
             font-size: 15px;
             font-weight: 600;
             color: #374151;
+            overflow-wrap: anywhere;
         }
         .school-meta {
             margin: 0;
@@ -262,16 +267,48 @@
         }
         .hidden { display: none !important; }
         @media (max-width: 640px) {
-            .container { margin: 24px auto; padding: 0 12px 32px; }
-            .card { padding: 20px; }
+            .container { margin: 16px auto; padding: 0 12px 32px; }
+            .page-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .page-header > div:first-child { flex-basis: auto; }
+            .header-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            .user-greeting {
+                white-space: normal;
+                line-height: 1.4;
+            }
+            .card { padding: 18px; border-radius: 14px; }
             .page-header h1 { font-size: 22px; }
             .weather-box,
             .weather-box-compact {
-                flex-wrap: wrap;
+                flex-direction: column;
+                align-items: flex-start;
             }
             .weather-temp { font-size: 24px; }
             .today-summary-grid {
                 grid-template-columns: 1fr;
+            }
+            .today-summary-value { font-size: 24px; }
+            .quick-links {
+                width: 100%;
+            }
+            .btn-quick {
+                flex: 1 1 calc(50% - 4px);
+            }
+            .role-block-actions {
+                width: 100%;
+            }
+            .role-block-actions .btn-primary {
+                width: 100%;
+            }
+        }
+        @media (max-width: 360px) {
+            .btn-quick {
+                flex: 1 1 100%;
             }
         }
     </style>
