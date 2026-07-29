@@ -86,10 +86,103 @@
             grid-template-columns: 1.2fr 0.8fr;
             gap: 16px;
         }
+        .dashboard-hero {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .dashboard-hero .card,
+        .dashboard-daily-grid .card,
+        .dashboard-workspace .card {
+            margin-bottom: 0;
+        }
+        .dashboard-hero #quickActionBar {
+            margin-bottom: 0;
+        }
+        .dashboard-daily-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .dashboard-workspace {
+            display: grid;
+            gap: 16px;
+        }
+        .section-group-label {
+            margin: 4px 0 0;
+            font-size: 13px;
+            font-weight: 700;
+            color: #64748b;
+        }
+        .card-compact {
+            padding: 18px 20px;
+        }
+        .assignment-details > summary {
+            list-style: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            min-height: 44px;
+        }
+        .assignment-details > summary::-webkit-details-marker {
+            display: none;
+        }
+        .assignment-details > summary::after {
+            content: '▾';
+            color: #6b7280;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .assignment-details:not([open]) > summary::after {
+            content: '▸';
+        }
+        .assignment-summary-hint {
+            font-size: 13px;
+            color: #6b7280;
+            font-weight: 500;
+            text-align: right;
+            overflow-wrap: anywhere;
+            min-width: 0;
+        }
+        .assignment-details[open] .assignment-summary-hint {
+            display: none;
+        }
+        .assignment-details .section-heading {
+            margin: 0;
+            padding: 0;
+            border: none;
+            font-size: 18px;
+        }
         @media (max-width: 640px) {
             .dashboard-widgets {
                 grid-template-columns: 1fr;
                 gap: 12px;
+            }
+            .dashboard-daily-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .dashboard-hero,
+            .dashboard-workspace {
+                gap: 12px;
+            }
+            .assignment-details > summary {
+                flex-wrap: wrap;
+            }
+            .assignment-summary-hint {
+                width: 100%;
+                text-align: left;
+            }
+            .assignment-details[open] .assignment-summary-hint {
+                display: none;
+            }
+        }
+        @media (min-width: 641px) {
+            .dashboard-daily-grid .card {
+                height: 100%;
             }
         }
         .dashboard-widget {
@@ -724,7 +817,7 @@
         <div>
             <p class="user-greeting" id="userGreeting">불러오는 중...</p>
             <h1>학생 홈</h1>
-            <p class="subtitle">오늘 상태를 확인하고 상담을 신청할 수 있습니다.</p>
+            <p class="subtitle">오늘 할 일부터 확인하고 상담까지 이어서 진행하세요.</p>
         </div>
         <div class="header-actions">
             <button type="button" class="btn-link" id="toggleSchoolChangeBtn">학교 변경</button>
@@ -737,6 +830,7 @@
     <div class="message" id="pageError"></div>
     <div class="success-message" id="pageSuccess"></div>
 
+    <div class="dashboard-hero">
     <nav class="quick-action-bar" id="quickActionBar" aria-label="빠른 이동">
         <button type="button" class="quick-action-btn" data-target="section-today">오늘</button>
         <button type="button" class="quick-action-btn" data-target="section-mood">마음</button>
@@ -780,7 +874,7 @@
 
     <div class="card" id="section-today">
         <section>
-            <h2>1. 오늘 한눈에</h2>
+            <h2>오늘 한눈에</h2>
             <p class="helper" id="mealSchoolHint">우리 학교 급식과 지역 날씨입니다.</p>
             <div class="dashboard-widgets">
                 <div class="dashboard-widget">
@@ -799,10 +893,12 @@
             </div>
         </section>
     </div>
+    </div>
 
+    <div class="dashboard-daily-grid">
     <div class="card" id="section-mood">
         <section>
-            <h2>2. 오늘의 마음 날씨</h2>
+            <h2>마음 날씨</h2>
             <p class="helper">하루에 한 번, 지금 마음 상태를 기록해 주세요. 담당 교사만 볼 수 있습니다.</p>
             <div class="mood-picker" id="moodPicker">
                 <button type="button" class="mood-option" data-mood="SUNNY"><span class="emoji">☀️</span>맑음</button>
@@ -817,7 +913,7 @@
 
     <div class="card" id="section-notice">
         <section>
-            <h2>3. 선생님 알림판</h2>
+            <h2>선생님 알림</h2>
             <p class="helper" id="noticeDisabledHint">담당 교사 등록 후 알림을 확인할 수 있습니다.</p>
             <div id="noticeList">
                 <div class="empty-state">등록된 알림이 없습니다.</div>
@@ -825,9 +921,17 @@
         </section>
     </div>
 
-    <div class="card" id="section-assignment">
-        <section>
-            <h2>4. 담당 교사</h2>
+        </section>
+    </div>
+    </div>
+
+    <div class="card card-compact" id="section-assignment">
+        <details class="assignment-details" id="assignmentDetails" open>
+            <summary>
+                <h2 class="section-heading">담당 교사</h2>
+                <span class="assignment-summary-hint" id="assignmentSummaryHint">초대 코드로 등록해 주세요</span>
+            </summary>
+            <section>
             <div id="assignmentRegister">
                 <p class="helper">교사가 알려준 6자리 초대 코드를 입력해 주세요.</p>
                 <div class="field">
@@ -845,12 +949,15 @@
                 <p><strong>담당 교사:</strong> <span id="teacherName">-</span></p>
                 <p class="helper">등록일: <span id="assignedAt">-</span></p>
             </div>
-        </section>
+            </section>
+        </details>
     </div>
 
+    <div class="dashboard-workspace">
+    <p class="section-group-label">상담 준비</p>
     <div class="card" id="section-pre-counsel">
         <section>
-            <h2>5. 사전 상담 카드</h2>
+            <h2>사전 상담 카드</h2>
             <p class="helper">상담 전에 나를 소개하는 카드를 작성합니다. 담당 교사만 열람할 수 있습니다.</p>
             <span class="profile-status" id="preCounselStatus">작성 전</span>
             <form id="preCounselForm">
@@ -949,7 +1056,7 @@
 
     <div class="card" id="section-counsel-create">
         <section>
-            <h2>6. 상담 신청</h2>
+            <h2>상담 신청</h2>
             <p class="helper" id="createDisabledHint">담당 교사 등록 후 상담을 신청할 수 있습니다.</p>
             <form id="createForm">
                 <div class="field">
@@ -984,9 +1091,10 @@
         </section>
     </div>
 
+    <p class="section-group-label">내 상담</p>
     <div class="card" id="section-counsel-list">
         <section>
-            <h2>7. 내 상담 목록</h2>
+            <h2>상담 목록</h2>
             <div class="post-list" id="postList">
                 <div class="empty-state">작성한 상담이 없습니다.</div>
             </div>
@@ -1038,6 +1146,7 @@
                 </form>
             </div>
         </section>
+    </div>
     </div>
 </div>
 
@@ -1109,6 +1218,8 @@
     const preCounselNav = document.getElementById('preCounselNav');
     const closeDetailBtn = document.getElementById('closeDetailBtn');
     const todayTodoList = document.getElementById('todayTodoList');
+    const assignmentDetails = document.getElementById('assignmentDetails');
+    const assignmentSummaryHint = document.getElementById('assignmentSummaryHint');
 
     let profileSchoolTypeFilter = '';
     let profileSearchTimer = null;
@@ -1227,6 +1338,12 @@
         hasAssignment = enabled;
         if (!enabled) {
             todayNoticeCount = null;
+            if (assignmentSummaryHint) {
+                assignmentSummaryHint.textContent = '초대 코드로 등록해 주세요';
+            }
+            if (assignmentDetails) {
+                assignmentDetails.open = true;
+            }
         }
         ['title', 'counselingType', 'desiredDate', 'content'].forEach(id => {
             document.getElementById(id).disabled = !enabled;
@@ -1257,6 +1374,12 @@
         document.getElementById('teacherName').textContent = teacherDisplay;
         document.getElementById('schoolName').textContent = schoolName;
         document.getElementById('assignedAt').textContent = formatDateTime(data.assignedAt);
+        if (assignmentSummaryHint) {
+            assignmentSummaryHint.textContent = `${schoolName} · ${teacherDisplay} 선생님`;
+        }
+        if (assignmentDetails) {
+            assignmentDetails.open = false;
+        }
         setCreateFormEnabled(true);
         noticeDisabledHint.style.display = 'none';
         loadNotices();
@@ -1692,6 +1815,12 @@
         } catch (error) {
             assignmentRegister.classList.remove('hidden');
             assignmentInfo.classList.add('hidden');
+            if (assignmentSummaryHint) {
+                assignmentSummaryHint.textContent = '초대 코드로 등록해 주세요';
+            }
+            if (assignmentDetails) {
+                assignmentDetails.open = true;
+            }
             setCreateFormEnabled(false);
             todayNoticeCount = null;
             refreshTodayTodo();
@@ -2001,6 +2130,9 @@
         }
         if (sectionId === 'section-pre-counsel') {
             openPreCounselSectionForNav();
+        }
+        if (sectionId === 'section-assignment' && assignmentDetails) {
+            assignmentDetails.open = true;
         }
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
