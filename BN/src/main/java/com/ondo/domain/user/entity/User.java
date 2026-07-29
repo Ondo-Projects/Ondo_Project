@@ -84,6 +84,12 @@ public class User {
     @Column(nullable = false, columnDefinition = "bit(1) not null default b'1'")
     private boolean active = true;
 
+    @Column
+    private Integer grade;
+
+    @Column
+    private Integer classNumber;
+
     @Builder
     public User(
             String username,
@@ -104,7 +110,9 @@ public class User {
             boolean agreePrivacy,
             boolean agreeSensitive,
             LocalDateTime agreedAt,
-            Boolean active
+            Boolean active,
+            Integer grade,
+            Integer classNumber
     ) {
         this.username = username;
         this.password = password;
@@ -125,6 +133,8 @@ public class User {
         this.agreeSensitive = agreeSensitive;
         this.agreedAt = agreedAt;
         this.active = active != null ? active : true;
+        this.grade = grade;
+        this.classNumber = classNumber;
     }
 
     public void changeSchool(School school) {
@@ -136,5 +146,10 @@ public class User {
 
     public void updateActive(boolean active) {
         this.active = active;
+    }
+
+    public void updateClassProfile(Integer grade, Integer classNumber) {
+        this.grade = grade;
+        this.classNumber = classNumber;
     }
 }

@@ -861,6 +861,16 @@
             border-radius: 10px;
             padding: 14px 12px;
         }
+        .class-profile-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+        @media (max-width: 640px) {
+            .class-profile-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -986,6 +996,30 @@
 
         </section>
     </div>
+    </div>
+
+    <div class="card card-compact" id="section-class-profile">
+        <section>
+            <h2 class="section-heading">학년 · 반</h2>
+            <p class="helper">시간표 등 학교생활 기능에 사용됩니다.</p>
+            <p class="helper" id="classProfileStatus">불러오는 중...</p>
+            <form id="classProfileForm">
+                <div class="class-profile-grid">
+                    <div class="field">
+                        <label for="classProfileGrade">학년</label>
+                        <input type="number" id="classProfileGrade" min="1" max="6" placeholder="예: 2">
+                    </div>
+                    <div class="field">
+                        <label for="classProfileClassNumber">반</label>
+                        <input type="number" id="classProfileClassNumber" min="1" max="20" placeholder="예: 3">
+                    </div>
+                </div>
+                <div class="inline-actions" style="margin-top: 12px;">
+                    <button type="submit" class="btn-primary" id="classProfileSaveBtn">저장</button>
+                    <button type="button" class="btn-secondary" id="classProfileClearBtn">초기화</button>
+                </div>
+            </form>
+        </section>
     </div>
 
     <div class="card card-compact" id="section-assignment">
@@ -1289,6 +1323,11 @@
     const assignmentDetails = document.getElementById('assignmentDetails');
     const assignmentSummaryHint = document.getElementById('assignmentSummaryHint');
     const studentMainTabs = document.getElementById('studentMainTabs');
+    const classProfileForm = document.getElementById('classProfileForm');
+    const classProfileStatus = document.getElementById('classProfileStatus');
+    const classProfileGrade = document.getElementById('classProfileGrade');
+    const classProfileClassNumber = document.getElementById('classProfileClassNumber');
+    const classProfileClearBtn = document.getElementById('classProfileClearBtn');
 
     const STUDENT_TAB_SECTIONS = {
         'pre-counsel': ['section-pre-counsel'],
@@ -1784,6 +1823,53 @@
     async function loadProfileSchool() {
         const data = await api('/api/student/profile/school');
         renderProfileSchool(data);
+    }
+
+    function renderClassProfile(data) {
+        if (!classProfileStatus) {
+            return;
+        }
+        if (data.completed) {
+            classProfileStatus.textContent = `${data.grade}학년 · ${data.classNumber}반`;
+        } else {
+            classProfileStatus.textContent = '아직 입력하지 않았습니다. 시간표 기능을 위해 학년·반을 입력해 주세요.';
+        }
+        if (classProfileGrade) {
+            classProfileGrade.value = data.grade ?? '';
+        }
+        if (classProfileClassNumber) {
+            classProfileClassNumber.value = data.classNumber ?? '';
+        }
+    }
+
+    async function loadClassProfile() {
+        const data = await api('/api/student/profile/class');
+        renderClassProfile(data);
+    }
+
+    async function saveClassProfile(event) {
+        event.preventDefault();
+        const gradeValue = classProfileGrade?.value.trim();
+        const classNumberValue = classProfileClassNumber?.value.trim();
+        const payload = {
+            grade: gradeValue ? Number(gradeValue) : null,
+            classNumber: classNumberValue ? Number(classNumberValue) : null
+        };
+        const data = await api('/api/student/profile/class', {
+            method: 'PATCH',
+            body: JSON.stringify(payload)
+        });
+        renderClassProfile(data);
+        showSuccess(data.message || '학년·반이 저장되었습니다.');
+    }
+
+    async function clearClassProfile() {
+        const data = await api('/api/student/profile/class', {
+            method: 'PATCH',
+            body: JSON.stringify({ grade: null, classNumber: null })
+        });
+        renderClassProfile(data);
+        showSuccess(data.message || '학년·반 정보가 초기화되었습니다.');
     }
 
     function resetProfileSchoolChange() {
@@ -2287,6 +2373,17 @@
         savePreCounselingProfile(event).catch(error => showError(error.message));
     });
 
+    if (classProfileForm) {
+        classProfileForm.addEventListener('submit', (event) => {
+            saveClassProfile(event).catch(error => showError(error.message));
+        });
+    }
+    if (classProfileClearBtn) {
+        classProfileClearBtn.addEventListener('click', () => {
+            clearClassProfile().catch(error => showError(error.message));
+        });
+    }
+
     if (preCounselNav) {
         preCounselNav.addEventListener('click', (event) => {
             const link = event.target.closest('a[href^="#"]');
@@ -2455,6 +2552,11 @@
         userGreeting.textContent = '학생 홈';
     });
     loadProfileSchool().catch(error => showError(error.message));
+    loadClassProfile().catch(error => {
+        if (classProfileStatus) {
+            classProfileStatus.textContent = '학년·반 정보를 불러올 수 없습니다.';
+        }
+    });
     loadPreCounselingProfile().catch(error => showError(error.message));
     loadMeals().catch(() => {
         mealList.innerHTML = '<div class="empty-state">급식 정보를 불러올 수 없습니다.</div>';
