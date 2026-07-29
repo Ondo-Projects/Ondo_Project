@@ -107,6 +107,14 @@
             font-weight: 600;
             color: #374151;
         }
+        .school-meta {
+            margin: 0;
+            font-size: 14px;
+            color: #1f2937;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
         .helper {
             margin: 0;
             color: #6b7280;
@@ -147,7 +155,7 @@
 
     <div class="card common-strip" id="commonStrip">
         <p class="today-date" id="todayDate"></p>
-        <p class="helper">공통 정보(학교명·날씨)는 다음 단계에서 연결됩니다.</p>
+        <p class="school-meta" id="schoolMeta">불러오는 중...</p>
     </div>
 
     <div class="card role-block hidden" id="studentBlock">
@@ -173,6 +181,7 @@
     const studentBlock = document.getElementById('studentBlock');
     const teacherBlock = document.getElementById('teacherBlock');
     const todayDate = document.getElementById('todayDate');
+    const schoolMeta = document.getElementById('schoolMeta');
 
     todayDate.textContent = new Intl.DateTimeFormat('ko-KR', { dateStyle: 'full' }).format(new Date());
 
@@ -201,10 +210,51 @@
         pageError.classList.remove('hidden');
     }
 
-    function renderUserGreeting(me) {
+    function formatSchoolTypeLabel(schoolType) {
+        if (schoolType === '중') return '중학교';
+        if (schoolType === '고') return '고등학교';
+        return schoolType || '-';
+    }
+
+    function resolveSchoolName(me, schoolProfile) {
+        if (schoolProfile && schoolProfile.schoolName && schoolProfile.schoolName.trim()) {
+            return schoolProfile.schoolName.trim();
+        }
+        if (me.schoolName && me.schoolName.trim()) {
+            return me.schoolName.trim();
+        }
+        return '학교 미등록';
+    }
+
+    function renderUserGreeting(me, schoolProfile) {
         const displayName = me.name && me.name.trim() ? me.name.trim() : me.username;
-        const schoolLabel = me.schoolName && me.schoolName.trim() ? me.schoolName.trim() : '학교 미등록';
-        userGreeting.textContent = `${displayName} · ${schoolLabel}`;
+        userGreeting.textContent = `${displayName} · ${resolveSchoolName(me, schoolProfile)}`;
+    }
+
+    function renderCommonStrip(me, schoolProfile) {
+        if (schoolProfile && schoolProfile.schoolName) {
+            schoolMeta.textContent = `${schoolProfile.schoolName} · ${formatSchoolTypeLabel(schoolProfile.schoolType)} · ${schoolProfile.region || '지역 정보 없음'}`;
+            return;
+        }
+
+        const fallbackSchool = resolveSchoolName(me, null);
+        if (fallbackSchool === '학교 미등록') {
+            schoolMeta.textContent = '등록된 학교가 없습니다. 학생·교사 홈에서 학교를 등록해 주세요.';
+            return;
+        }
+
+        const region = me.schoolRegion && me.schoolRegion.trim() ? me.schoolRegion.trim() : '지역 정보 없음';
+        schoolMeta.textContent = `${fallbackSchool} · ${region}`;
+    }
+
+    async function loadProfileSchool(role) {
+        if (role === 'STUDENT') {
+            return api('/api/student/profile/school');
+        }
+        if (role === 'TEACHER') {
+            return api('/api/teacher/profile/school');
+        }
+        return null;
     }
 
     function renderRoleBlocks(role) {
@@ -223,8 +273,17 @@
     async function loadPage() {
         try {
             const me = await api('/api/auth/me');
-            renderUserGreeting(me);
             renderRoleBlocks(me.role);
+
+            let schoolProfile = null;
+            try {
+                schoolProfile = await loadProfileSchool(me.role);
+            } catch (error) {
+                showPageError(error.message || '학교 정보를 불러오지 못했습니다.');
+            }
+
+            renderUserGreeting(me, schoolProfile);
+            renderCommonStrip(me, schoolProfile);
         } catch (error) {
             showPageError(error.message || '페이지 정보를 불러오지 못했습니다.');
         }
