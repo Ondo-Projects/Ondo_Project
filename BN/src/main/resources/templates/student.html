@@ -520,6 +520,7 @@
         #section-today,
         #section-mood,
         #section-notice,
+        #section-school-calendar,
         #section-assignment,
         #section-pre-counsel,
         #section-counsel-create,
@@ -818,6 +819,48 @@
         .today-todo-item--done .today-todo-status { color: #166534; }
         .today-todo-item--pending .today-todo-status { color: #92400e; }
         .today-todo-item--warn .today-todo-status { color: #c2410c; }
+        .schedule-list-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+        }
+        .schedule-list-item:last-child {
+            margin-bottom: 0;
+        }
+        .schedule-list-date {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 6px;
+        }
+        .schedule-list-title {
+            margin: 0 0 4px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #111827;
+        }
+        .schedule-list-content {
+            margin: 0;
+            font-size: 14px;
+            color: #4b5563;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+        .schedule-status-info {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 14px 12px;
+        }
+        .schedule-status-warn {
+            color: #92400e;
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 10px;
+            padding: 14px 12px;
+        }
     </style>
 </head>
 <body>
@@ -846,6 +889,7 @@
         <button type="button" class="quick-action-btn" data-target="section-notice">알림</button>
         <button type="button" class="quick-action-btn" data-target="section-counsel-create">상담</button>
         <button type="button" class="quick-action-btn" data-target="section-pre-counsel">사전카드</button>
+        <button type="button" class="quick-action-btn" data-target="section-school-calendar">일정</button>
     </nav>
 
     <div class="card" id="todayTodoCard">
@@ -926,6 +970,16 @@
             <p class="helper" id="noticeDisabledHint">담당 교사 등록 후 알림을 확인할 수 있습니다.</p>
             <div id="noticeList">
                 <div class="empty-state">등록된 알림이 없습니다.</div>
+            </div>
+        </section>
+    </div>
+
+    <div class="card" id="section-school-calendar">
+        <section>
+            <h2>학사일정</h2>
+            <p class="helper">앞으로 2주간 학교 주요 행사입니다.</p>
+            <div id="schoolScheduleList">
+                <div class="empty-state">학사일정을 불러오는 중...</div>
             </div>
         </section>
     </div>
@@ -1186,6 +1240,7 @@
     let selectedPostId = null;
     let selectedMood = null;
     let cachedMealData = null;
+    let cachedSchoolScheduleData = null;
     let todayMoodRecorded = false;
     let todayMoodSummary = '';
     let todayNoticeCount = null;
@@ -1215,6 +1270,7 @@
     const noticeList = document.getElementById('noticeList');
     const noticeDisabledHint = document.getElementById('noticeDisabledHint');
     const mealList = document.getElementById('mealList');
+    const schoolScheduleList = document.getElementById('schoolScheduleList');
     const mealSchoolHint = document.getElementById('mealSchoolHint');
     const weatherBox = document.getElementById('weatherBox');
     const weatherRegionHint = document.getElementById('weatherRegionHint');
@@ -1598,6 +1654,109 @@
         }
     }
 
+    function resolveScheduleStatus(data) {
+        if (data.status) {
+            return data.status;
+        }
+        if (data.events && data.events.length) {
+            return 'OK';
+        }
+        return 'NO_EVENTS';
+    }
+
+    function scheduleDisplayMessage(data, status) {
+        if (data.message) {
+            return data.message;
+        }
+        switch (status) {
+            case 'NO_EVENTS':
+                return '다가오는 학사일정이 없습니다. 방학·주말에는 등록된 행사가 없을 수 있습니다.';
+            case 'MAPPING_FAILED':
+                return '학사일정 연동 준비 중입니다. 학교 일정 정보가 곧 표시됩니다.';
+            case 'UNAVAILABLE':
+                return '학사일정을 일시적으로 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.';
+            default:
+                return '다가오는 학사일정이 없습니다.';
+        }
+    }
+
+    function scheduleStatusClass(status) {
+        if (status === 'MAPPING_FAILED' || status === 'UNAVAILABLE') {
+            return 'empty-state schedule-status-warn';
+        }
+        if (status === 'NO_EVENTS') {
+            return 'empty-state schedule-status-info';
+        }
+        return 'empty-state';
+    }
+
+    function formatScheduleDate(value) {
+        if (!value) {
+            return '-';
+        }
+        const date = new Date(`${value}T00:00:00`);
+        if (Number.isNaN(date.getTime())) {
+            return value;
+        }
+        return new Intl.DateTimeFormat('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' }).format(date);
+    }
+
+    function todayDateKey() {
+        const now = new Date();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${now.getFullYear()}-${month}-${day}`;
+    }
+
+    function findTodayScheduleEvent(events) {
+        if (!events || !events.length) {
+            return null;
+        }
+        const todayKey = todayDateKey();
+        return events.find(event => event.date === todayKey) || null;
+    }
+
+    function renderSchoolSchedule(data) {
+        cachedSchoolScheduleData = data;
+        refreshTodayTodo();
+
+        if (!schoolScheduleList) {
+            return;
+        }
+
+        const status = resolveScheduleStatus(data);
+
+        if (status !== 'OK' || !data.events || !data.events.length) {
+            schoolScheduleList.innerHTML = `<div class="${scheduleStatusClass(status)}">${escapeHtml(scheduleDisplayMessage(data, status))}</div>`;
+            return;
+        }
+
+        schoolScheduleList.innerHTML = data.events.map(event => `
+            <div class="schedule-list-item">
+                <div class="schedule-list-date">${escapeHtml(formatScheduleDate(event.date))}</div>
+                <h3 class="schedule-list-title">${escapeHtml(event.eventName)}</h3>
+                ${event.eventContent ? `<p class="schedule-list-content">${escapeHtml(event.eventContent)}</p>` : ''}
+            </div>
+        `).join('');
+
+        if (data.message) {
+            schoolScheduleList.innerHTML += `<p class="helper">${escapeHtml(data.message)}</p>`;
+        }
+    }
+
+    async function loadSchoolSchedule() {
+        try {
+            const data = await api('/api/common/school-schedule/upcoming?days=14');
+            renderSchoolSchedule(data);
+        } catch (error) {
+            cachedSchoolScheduleData = { status: 'UNAVAILABLE', message: error.message };
+            refreshTodayTodo();
+            if (schoolScheduleList) {
+                schoolScheduleList.innerHTML = `<div class="empty-state">${escapeHtml(error.message)}</div>`;
+            }
+        }
+    }
+
     function formatSchoolTypeLabel(schoolType) {
         if (schoolType === '중') return '중학교';
         if (schoolType === '고') return '고등학교';
@@ -1710,6 +1869,11 @@
             }),
             loadWeather().catch(() => {
                 weatherBox.innerHTML = '<div class="empty-state">날씨 정보를 불러올 수 없습니다.</div>';
+            }),
+            loadSchoolSchedule().catch(() => {
+                if (schoolScheduleList) {
+                    schoolScheduleList.innerHTML = '<div class="empty-state">학사일정을 불러올 수 없습니다.</div>';
+                }
             })
         ]);
         await loadAssignment();
@@ -1772,6 +1936,42 @@
         return { label: '사전 상담 카드', status: '작성하기', tone: 'pending', target: 'section-pre-counsel' };
     }
 
+    function buildSchoolScheduleTodoItem() {
+        if (!cachedSchoolScheduleData) {
+            return { label: '학사일정', status: '불러오는 중...', tone: '', target: 'section-school-calendar', disabled: true };
+        }
+        const status = resolveScheduleStatus(cachedSchoolScheduleData);
+        if (status === 'OK' && cachedSchoolScheduleData.events && cachedSchoolScheduleData.events.length) {
+            const todayEvent = findTodayScheduleEvent(cachedSchoolScheduleData.events);
+            if (todayEvent) {
+                return {
+                    label: '학사일정',
+                    status: todayEvent.eventName,
+                    tone: 'pending',
+                    target: 'section-school-calendar'
+                };
+            }
+            return {
+                label: '학사일정',
+                status: `${cachedSchoolScheduleData.events.length}건 예정`,
+                tone: 'done',
+                target: 'section-school-calendar'
+            };
+        }
+        if (status === 'NO_EVENTS') {
+            return { label: '학사일정', status: '예정 없음', tone: 'done', target: 'section-school-calendar' };
+        }
+        if (status === 'MAPPING_FAILED' || status === 'UNAVAILABLE') {
+            return {
+                label: '학사일정',
+                status: status === 'MAPPING_FAILED' ? '연동 준비 중' : '일시 오류',
+                tone: 'warn',
+                target: 'section-school-calendar'
+            };
+        }
+        return { label: '학사일정', status: '확인하기', tone: 'pending', target: 'section-school-calendar' };
+    }
+
     function buildCounselTodoItem() {
         if (!hasAssignment) {
             return { label: '상담', status: '담당 교사 등록 후', tone: 'warn', target: 'section-assignment' };
@@ -1816,6 +2016,7 @@
         const items = [
             buildAssignmentTodoItem(),
             buildMealTodoItem(),
+            buildSchoolScheduleTodoItem(),
             buildMoodTodoItem(),
             buildNoticeTodoItem(),
             buildPreCounselTodoItem(),
@@ -2120,6 +2321,7 @@
         'section-today',
         'section-mood',
         'section-notice',
+        'section-school-calendar',
         'section-assignment',
         'section-pre-counsel',
         'section-counsel-create',
@@ -2259,6 +2461,11 @@
     });
     loadWeather().catch(() => {
         weatherBox.innerHTML = '<div class="empty-state">날씨 정보를 불러올 수 없습니다.</div>';
+    });
+    loadSchoolSchedule().catch(() => {
+        if (schoolScheduleList) {
+            schoolScheduleList.innerHTML = '<div class="empty-state">학사일정을 불러올 수 없습니다.</div>';
+        }
     });
     loadTodayMood().catch(() => updateMoodStatus(null));
     loadAssignment().then(loadPosts).catch(error => showError(error.message));

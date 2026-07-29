@@ -3,6 +3,7 @@ package com.ondo.domain.meal.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ondo.domain.meal.dto.MealItemResponseDTO;
+import com.ondo.domain.schoollife.dto.SchoolScheduleItemResponseDTO;
 import com.ondo.global.config.NeisProperties;
 import com.ondo.global.error.BusinessException;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -178,6 +180,63 @@ public class NeisApiClient {
         }
         meals.sort(Comparator.comparingInt(MealItemResponseDTO::getMealOrder));
         return meals;
+    }
+
+    public List<SchoolScheduleItemResponseDTO> fetchSchoolSchedule(
+            String officeCode,
+            String standardSchoolCode,
+            LocalDate fromDate,
+            LocalDate toDate
+    ) {
+        URI uri = UriComponentsBuilder
+                .fromUriString(neisProperties.getBaseUrl() + "/SchoolSchedule")
+                .queryParam("KEY", requireApiKey())
+                .queryParam("Type", "json")
+                .queryParam("pIndex", 1)
+                .queryParam("pSize", 100)
+                .queryParam("ATPT_OFCDC_SC_CODE", officeCode)
+                .queryParam("SD_SCHUL_CODE", standardSchoolCode)
+                .queryParam("AA_FROM_YMD", NEIS_DATE.format(fromDate))
+                .queryParam("AA_TO_YMD", NEIS_DATE.format(toDate))
+                .build()
+                .encode()
+                .toUri();
+
+        JsonNode rows = fetchRows(uri, "SchoolSchedule");
+        Map<LocalDate, SchoolScheduleItemResponseDTO> eventsByDate = new LinkedHashMap<>();
+        for (JsonNode row : rows) {
+            LocalDate eventDate = parseNeisDate(textValue(row, "AA_YMD"));
+            if (eventDate == null) {
+                continue;
+            }
+            if (eventDate.isBefore(fromDate) || eventDate.isAfter(toDate)) {
+                continue;
+            }
+            String eventName = textValue(row, "EVENT_NM");
+            if (eventName == null || eventName.isBlank()) {
+                continue;
+            }
+            String eventContent = textValue(row, "EVENT_CNTNT");
+            eventsByDate.putIfAbsent(
+                    eventDate,
+                    new SchoolScheduleItemResponseDTO(eventDate, eventName, eventContent)
+            );
+        }
+
+        return eventsByDate.values().stream()
+                .sorted(Comparator.comparing(SchoolScheduleItemResponseDTO::getDate))
+                .toList();
+    }
+
+    private LocalDate parseNeisDate(String rawDate) {
+        if (rawDate == null || rawDate.isBlank()) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(rawDate.trim(), NEIS_DATE);
+        } catch (Exception exception) {
+            return null;
+        }
     }
 
     private JsonNode fetchRows(URI uri, String rootKey) {
