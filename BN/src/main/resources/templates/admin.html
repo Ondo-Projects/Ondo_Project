@@ -806,7 +806,21 @@
         USER_ACTIVATE: '회원 활성화',
         USER_DEACTIVATE: '회원 비활성화',
         USER_SCHOOL_CHANGE: '학교 변경',
-        SCHOOL_CSV_SYNC: '학교 CSV 동기화'
+        SCHOOL_CSV_SYNC: '학교 CSV 동기화',
+        SUGGESTION_STATUS_CHANGE: '건의 상태 변경',
+        SUGGESTION_REPLY: '건의 답변'
+    };
+    const SUGGESTION_CATEGORY_LABELS = {
+        BUG: '버그 / 오류',
+        FEATURE: '기능 개선',
+        OPERATION: '운영 문의',
+        OTHER: '기타'
+    };
+    const SUGGESTION_STATUS_LABELS = {
+        OPEN: '접수',
+        IN_REVIEW: '검토 중',
+        RESOLVED: '처리 완료',
+        CLOSED: '종료'
     };
 
     let userRoleFilter = '';
@@ -818,10 +832,22 @@
     let activityLogPage = 0;
     let currentLogTab = 'counseling';
     let selectedUser = null;
+    let suggestionStatusFilter = '';
+    let suggestionCategoryFilter = '';
+    let suggestionRoleFilter = '';
+    let suggestionPage = 0;
+    let selectedSuggestionId = null;
+    let suggestionPageData = { items: [], totalElements: 0, page: 0, size: 20 };
 
     const pageError = document.getElementById('pageError');
     const pageSuccess = document.getElementById('pageSuccess');
     const userGreeting = document.getElementById('userGreeting');
+    const suggestionTableWrap = document.getElementById('suggestionTableWrap');
+    const suggestionDetail = document.getElementById('suggestionDetail');
+    const suggestionDetailBody = document.getElementById('suggestionDetailBody');
+    const suggestionStatusSelect = document.getElementById('suggestionStatusSelect');
+    const suggestionExistingReply = document.getElementById('suggestionExistingReply');
+    const suggestionReplyContent = document.getElementById('suggestionReplyContent');
 
     function showError(message) {
         pageSuccess.style.display = 'none';
@@ -887,6 +913,14 @@
     function roleBadge(role) {
         const cls = role === 'STUDENT' ? 'badge-student' : role === 'TEACHER' ? 'badge-teacher' : 'badge-admin';
         return `<span class="badge ${cls}">${ROLE_LABELS[role] || escapeHtml(role)}</span>`;
+    }
+
+    function suggestionStatusBadge(status) {
+        return `<span class="badge badge-${status}">${SUGGESTION_STATUS_LABELS[status] || escapeHtml(status)}</span>`;
+    }
+
+    function suggestionCategoryBadge(category) {
+        return `<span class="badge badge-suggestion-cat">${SUGGESTION_CATEGORY_LABELS[category] || escapeHtml(category)}</span>`;
     }
 
     function renderPager(containerId, infoId, prevBtnId, nextBtnId, pageData, onPageChange) {
@@ -1237,6 +1271,155 @@
         renderActivityLogTable(data);
     }
 
+    function renderSuggestionTable(pageData) {
+        suggestionPageData = pageData;
+        if (!pageData.items.length) {
+            suggestionTableWrap.innerHTML = '<div class="empty-state">검색 결과가 없습니다.</div>';
+            document.getElementById('suggestionPager').classList.add('hidden');
+            if (selectedSuggestionId) {
+                closeSuggestionDetail();
+            }
+            return;
+        }
+
+        suggestionTableWrap.innerHTML = wrapTableHtml(`
+            <table class="data-table data-table--responsive">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>분류</th>
+                        <th>제목</th>
+                        <th>상태</th>
+                        <th>작성자</th>
+                        <th>역할</th>
+                        <th>등록일</th>
+                        <th>답변</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${pageData.items.map(item => `
+                        <tr class="suggestion-row${selectedSuggestionId === item.id ? ' active' : ''}"
+                            data-id="${item.id}"
+                            tabindex="0"
+                            role="button"
+                            aria-label="건의 상세 보기">
+                            <td data-label="ID">${escapeHtml(item.id)}</td>
+                            <td data-label="분류">${suggestionCategoryBadge(item.category)}</td>
+                            <td data-label="제목" class="suggestion-title-cell">${escapeHtml(item.title)}</td>
+                            <td data-label="상태">${suggestionStatusBadge(item.status)}</td>
+                            <td data-label="작성자">${escapeHtml(item.authorName || item.authorUsername)}</td>
+                            <td data-label="역할">${roleBadge(item.authorRole)}</td>
+                            <td data-label="등록일">${formatDateTime(item.createdAt)}</td>
+                            <td data-label="답변">
+                                <span class="badge ${item.hasAdminReply ? 'badge-reply-yes' : 'badge-reply-no'}">
+                                    ${item.hasAdminReply ? '완료' : '없음'}
+                                </span>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `);
+
+        suggestionTableWrap.querySelectorAll('.suggestion-row').forEach(row => {
+            row.addEventListener('click', () => {
+                clearMessages();
+                openSuggestionDetail(Number(row.dataset.id)).catch(error => showError(error.message));
+            });
+            row.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    clearMessages();
+                    openSuggestionDetail(Number(row.dataset.id)).catch(error => showError(error.message));
+                }
+            });
+        });
+
+        renderPager('suggestionPager', 'suggestionPagerInfo', 'suggestionPrevBtn', 'suggestionNextBtn', pageData, (page) => {
+            suggestionPage = page;
+            loadSuggestions().catch(error => showError(error.message));
+        });
+    }
+
+    async function loadSuggestions() {
+        const params = new URLSearchParams({ page: String(suggestionPage), size: '20' });
+        const keyword = document.getElementById('suggestionKeyword').value.trim();
+        if (keyword) params.set('keyword', keyword);
+        if (suggestionStatusFilter) params.set('status', suggestionStatusFilter);
+        if (suggestionCategoryFilter) params.set('category', suggestionCategoryFilter);
+        if (suggestionRoleFilter) params.set('role', suggestionRoleFilter);
+
+        const data = await api(`/api/admin/suggestions?${params.toString()}`);
+        renderSuggestionTable(data);
+
+        if (selectedSuggestionId && !data.items.some(item => item.id === selectedSuggestionId)) {
+            closeSuggestionDetail();
+        }
+    }
+
+    async function openSuggestionDetail(id, scroll = true) {
+        selectedSuggestionId = id;
+        if (suggestionPageData.items.length) {
+            renderSuggestionTable(suggestionPageData);
+        }
+
+        try {
+            const post = await api(`/api/admin/suggestions/${id}`);
+            suggestionDetail.classList.remove('hidden');
+
+            suggestionDetailBody.innerHTML = `
+                <div class="suggestion-detail-header">
+                    <h4>${escapeHtml(post.title)}</h4>
+                    <div class="suggestion-detail-badges">
+                        ${suggestionCategoryBadge(post.category)}
+                        ${suggestionStatusBadge(post.status)}
+                    </div>
+                </div>
+                <p class="detail-meta">
+                    작성자 ${escapeHtml(post.authorName || post.authorUsername)} (${escapeHtml(post.authorUsername)})
+                    · ${ROLE_LABELS[post.authorRole] || post.authorRole}
+                    · 등록 ${formatDateTime(post.createdAt)}${post.updatedAt && post.updatedAt !== post.createdAt ? ` · 수정 ${formatDateTime(post.updatedAt)}` : ''}
+                </p>
+                <div class="detail-content">${escapeHtml(post.content)}</div>
+            `;
+
+            suggestionStatusSelect.value = post.status;
+
+            if (post.adminReply) {
+                suggestionExistingReply.classList.remove('hidden');
+                suggestionExistingReply.innerHTML = `
+                    <div class="existing-reply-label">등록된 관리자 답변</div>
+                    <p class="detail-meta">${post.repliedByUsername ? `${escapeHtml(post.repliedByUsername)} · ` : ''}${formatDateTime(post.repliedAt)}</p>
+                    <div>${escapeHtml(post.adminReply)}</div>
+                `;
+                suggestionReplyContent.value = post.adminReply;
+            } else {
+                suggestionExistingReply.classList.add('hidden');
+                suggestionExistingReply.innerHTML = '';
+                suggestionReplyContent.value = '';
+            }
+
+            if (scroll) {
+                suggestionDetail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        } catch (error) {
+            selectedSuggestionId = null;
+            if (suggestionPageData.items.length) {
+                renderSuggestionTable(suggestionPageData);
+            }
+            suggestionDetail.classList.add('hidden');
+            showError(error.message);
+        }
+    }
+
+    function closeSuggestionDetail() {
+        selectedSuggestionId = null;
+        suggestionDetail.classList.add('hidden');
+        if (suggestionPageData.items.length) {
+            renderSuggestionTable(suggestionPageData);
+        }
+    }
+
     async function updateSelectedUserStatus(active) {
         if (!selectedUser) {
             throw new Error('관리할 회원을 먼저 선택해 주세요.');
@@ -1357,6 +1540,49 @@
         syncNeisSchools().catch(error => showError(error.message));
     });
 
+    document.getElementById('searchSuggestionsBtn').addEventListener('click', () => {
+        clearMessages();
+        suggestionPage = 0;
+        loadSuggestions().catch(error => showError(error.message));
+    });
+
+    document.getElementById('suggestionKeyword').addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter') return;
+        event.preventDefault();
+        clearMessages();
+        suggestionPage = 0;
+        loadSuggestions().catch(error => showError(error.message));
+    });
+
+    document.getElementById('suggestionStatusFilter').addEventListener('click', (event) => {
+        const chip = event.target.closest('.filter-chip');
+        if (!chip) return;
+        document.querySelectorAll('#suggestionStatusFilter .filter-chip').forEach(item => item.classList.remove('active'));
+        chip.classList.add('active');
+        suggestionStatusFilter = chip.dataset.status || '';
+    });
+
+    document.getElementById('suggestionCategoryFilter').addEventListener('click', (event) => {
+        const chip = event.target.closest('.filter-chip');
+        if (!chip) return;
+        document.querySelectorAll('#suggestionCategoryFilter .filter-chip').forEach(item => item.classList.remove('active'));
+        chip.classList.add('active');
+        suggestionCategoryFilter = chip.dataset.category || '';
+    });
+
+    document.getElementById('suggestionRoleFilter').addEventListener('click', (event) => {
+        const chip = event.target.closest('.filter-chip');
+        if (!chip) return;
+        document.querySelectorAll('#suggestionRoleFilter .filter-chip').forEach(item => item.classList.remove('active'));
+        chip.classList.add('active');
+        suggestionRoleFilter = chip.dataset.role || '';
+    });
+
+    document.getElementById('closeSuggestionDetailBtn').addEventListener('click', () => {
+        clearMessages();
+        closeSuggestionDetail();
+    });
+
     loadCurrentUser().catch(() => {
         userGreeting.textContent = '관리자';
     });
@@ -1368,7 +1594,8 @@
         loadSystemStatus(),
         loadStatistics(),
         loadActivityLogs(),
-        loadCounselingLogs()
+        loadCounselingLogs(),
+        loadSuggestions()
     ]).catch(error => showError(error.message));
 </script>
 </body>
