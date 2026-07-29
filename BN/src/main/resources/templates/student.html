@@ -115,6 +115,15 @@
             font-weight: 700;
             color: #64748b;
         }
+        .student-main-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .student-tab-hidden {
+            display: none !important;
+        }
         .card-compact {
             padding: 18px 20px;
         }
@@ -954,7 +963,11 @@
     </div>
 
     <div class="dashboard-workspace">
-    <p class="section-group-label">상담 준비</p>
+    <div class="student-main-tabs" id="studentMainTabs" role="tablist" aria-label="상담 메뉴">
+        <button type="button" class="filter-chip active" data-student-tab="pre-counsel" role="tab" aria-selected="true">사전카드</button>
+        <button type="button" class="filter-chip" data-student-tab="counsel-create" role="tab" aria-selected="false">상담 신청</button>
+        <button type="button" class="filter-chip" data-student-tab="counsel-list" role="tab" aria-selected="false">내 상담</button>
+    </div>
     <div class="card" id="section-pre-counsel">
         <section>
             <h2>사전 상담 카드</h2>
@@ -1054,7 +1067,7 @@
         </section>
     </div>
 
-    <div class="card" id="section-counsel-create">
+    <div class="card student-tab-hidden" id="section-counsel-create">
         <section>
             <h2>상담 신청</h2>
             <p class="helper" id="createDisabledHint">담당 교사 등록 후 상담을 신청할 수 있습니다.</p>
@@ -1091,8 +1104,7 @@
         </section>
     </div>
 
-    <p class="section-group-label">내 상담</p>
-    <div class="card" id="section-counsel-list">
+    <div class="card student-tab-hidden" id="section-counsel-list">
         <section>
             <h2>상담 목록</h2>
             <div class="post-list" id="postList">
@@ -1101,7 +1113,7 @@
         </section>
     </div>
 
-    <div class="card hidden" id="section-counsel-detail">
+    <div class="card hidden student-tab-hidden" id="section-counsel-detail">
         <section>
             <div class="detail-card-header">
                 <h2>상담 상세</h2>
@@ -1220,7 +1232,13 @@
     const todayTodoList = document.getElementById('todayTodoList');
     const assignmentDetails = document.getElementById('assignmentDetails');
     const assignmentSummaryHint = document.getElementById('assignmentSummaryHint');
+    const studentMainTabs = document.getElementById('studentMainTabs');
 
+    const STUDENT_TAB_SECTIONS = {
+        'pre-counsel': ['section-pre-counsel'],
+        'counsel-create': ['section-counsel-create'],
+        'counsel-list': ['section-counsel-list', 'section-counsel-detail']
+    };
     let profileSchoolTypeFilter = '';
     let profileSearchTimer = null;
     let profileSelectedSchool = null;
@@ -1875,6 +1893,7 @@
     }
 
     async function openDetail(id, scroll = true) {
+        activateStudentTab('counsel-list');
         selectedPostId = id;
         renderPosts();
         editPanel.classList.add('hidden');
@@ -2123,7 +2142,47 @@
         });
     }
 
+    function sectionIdToStudentTab(sectionId) {
+        if (sectionId === 'section-pre-counsel') {
+            return 'pre-counsel';
+        }
+        if (sectionId === 'section-counsel-create') {
+            return 'counsel-create';
+        }
+        if (sectionId === 'section-counsel-list' || sectionId === 'section-counsel-detail') {
+            return 'counsel-list';
+        }
+        return null;
+    }
+
+    function activateStudentTab(tabId) {
+        if (!STUDENT_TAB_SECTIONS[tabId]) {
+            return;
+        }
+        if (studentMainTabs) {
+            studentMainTabs.querySelectorAll('[data-student-tab]').forEach(button => {
+                const isActive = button.dataset.studentTab === tabId;
+                button.classList.toggle('active', isActive);
+                button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+        }
+        Object.entries(STUDENT_TAB_SECTIONS).forEach(([tab, sectionIds]) => {
+            const hide = tab !== tabId;
+            sectionIds.forEach(sectionId => {
+                const element = document.getElementById(sectionId);
+                if (!element) {
+                    return;
+                }
+                element.classList.toggle('student-tab-hidden', hide);
+            });
+        });
+    }
+
     function scrollToSection(sectionId) {
+        const tabId = sectionIdToStudentTab(sectionId);
+        if (tabId) {
+            activateStudentTab(tabId);
+        }
         const target = document.getElementById(sectionId);
         if (!target) {
             return;
@@ -2134,7 +2193,9 @@
         if (sectionId === 'section-assignment' && assignmentDetails) {
             assignmentDetails.open = true;
         }
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        window.requestAnimationFrame(() => {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
     }
 
     if (quickActionBar) {
@@ -2154,6 +2215,22 @@
                 return;
             }
             scrollToSection(button.dataset.target);
+        });
+    }
+
+    if (studentMainTabs) {
+        studentMainTabs.addEventListener('click', (event) => {
+            const tabButton = event.target.closest('[data-student-tab]');
+            if (!tabButton) {
+                return;
+            }
+            const tabId = tabButton.dataset.studentTab;
+            const sectionIds = STUDENT_TAB_SECTIONS[tabId];
+            if (!sectionIds || !sectionIds.length) {
+                return;
+            }
+            activateStudentTab(tabId);
+            document.getElementById(sectionIds[0])?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
     }
 
