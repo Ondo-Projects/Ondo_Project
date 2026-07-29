@@ -2,6 +2,8 @@ package com.ondo.domain.meal.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.ondo.domain.meal.dto.MealItemResponseDTO;
 import com.ondo.domain.schoollife.dto.SchoolScheduleItemResponseDTO;
 import com.ondo.domain.schoollife.dto.TimetablePeriodResponseDTO;
@@ -11,8 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -25,6 +29,8 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class NeisApiClient {
+
+    private static final JsonNodeFactory NODE_FACTORY = JsonNodeFactory.instance;
 
     private static final DateTimeFormatter NEIS_DATE = DateTimeFormatter.BASIC_ISO_DATE;
     private static final Map<String, String> MEAL_TYPE_LABELS = Map.of(
@@ -65,7 +71,7 @@ public class NeisApiClient {
         if (locationName != null && !locationName.isBlank()) {
             builder.queryParam("LCTN_SC_NM", locationName);
         }
-        URI uri = builder.build().encode().toUri();
+        URI uri = buildEncodedUri(builder);
         return fetchRows(uri, "schoolInfo");
     }
 
@@ -151,7 +157,7 @@ public class NeisApiClient {
     }
 
     public List<MealItemResponseDTO> fetchMeals(String officeCode, String standardSchoolCode, LocalDate date) {
-        URI uri = UriComponentsBuilder
+        URI uri = buildEncodedUri(UriComponentsBuilder
                 .fromUriString(neisProperties.getBaseUrl() + "/mealServiceDietInfo")
                 .queryParam("KEY", requireApiKey())
                 .queryParam("Type", "json")
@@ -159,10 +165,7 @@ public class NeisApiClient {
                 .queryParam("pSize", 100)
                 .queryParam("ATPT_OFCDC_SC_CODE", officeCode)
                 .queryParam("SD_SCHUL_CODE", standardSchoolCode)
-                .queryParam("MLSV_YMD", NEIS_DATE.format(date))
-                .build()
-                .encode()
-                .toUri();
+                .queryParam("MLSV_YMD", NEIS_DATE.format(date)));
 
         JsonNode rows = fetchRows(uri, "mealServiceDietInfo");
         List<MealItemResponseDTO> meals = new ArrayList<>();
@@ -189,7 +192,7 @@ public class NeisApiClient {
             LocalDate fromDate,
             LocalDate toDate
     ) {
-        URI uri = UriComponentsBuilder
+        URI uri = buildEncodedUri(UriComponentsBuilder
                 .fromUriString(neisProperties.getBaseUrl() + "/SchoolSchedule")
                 .queryParam("KEY", requireApiKey())
                 .queryParam("Type", "json")
@@ -198,10 +201,7 @@ public class NeisApiClient {
                 .queryParam("ATPT_OFCDC_SC_CODE", officeCode)
                 .queryParam("SD_SCHUL_CODE", standardSchoolCode)
                 .queryParam("AA_FROM_YMD", NEIS_DATE.format(fromDate))
-                .queryParam("AA_TO_YMD", NEIS_DATE.format(toDate))
-                .build()
-                .encode()
-                .toUri();
+                .queryParam("AA_TO_YMD", NEIS_DATE.format(toDate)));
 
         JsonNode rows = fetchRows(uri, "SchoolSchedule");
         Map<LocalDate, SchoolScheduleItemResponseDTO> eventsByDate = new LinkedHashMap<>();
@@ -238,7 +238,7 @@ public class NeisApiClient {
             int classNumber
     ) {
         String rootKey = resolveTimetableRootKey(schoolType);
-        URI uri = UriComponentsBuilder
+        URI uri = buildEncodedUri(UriComponentsBuilder
                 .fromUriString(neisProperties.getBaseUrl() + "/" + rootKey)
                 .queryParam("KEY", requireApiKey())
                 .queryParam("Type", "json")
@@ -248,10 +248,7 @@ public class NeisApiClient {
                 .queryParam("SD_SCHUL_CODE", standardSchoolCode)
                 .queryParam("ALL_TI_YMD", NEIS_DATE.format(date))
                 .queryParam("GRADE", String.valueOf(grade))
-                .queryParam("CLASS_NM", String.valueOf(classNumber))
-                .build()
-                .encode()
-                .toUri();
+                .queryParam("CLASS_NM", String.valueOf(classNumber)));
 
         JsonNode rows = fetchRows(uri, rootKey);
         Map<Integer, TimetablePeriodResponseDTO> periodsByNumber = new LinkedHashMap<>();
@@ -321,22 +318,7 @@ public class NeisApiClient {
             }
 
             JsonNode root = objectMapper.readTree(body);
-            JsonNode container = root.path(rootKey);
-            if (!container.isArray() || container.isEmpty()) {
-                return objectMapper.createArrayNode();
-            }
-
-            JsonNode first = container.get(0);
-            assertSuccess(first.path("head"));
-
-            JsonNode rowNode = first.path("row");
-            if (rowNode.isMissingNode() || rowNode.isNull()) {
-                return objectMapper.createArrayNode();
-            }
-            if (rowNode.isArray()) {
-                return rowNode;
-            }
-            return objectMapper.createArrayNode().add(rowNode);
+            return extractRowsFromNeisResponse(root, rootKey);
         } catch (BusinessException exception) {
             throw exception;
         } catch (Exception exception) {
@@ -344,20 +326,82 @@ public class NeisApiClient {
         }
     }
 
-    private void assertSuccess(JsonNode headNode) {
-        if (!headNode.isArray() || headNode.isEmpty()) {
+    static JsonNode extractRowsFromNeisResponse(JsonNode root, String rootKey) {
+        JsonNode container = root.path(rootKey);
+        if (!container.isArray() || container.isEmpty()) {
+            assertSuccess(root.path("RESULT"));
+            return NODE_FACTORY.arrayNode();
+        }
+
+        JsonNode headNode = null;
+        JsonNode rowNode = null;
+        for (JsonNode item : container) {
+            if (item.has("head")) {
+                headNode = item.path("head");
+            }
+            if (item.has("row")) {
+                rowNode = item.path("row");
+            }
+        }
+
+        assertSuccess(headNode);
+        assertSuccess(root.path("RESULT"));
+
+        if (rowNode == null || rowNode.isMissingNode() || rowNode.isNull()) {
+            return NODE_FACTORY.arrayNode();
+        }
+        if (rowNode.isArray()) {
+            return rowNode;
+        }
+        ArrayNode singleRow = NODE_FACTORY.arrayNode();
+        singleRow.add(rowNode);
+        return singleRow;
+    }
+
+    private static void assertSuccess(JsonNode headOrResultNode) {
+        if (headOrResultNode == null || headOrResultNode.isMissingNode() || headOrResultNode.isNull()) {
             return;
         }
-        JsonNode result = headNode.get(0).path("RESULT");
-        if (result.isMissingNode()) {
+
+        if (headOrResultNode.has("CODE")) {
+            assertSuccessCode(textValue(headOrResultNode, "CODE"), textValue(headOrResultNode, "MESSAGE"));
             return;
         }
-        String code = textValue(result, "CODE");
+
+        if (!headOrResultNode.isArray()) {
+            return;
+        }
+
+        for (JsonNode item : headOrResultNode) {
+            JsonNode result = item.path("RESULT");
+            if (!result.isMissingNode()) {
+                assertSuccessCode(textValue(result, "CODE"), textValue(result, "MESSAGE"));
+            }
+        }
+    }
+
+    private static void assertSuccessCode(String code, String message) {
         if (code == null || code.startsWith("INFO-000") || code.startsWith("INFO-200")) {
             return;
         }
-        String message = textValue(result, "MESSAGE");
         throw new BusinessException(message != null ? message : "NEIS API 오류가 발생했습니다.");
+    }
+
+    private URI buildEncodedUri(UriComponentsBuilder builder) {
+        var components = builder.build();
+        StringBuilder query = new StringBuilder();
+        components.getQueryParams().forEach((name, values) -> {
+            for (String value : values) {
+                if (!query.isEmpty()) {
+                    query.append('&');
+                }
+                query.append(UriUtils.encodeQueryParam(name, StandardCharsets.UTF_8));
+                query.append('=');
+                query.append(UriUtils.encodeQueryParam(value != null ? value : "", StandardCharsets.UTF_8));
+            }
+        });
+        String base = components.toUriString().split("\\?", 2)[0];
+        return URI.create(base + "?" + query);
     }
 
     private String requireApiKey() {
@@ -367,7 +411,7 @@ public class NeisApiClient {
         return neisProperties.getApiKey();
     }
 
-    private String textValue(JsonNode node, String fieldName) {
+    private static String textValue(JsonNode node, String fieldName) {
         JsonNode value = node.path(fieldName);
         if (value.isMissingNode() || value.isNull()) {
             return null;

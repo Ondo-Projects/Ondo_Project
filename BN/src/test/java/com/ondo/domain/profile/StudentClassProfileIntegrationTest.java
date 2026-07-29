@@ -130,7 +130,7 @@ class StudentClassProfileIntegrationTest {
                         .header("Authorization", "Bearer " + bearerToken(TEACHER_USERNAME, Role.TEACHER))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("접근 권한이 없습니다."));
     }
 
