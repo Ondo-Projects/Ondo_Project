@@ -128,6 +128,7 @@
         .btn-primary { background: #111827; color: #fff; }
         .btn-muted { background: #f3f4f6; color: #374151; }
         .btn-muted:disabled { opacity: 0.45; cursor: not-allowed; }
+        .btn-primary:disabled, .btn-secondary:disabled { opacity: 0.45; cursor: not-allowed; }
         .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
         .data-table th, .data-table td {
             padding: 10px 8px;
@@ -837,6 +838,7 @@
     let suggestionRoleFilter = '';
     let suggestionPage = 0;
     let selectedSuggestionId = null;
+    let currentSuggestionPost = null;
     let suggestionPageData = { items: [], totalElements: 0, page: 0, size: 20 };
 
     const pageError = document.getElementById('pageError');
@@ -846,8 +848,11 @@
     const suggestionDetail = document.getElementById('suggestionDetail');
     const suggestionDetailBody = document.getElementById('suggestionDetailBody');
     const suggestionStatusSelect = document.getElementById('suggestionStatusSelect');
+    const suggestionStatusBtn = document.getElementById('suggestionStatusBtn');
+    const suggestionStatusClosedHint = document.getElementById('suggestionStatusClosedHint');
     const suggestionExistingReply = document.getElementById('suggestionExistingReply');
     const suggestionReplyContent = document.getElementById('suggestionReplyContent');
+    const suggestionReplyBtn = document.getElementById('suggestionReplyBtn');
 
     function showError(message) {
         pageSuccess.style.display = 'none';
@@ -1357,6 +1362,94 @@
         }
     }
 
+    function isSuggestionClosed(post) {
+        return post && String(post.status).toUpperCase() === 'CLOSED';
+    }
+
+    function renderSuggestionDetailContent(post) {
+        suggestionDetailBody.innerHTML = `
+            <div class="suggestion-detail-header">
+                <h4>${escapeHtml(post.title)}</h4>
+                <div class="suggestion-detail-badges">
+                    ${suggestionCategoryBadge(post.category)}
+                    ${suggestionStatusBadge(post.status)}
+                </div>
+            </div>
+            <p class="detail-meta">
+                작성자 ${escapeHtml(post.authorName || post.authorUsername)} (${escapeHtml(post.authorUsername)})
+                · ${ROLE_LABELS[post.authorRole] || post.authorRole}
+                · 등록 ${formatDateTime(post.createdAt)}${post.updatedAt && post.updatedAt !== post.createdAt ? ` · 수정 ${formatDateTime(post.updatedAt)}` : ''}
+            </p>
+            <div class="detail-content">${escapeHtml(post.content)}</div>
+        `;
+
+        suggestionStatusSelect.value = post.status;
+
+        if (post.adminReply) {
+            suggestionExistingReply.classList.remove('hidden');
+            suggestionExistingReply.innerHTML = `
+                <div class="existing-reply-label">등록된 관리자 답변</div>
+                <p class="detail-meta">${post.repliedByUsername ? `${escapeHtml(post.repliedByUsername)} · ` : ''}${formatDateTime(post.repliedAt)}</p>
+                <div>${escapeHtml(post.adminReply)}</div>
+            `;
+            suggestionReplyContent.value = post.adminReply;
+            suggestionReplyBtn.textContent = '답변 수정';
+        } else {
+            suggestionExistingReply.classList.add('hidden');
+            suggestionExistingReply.innerHTML = '';
+            suggestionReplyContent.value = '';
+            suggestionReplyBtn.textContent = '답변 등록';
+        }
+    }
+
+    function updateSuggestionDetailControls(post) {
+        const closed = isSuggestionClosed(post);
+        suggestionStatusSelect.disabled = closed;
+        suggestionStatusBtn.disabled = closed;
+        suggestionStatusClosedHint.classList.toggle('hidden', !closed);
+    }
+
+    async function updateSuggestionStatus() {
+        if (!selectedSuggestionId || !currentSuggestionPost) {
+            throw new Error('건의를 먼저 선택해 주세요.');
+        }
+        if (isSuggestionClosed(currentSuggestionPost)) {
+            throw new Error('종료된 건의는 상태를 변경할 수 없습니다.');
+        }
+
+        const newStatus = suggestionStatusSelect.value;
+        if (newStatus === currentSuggestionPost.status) {
+            throw new Error('변경할 상태를 선택해 주세요.');
+        }
+
+        const post = await apiPatch(`/api/admin/suggestions/${selectedSuggestionId}/status`, { status: newStatus });
+        currentSuggestionPost = post;
+        renderSuggestionDetailContent(post);
+        updateSuggestionDetailControls(post);
+        showSuccess('건의 상태를 변경했습니다.');
+        await loadSuggestions();
+        loadActivityLogs().catch(() => {});
+    }
+
+    async function submitSuggestionReply() {
+        if (!selectedSuggestionId) {
+            throw new Error('건의를 먼저 선택해 주세요.');
+        }
+
+        const reply = suggestionReplyContent.value.trim();
+        if (!reply) {
+            throw new Error('답변 내용을 입력해 주세요.');
+        }
+
+        const post = await apiPost(`/api/admin/suggestions/${selectedSuggestionId}/reply`, { reply });
+        currentSuggestionPost = post;
+        renderSuggestionDetailContent(post);
+        updateSuggestionDetailControls(post);
+        showSuccess('관리자 답변을 등록했습니다.');
+        await loadSuggestions();
+        loadActivityLogs().catch(() => {});
+    }
+
     async function openSuggestionDetail(id, scroll = true) {
         selectedSuggestionId = id;
         if (suggestionPageData.items.length) {
@@ -1365,45 +1458,17 @@
 
         try {
             const post = await api(`/api/admin/suggestions/${id}`);
+            currentSuggestionPost = post;
             suggestionDetail.classList.remove('hidden');
-
-            suggestionDetailBody.innerHTML = `
-                <div class="suggestion-detail-header">
-                    <h4>${escapeHtml(post.title)}</h4>
-                    <div class="suggestion-detail-badges">
-                        ${suggestionCategoryBadge(post.category)}
-                        ${suggestionStatusBadge(post.status)}
-                    </div>
-                </div>
-                <p class="detail-meta">
-                    작성자 ${escapeHtml(post.authorName || post.authorUsername)} (${escapeHtml(post.authorUsername)})
-                    · ${ROLE_LABELS[post.authorRole] || post.authorRole}
-                    · 등록 ${formatDateTime(post.createdAt)}${post.updatedAt && post.updatedAt !== post.createdAt ? ` · 수정 ${formatDateTime(post.updatedAt)}` : ''}
-                </p>
-                <div class="detail-content">${escapeHtml(post.content)}</div>
-            `;
-
-            suggestionStatusSelect.value = post.status;
-
-            if (post.adminReply) {
-                suggestionExistingReply.classList.remove('hidden');
-                suggestionExistingReply.innerHTML = `
-                    <div class="existing-reply-label">등록된 관리자 답변</div>
-                    <p class="detail-meta">${post.repliedByUsername ? `${escapeHtml(post.repliedByUsername)} · ` : ''}${formatDateTime(post.repliedAt)}</p>
-                    <div>${escapeHtml(post.adminReply)}</div>
-                `;
-                suggestionReplyContent.value = post.adminReply;
-            } else {
-                suggestionExistingReply.classList.add('hidden');
-                suggestionExistingReply.innerHTML = '';
-                suggestionReplyContent.value = '';
-            }
+            renderSuggestionDetailContent(post);
+            updateSuggestionDetailControls(post);
 
             if (scroll) {
                 suggestionDetail.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         } catch (error) {
             selectedSuggestionId = null;
+            currentSuggestionPost = null;
             if (suggestionPageData.items.length) {
                 renderSuggestionTable(suggestionPageData);
             }
@@ -1414,6 +1479,7 @@
 
     function closeSuggestionDetail() {
         selectedSuggestionId = null;
+        currentSuggestionPost = null;
         suggestionDetail.classList.add('hidden');
         if (suggestionPageData.items.length) {
             renderSuggestionTable(suggestionPageData);
@@ -1581,6 +1647,16 @@
     document.getElementById('closeSuggestionDetailBtn').addEventListener('click', () => {
         clearMessages();
         closeSuggestionDetail();
+    });
+
+    document.getElementById('suggestionStatusBtn').addEventListener('click', () => {
+        clearMessages();
+        updateSuggestionStatus().catch(error => showError(error.message));
+    });
+
+    document.getElementById('suggestionReplyBtn').addEventListener('click', () => {
+        clearMessages();
+        submitSuggestionReply().catch(error => showError(error.message));
     });
 
     loadCurrentUser().catch(() => {
