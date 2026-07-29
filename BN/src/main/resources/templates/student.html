@@ -93,17 +93,22 @@
         }
         .dashboard-hero .card,
         .dashboard-daily-grid .card,
+        .dashboard-setup-grid .card,
         .dashboard-workspace .card {
             margin-bottom: 0;
         }
         .dashboard-hero #quickActionBar {
             margin-bottom: 0;
         }
-        .dashboard-daily-grid {
+        .dashboard-daily-grid,
+        .dashboard-setup-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
             margin-bottom: 20px;
+        }
+        .dashboard-setup-grid .card {
+            margin-bottom: 0;
         }
         .dashboard-workspace {
             display: grid;
@@ -126,6 +131,16 @@
         }
         .card-compact {
             padding: 18px 20px;
+        }
+        .card-compact .section-heading,
+        .card-compact > section > h2.section-heading {
+            font-size: 18px;
+            margin: 0 0 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .card-compact .helper {
+            margin-top: 4px;
         }
         .assignment-details > summary {
             list-style: none;
@@ -170,7 +185,8 @@
                 grid-template-columns: 1fr;
                 gap: 12px;
             }
-            .dashboard-daily-grid {
+            .dashboard-daily-grid,
+            .dashboard-setup-grid {
                 grid-template-columns: 1fr;
                 gap: 12px;
             }
@@ -190,7 +206,8 @@
             }
         }
         @media (min-width: 641px) {
-            .dashboard-daily-grid .card {
+            .dashboard-daily-grid .card,
+            .dashboard-setup-grid .card {
                 height: 100%;
             }
         }
@@ -897,10 +914,100 @@
             border-radius: 10px;
             padding: 14px 12px;
         }
+        .schedule-summary-line {
+            margin: 0 0 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+            color: #374151;
+        }
+        .schedule-summary-line:last-child {
+            margin-bottom: 0;
+        }
+        .btn-expand {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 0;
+            border: none;
+            background: none;
+            color: #1e3a8a;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+        .btn-expand:hover {
+            color: #1e40af;
+        }
+        .compact-list-full {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e5e7eb;
+        }
         .class-profile-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 12px;
+        }
+        #section-class-profile .field,
+        #section-assignment .field {
+            margin-bottom: 10px;
+        }
+        #section-class-profile label,
+        #section-assignment label,
+        #section-pre-counsel label {
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        #section-class-profile input,
+        #section-assignment input,
+        #section-pre-counsel input[type="text"],
+        #section-pre-counsel select {
+            padding: 10px 12px;
+            font-size: 14px;
+        }
+        #section-assignment .assignment-summary {
+            font-size: 15px;
+        }
+        #section-assignment .info-box {
+            padding: 12px 14px;
+        }
+        #section-assignment .info-box p {
+            font-size: 14px;
+        }
+        #section-pre-counsel textarea {
+            min-height: 72px;
+            padding: 10px 12px;
+            font-size: 14px;
+        }
+        #section-pre-counsel .form-section-title {
+            font-size: 15px;
+        }
+        #section-pre-counsel .form-section summary.form-section-title {
+            padding: 10px 14px;
+        }
+        #section-pre-counsel .form-section-body {
+            padding: 12px 14px 2px;
+        }
+        #section-pre-counsel .field {
+            margin-bottom: 10px;
+        }
+        #section-pre-counsel .submit-btn {
+            font-size: 14px;
+            padding: 10px 16px;
+            min-height: 44px;
+        }
+        @media (min-width: 641px) {
+            #section-pre-counsel .form-section-body {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                column-gap: 12px;
+            }
+            #section-pre-counsel .form-section-body .field:has(textarea) {
+                grid-column: 1 / -1;
+            }
         }
         @media (max-width: 640px) {
             .class-profile-grid {
@@ -1040,11 +1147,9 @@
             </div>
         </section>
     </div>
-
-        </section>
-    </div>
     </div>
 
+    <div class="dashboard-setup-grid">
     <div class="card card-compact" id="section-class-profile">
         <section>
             <h2 class="section-heading">학년 · 반</h2>
@@ -1096,6 +1201,7 @@
             </section>
         </details>
     </div>
+    </div>
 
     <div class="dashboard-workspace">
     <div class="student-main-tabs" id="studentMainTabs" role="tablist" aria-label="상담 메뉴">
@@ -1103,9 +1209,9 @@
         <button type="button" class="filter-chip" data-student-tab="counsel-create" role="tab" aria-selected="false">상담 신청</button>
         <button type="button" class="filter-chip" data-student-tab="counsel-list" role="tab" aria-selected="false">내 상담</button>
     </div>
-    <div class="card" id="section-pre-counsel">
+    <div class="card card-compact" id="section-pre-counsel">
         <section>
-            <h2>사전 상담 카드</h2>
+            <h2 class="section-heading">사전 상담 카드</h2>
             <p class="helper">상담 전에 나를 소개하는 카드를 작성합니다. 담당 교사만 열람할 수 있습니다.</p>
             <span class="profile-status" id="preCounselStatus">작성 전</span>
             <form id="preCounselForm">
@@ -1323,6 +1429,11 @@
     let cachedMealData = null;
     let cachedSchoolScheduleData = null;
     let cachedTimetableData = null;
+    let schoolScheduleExpanded = false;
+    let timetableExpanded = false;
+
+    const SCHEDULE_SUMMARY_LIMIT = 2;
+    const TIMETABLE_SUMMARY_LIMIT = 3;
     let todayMoodRecorded = false;
     let todayMoodSummary = '';
     let todayNoticeCount = null;
@@ -1790,6 +1901,114 @@
         return new Intl.DateTimeFormat('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' }).format(date);
     }
 
+    function formatScheduleDateShort(value) {
+        if (!value) {
+            return '-';
+        }
+        const date = new Date(`${value}T00:00:00`);
+        if (Number.isNaN(date.getTime())) {
+            return value;
+        }
+        return new Intl.DateTimeFormat('ko-KR', { month: 'long', day: 'numeric' }).format(date);
+    }
+
+    function formatScheduleEventDate(event) {
+        const fromDate = event.fromDate || event.date;
+        const toDate = event.toDate || event.date;
+        if (fromDate && toDate && fromDate !== toDate) {
+            return `${formatScheduleDateShort(fromDate)} ~ ${formatScheduleDateShort(toDate)}`;
+        }
+        return formatScheduleDate(fromDate);
+    }
+
+    function truncateText(text, maxLength) {
+        if (!text) {
+            return '';
+        }
+        const normalized = String(text).replace(/\s+/g, ' ').trim();
+        if (normalized.length <= maxLength) {
+            return normalized;
+        }
+        return `${normalized.slice(0, maxLength)}…`;
+    }
+
+    function normalizeScheduleEventName(name) {
+        return String(name || '').replace(/\s+/g, ' ').trim();
+    }
+
+    function isConsecutiveScheduleDate(previousDate, nextDate) {
+        const previous = new Date(`${previousDate}T00:00:00`);
+        const next = new Date(`${nextDate}T00:00:00`);
+        if (Number.isNaN(previous.getTime()) || Number.isNaN(next.getTime())) {
+            return false;
+        }
+        const diffDays = Math.round((next - previous) / 86400000);
+        return diffDays === 1;
+    }
+
+    function mergeConsecutiveScheduleEvents(events) {
+        if (!events || !events.length) {
+            return [];
+        }
+
+        const sorted = [...events].sort((a, b) => String(a.date).localeCompare(String(b.date)));
+        const merged = [];
+        let current = null;
+
+        for (const event of sorted) {
+            const eventName = normalizeScheduleEventName(event.eventName);
+            if (!eventName) {
+                continue;
+            }
+
+            if (
+                current
+                && current.eventName === eventName
+                && isConsecutiveScheduleDate(current.toDate, event.date)
+            ) {
+                current.toDate = event.date;
+                if (event.eventContent && !current.eventContent) {
+                    current.eventContent = event.eventContent;
+                }
+                continue;
+            }
+
+            if (current) {
+                merged.push(current);
+            }
+            current = {
+                fromDate: event.date,
+                toDate: event.date,
+                eventName: event.eventName,
+                eventContent: event.eventContent || null
+            };
+        }
+
+        if (current) {
+            merged.push(current);
+        }
+        return merged;
+    }
+
+    function renderScheduleSummaryLine(event) {
+        return `
+            <p class="schedule-summary-line">
+                <strong>${escapeHtml(formatScheduleEventDate(event))}</strong>
+                ${escapeHtml(truncateText(event.eventName, 40))}
+            </p>
+        `;
+    }
+
+    function renderScheduleListItem(event) {
+        return `
+            <div class="schedule-list-item">
+                <div class="schedule-list-date">${escapeHtml(formatScheduleEventDate(event))}</div>
+                <h3 class="schedule-list-title">${escapeHtml(event.eventName)}</h3>
+                ${event.eventContent ? `<p class="schedule-list-content">${escapeHtml(event.eventContent)}</p>` : ''}
+            </div>
+        `;
+    }
+
     function todayDateKey() {
         const now = new Date();
         const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -1816,21 +2035,30 @@
         const status = resolveScheduleStatus(data);
 
         if (status !== 'OK' || !data.events || !data.events.length) {
+            schoolScheduleExpanded = false;
             schoolScheduleList.innerHTML = `<div class="${scheduleStatusClass(status)}">${escapeHtml(scheduleDisplayMessage(data, status))}</div>`;
             return;
         }
 
-        schoolScheduleList.innerHTML = data.events.map(event => `
-            <div class="schedule-list-item">
-                <div class="schedule-list-date">${escapeHtml(formatScheduleDate(event.date))}</div>
-                <h3 class="schedule-list-title">${escapeHtml(event.eventName)}</h3>
-                ${event.eventContent ? `<p class="schedule-list-content">${escapeHtml(event.eventContent)}</p>` : ''}
-            </div>
-        `).join('');
+        const mergedEvents = mergeConsecutiveScheduleEvents(data.events);
+        const needsExpand = mergedEvents.length > SCHEDULE_SUMMARY_LIMIT;
+        let html = '';
+
+        if (needsExpand && schoolScheduleExpanded) {
+            html = mergedEvents.map(renderScheduleListItem).join('');
+            html += `<button type="button" class="btn-expand" data-toggle-schedule-expand">접기</button>`;
+        } else if (needsExpand) {
+            html = mergedEvents.slice(0, SCHEDULE_SUMMARY_LIMIT).map(renderScheduleSummaryLine).join('');
+            html += `<button type="button" class="btn-expand" data-toggle-schedule-expand">전체 ${mergedEvents.length}건 보기</button>`;
+        } else {
+            html = mergedEvents.map(renderScheduleSummaryLine).join('');
+        }
 
         if (data.message) {
-            schoolScheduleList.innerHTML += `<p class="helper">${escapeHtml(data.message)}</p>`;
+            html += `<p class="helper">${escapeHtml(data.message)}</p>`;
         }
+
+        schoolScheduleList.innerHTML = html;
     }
 
     async function loadSchoolSchedule() {
@@ -1904,23 +2132,48 @@
         }
 
         if (status !== 'OK' || !data.periods || !data.periods.length) {
+            timetableExpanded = false;
             timetableList.innerHTML = `<div class="${timetableStatusClass(status)}">${escapeHtml(timetableDisplayMessage(data, status))}</div>`;
             return;
         }
 
-        timetableList.innerHTML = data.periods.map(period => `
-            <div class="timetable-list-item">
-                <div class="timetable-period">${escapeHtml(String(period.period))}</div>
-                <div>
-                    <p class="timetable-subject">${escapeHtml(period.subject)}</p>
-                    ${period.classroom ? `<p class="timetable-classroom">${escapeHtml(period.classroom)}</p>` : ''}
+        const periods = data.periods;
+        const needsExpand = periods.length > TIMETABLE_SUMMARY_LIMIT;
+        let html = '';
+
+        if (needsExpand && timetableExpanded) {
+            html = periods.map(period => `
+                <div class="timetable-list-item">
+                    <div class="timetable-period">${escapeHtml(String(period.period))}</div>
+                    <div>
+                        <p class="timetable-subject">${escapeHtml(period.subject)}</p>
+                        ${period.classroom ? `<p class="timetable-classroom">${escapeHtml(period.classroom)}</p>` : ''}
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `).join('');
+            html += `<button type="button" class="btn-expand" data-toggle-timetable-expand">접기</button>`;
+        } else if (needsExpand) {
+            html = periods.slice(0, TIMETABLE_SUMMARY_LIMIT).map(period => `
+                <p class="schedule-summary-line">
+                    <strong>${escapeHtml(String(period.period))}교시</strong>
+                    ${escapeHtml(truncateText(period.subject, 24))}
+                </p>
+            `).join('');
+            html += `<button type="button" class="btn-expand" data-toggle-timetable-expand">전체 ${periods.length}교시 보기</button>`;
+        } else {
+            html = periods.map(period => `
+                <p class="schedule-summary-line">
+                    <strong>${escapeHtml(String(period.period))}교시</strong>
+                    ${escapeHtml(truncateText(period.subject, 24))}
+                </p>
+            `).join('');
+        }
 
         if (data.message) {
-            timetableList.innerHTML += `<p class="helper">${escapeHtml(data.message)}</p>`;
+            html += `<p class="helper">${escapeHtml(data.message)}</p>`;
         }
+
+        timetableList.innerHTML = html;
     }
 
     async function loadTimetable() {
@@ -2192,9 +2445,10 @@
                     target: 'section-school-calendar'
                 };
             }
+            const mergedCount = mergeConsecutiveScheduleEvents(cachedSchoolScheduleData.events).length;
             return {
                 label: '학사일정',
-                status: `${cachedSchoolScheduleData.events.length}건 예정`,
+                status: `${mergedCount}건 예정`,
                 tone: 'done',
                 target: 'section-school-calendar'
             };
@@ -2734,6 +2988,30 @@
     window.addEventListener('hashchange', handleInitialHashNavigation);
 
     closeDetailBtn.addEventListener('click', closeDetail);
+
+    if (schoolScheduleList) {
+        schoolScheduleList.addEventListener('click', (event) => {
+            if (!event.target.closest('[data-toggle-schedule-expand]')) {
+                return;
+            }
+            schoolScheduleExpanded = !schoolScheduleExpanded;
+            if (cachedSchoolScheduleData) {
+                renderSchoolSchedule(cachedSchoolScheduleData);
+            }
+        });
+    }
+
+    if (timetableList) {
+        timetableList.addEventListener('click', (event) => {
+            if (!event.target.closest('[data-toggle-timetable-expand]')) {
+                return;
+            }
+            timetableExpanded = !timetableExpanded;
+            if (cachedTimetableData) {
+                renderTimetable(cachedTimetableData);
+            }
+        });
+    }
 
     loadCurrentUser().catch(() => {
         userGreeting.textContent = '학생 홈';

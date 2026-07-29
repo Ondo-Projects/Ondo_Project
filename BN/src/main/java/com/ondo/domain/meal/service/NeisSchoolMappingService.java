@@ -10,6 +10,7 @@ import com.ondo.global.error.NeisMappingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class NeisSchoolMappingService {
     private final NeisApiClient neisApiClient;
     private final SchoolRepository schoolRepository;
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public NeisSchoolCodeDTO resolveNeisCodes(School school) {
         if (school.hasNeisCodes()) {
             return new NeisSchoolCodeDTO(school.getNeisOfficeCode(), school.getNeisSchoolCode());
