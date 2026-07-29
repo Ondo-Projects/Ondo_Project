@@ -348,6 +348,14 @@
         .badge-CONFIRMED { background: #dbeafe; color: #1d4ed8; }
         .badge-COMPLETED { background: #dcfce7; color: #166534; }
         .badge-CANCELLED { background: #f3f4f6; color: #4b5563; }
+        .badge-OPEN { background: #fef3c7; color: #92400e; }
+        .badge-IN_REVIEW { background: #dbeafe; color: #1d4ed8; }
+        .badge-RESOLVED { background: #dcfce7; color: #166534; }
+        .badge-CLOSED { background: #f3f4f6; color: #4b5563; }
+        .badge-suggestion-cat {
+            background: #f3f4f6;
+            color: #374151;
+        }
         .post-meta {
             color: #6b7280;
             font-size: 13px;
@@ -1015,6 +1023,143 @@
                 grid-template-columns: 1fr;
             }
         }
+        .suggestion-subheading {
+            font-size: 16px;
+            font-weight: 700;
+            color: #374151;
+            margin: 24px 0 12px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .suggestion-subheading--compact {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+        #section-suggestion .field {
+            margin-bottom: 10px;
+        }
+        #section-suggestion label {
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        #section-suggestion input[type="text"],
+        #section-suggestion select,
+        #section-suggestion textarea {
+            padding: 10px 12px;
+            font-size: 14px;
+        }
+        #section-suggestion textarea {
+            min-height: 96px;
+            resize: vertical;
+        }
+        #section-suggestion .submit-btn {
+            font-size: 14px;
+            padding: 10px 16px;
+            min-height: 44px;
+        }
+        #suggestionDetail {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+        #suggestionDetail .detail-card-header h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+        #suggestionDetailBody {
+            background: #f9fafb;
+            border-radius: 10px;
+            padding: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+        #suggestionDetailBody .suggestion-detail-meta {
+            color: #6b7280;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+        #suggestionDetailBody .suggestion-detail-title {
+            font-size: 17px;
+            font-weight: 700;
+            margin: 0 0 10px;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+        #suggestionDetailBody .suggestion-detail-content {
+            margin: 0;
+            color: #374151;
+        }
+        #suggestionDetailReply {
+            margin-top: 12px;
+        }
+        .suggestion-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 14px 16px;
+            min-height: 56px;
+            cursor: pointer;
+            transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+            -webkit-tap-highlight-color: rgba(37, 99, 235, 0.12);
+        }
+        .suggestion-item:hover,
+        .suggestion-item.active {
+            border-color: #2563eb;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12);
+        }
+        .suggestion-item:active {
+            background: #f8fafc;
+        }
+        .suggestion-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .suggestion-item-title {
+            margin: 0;
+            font-size: 16px;
+            flex: 1;
+            min-width: 0;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+        .suggestion-item-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .suggestion-item-meta {
+            color: #6b7280;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+        @media (max-width: 640px) {
+            #section-suggestion .inline-actions {
+                width: 100%;
+            }
+            #section-suggestion .inline-actions button {
+                flex: 1 1 calc(50% - 4px);
+            }
+            #suggestionDetailActions {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+            }
+            #suggestionDetailActions button {
+                width: 100%;
+            }
+            .suggestion-item-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .suggestion-item-badges {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1202,81 +1347,6 @@
             </section>
         </details>
     </div>
-    </div>
-
-    <div class="card card-compact" id="section-suggestion">
-        <section>
-            <h2 class="section-heading">운영 건의</h2>
-            <p class="helper">서비스 버그, 기능 개선, 운영 문의를 운영팀에 남길 수 있습니다. 담당 관리자만 확인합니다.</p>
-
-            <form id="suggestionForm">
-                <div class="field">
-                    <label for="suggestionCategory">분류</label>
-                    <select id="suggestionCategory" required>
-                        <option value="">선택해 주세요</option>
-                        <option value="BUG">버그 / 오류</option>
-                        <option value="FEATURE">기능 개선</option>
-                        <option value="OPERATION">운영 문의</option>
-                        <option value="OTHER">기타</option>
-                    </select>
-                </div>
-                <div class="field">
-                    <label for="suggestionTitle">제목</label>
-                    <input type="text" id="suggestionTitle" maxlength="100" required placeholder="건의 제목을 입력해 주세요.">
-                </div>
-                <div class="field">
-                    <label for="suggestionContent">내용</label>
-                    <textarea id="suggestionContent" maxlength="2000" required placeholder="어떤 문제인지, 어떤 점이 불편했는지 구체적으로 적어 주세요."></textarea>
-                </div>
-                <button type="submit" class="submit-btn" id="suggestionSubmitBtn">건의 등록하기</button>
-            </form>
-
-            <h3 class="suggestion-subheading">내 건의</h3>
-            <div class="post-list" id="suggestionList">
-                <div class="empty-state">불러오는 중...</div>
-            </div>
-
-            <div class="hidden" id="suggestionDetail">
-                <div class="detail-card-header">
-                    <h3>건의 상세</h3>
-                    <button type="button" class="btn-secondary detail-close-btn" id="closeSuggestionDetailBtn" aria-label="건의 상세 닫기">닫기</button>
-                </div>
-                <div id="suggestionDetailBody"></div>
-                <div class="reply-box hidden" id="suggestionDetailReply"></div>
-                <p class="helper hidden" id="suggestionEditHint">검토 중이거나 처리된 건의는 수정할 수 없습니다.</p>
-                <div class="inline-actions hidden" id="suggestionDetailActions">
-                    <button type="button" class="btn-primary" id="editSuggestionBtn">수정</button>
-                    <button type="button" class="btn-danger" id="deleteSuggestionBtn">삭제</button>
-                </div>
-                <div class="detail-panel hidden" id="suggestionEditPanel">
-                    <h3 style="margin-top: 0;">건의 수정</h3>
-                    <form id="suggestionEditForm">
-                        <input type="hidden" id="suggestionEditId">
-                        <div class="field">
-                            <label for="suggestionEditCategory">분류</label>
-                            <select id="suggestionEditCategory" required>
-                                <option value="BUG">버그 / 오류</option>
-                                <option value="FEATURE">기능 개선</option>
-                                <option value="OPERATION">운영 문의</option>
-                                <option value="OTHER">기타</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label for="suggestionEditTitle">제목</label>
-                            <input type="text" id="suggestionEditTitle" maxlength="100" required>
-                        </div>
-                        <div class="field">
-                            <label for="suggestionEditContent">내용</label>
-                            <textarea id="suggestionEditContent" maxlength="2000" required></textarea>
-                        </div>
-                        <div class="inline-actions">
-                            <button type="submit" class="btn-primary" id="suggestionEditSaveBtn">저장</button>
-                            <button type="button" class="btn-secondary" id="cancelSuggestionEditBtn">취소</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </section>
     </div>
 
     <div class="dashboard-workspace">
@@ -1476,6 +1546,81 @@
             </div>
         </section>
     </div>
+    </div>
+
+    <div class="card card-compact" id="section-suggestion">
+        <section>
+            <h2 class="section-heading">운영 건의</h2>
+            <p class="helper">서비스 버그, 기능 개선, 운영 문의를 운영팀에 남길 수 있습니다. 담당 관리자만 확인합니다.</p>
+
+            <form id="suggestionForm">
+                <div class="field">
+                    <label for="suggestionCategory">분류</label>
+                    <select id="suggestionCategory" required>
+                        <option value="">선택해 주세요</option>
+                        <option value="BUG">버그 / 오류</option>
+                        <option value="FEATURE">기능 개선</option>
+                        <option value="OPERATION">운영 문의</option>
+                        <option value="OTHER">기타</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="suggestionTitle">제목</label>
+                    <input type="text" id="suggestionTitle" maxlength="100" required placeholder="건의 제목을 입력해 주세요.">
+                </div>
+                <div class="field">
+                    <label for="suggestionContent">내용</label>
+                    <textarea id="suggestionContent" maxlength="2000" required placeholder="어떤 문제인지, 어떤 점이 불편했는지 구체적으로 적어 주세요."></textarea>
+                </div>
+                <button type="submit" class="submit-btn" id="suggestionSubmitBtn">건의 등록하기</button>
+            </form>
+
+            <h3 class="suggestion-subheading">내 건의</h3>
+            <div class="post-list" id="suggestionList">
+                <div class="empty-state">불러오는 중...</div>
+            </div>
+
+            <div class="hidden" id="suggestionDetail">
+                <div class="detail-card-header">
+                    <h3>건의 상세</h3>
+                    <button type="button" class="btn-secondary detail-close-btn" id="closeSuggestionDetailBtn" aria-label="건의 상세 닫기">닫기</button>
+                </div>
+                <div id="suggestionDetailBody"></div>
+                <div class="reply-box hidden" id="suggestionDetailReply"></div>
+                <p class="helper hidden" id="suggestionEditHint">검토 중이거나 처리된 건의는 수정할 수 없습니다.</p>
+                <div class="inline-actions hidden" id="suggestionDetailActions">
+                    <button type="button" class="btn-primary" id="editSuggestionBtn">수정</button>
+                    <button type="button" class="btn-danger" id="deleteSuggestionBtn">삭제</button>
+                </div>
+                <div class="detail-panel hidden" id="suggestionEditPanel">
+                    <h3 class="suggestion-subheading suggestion-subheading--compact">건의 수정</h3>
+                    <form id="suggestionEditForm">
+                        <input type="hidden" id="suggestionEditId">
+                        <div class="field">
+                            <label for="suggestionEditCategory">분류</label>
+                            <select id="suggestionEditCategory" required>
+                                <option value="BUG">버그 / 오류</option>
+                                <option value="FEATURE">기능 개선</option>
+                                <option value="OPERATION">운영 문의</option>
+                                <option value="OTHER">기타</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="suggestionEditTitle">제목</label>
+                            <input type="text" id="suggestionEditTitle" maxlength="100" required>
+                        </div>
+                        <div class="field">
+                            <label for="suggestionEditContent">내용</label>
+                            <textarea id="suggestionEditContent" maxlength="2000" required></textarea>
+                        </div>
+                        <div class="inline-actions">
+                            <button type="submit" class="btn-primary" id="suggestionEditSaveBtn">저장</button>
+                            <button type="button" class="btn-secondary" id="cancelSuggestionEditBtn">취소</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
     </div>
 </div>
 
