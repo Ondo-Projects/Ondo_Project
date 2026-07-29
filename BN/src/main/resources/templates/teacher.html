@@ -1126,10 +1126,25 @@
         COMPLETED: '완료',
         CANCELLED: '취소'
     };
+    const SUGGESTION_CATEGORY_LABELS = {
+        BUG: '버그 / 오류',
+        FEATURE: '기능 개선',
+        OPERATION: '운영 문의',
+        OTHER: '기타'
+    };
+    const SUGGESTION_STATUS_LABELS = {
+        OPEN: '접수',
+        IN_REVIEW: '검토 중',
+        RESOLVED: '처리 완료',
+        CLOSED: '종료'
+    };
 
     let currentFilter = '';
     let posts = [];
     let selectedPost = null;
+    let suggestions = [];
+    let selectedSuggestionId = null;
+    let currentSuggestionPost = null;
 
     const pageError = document.getElementById('pageError');
     const pageSuccess = document.getElementById('pageSuccess');
@@ -1165,6 +1180,17 @@
     const profileSchoolResults = document.getElementById('profileSchoolResults');
     const profileSelectedSchoolCode = document.getElementById('profileSelectedSchoolCode');
     const confirmSchoolChangeBtn = document.getElementById('confirmSchoolChangeBtn');
+    const suggestionForm = document.getElementById('suggestionForm');
+    const suggestionList = document.getElementById('suggestionList');
+    const suggestionDetail = document.getElementById('suggestionDetail');
+    const suggestionDetailBody = document.getElementById('suggestionDetailBody');
+    const suggestionDetailReply = document.getElementById('suggestionDetailReply');
+    const suggestionDetailActions = document.getElementById('suggestionDetailActions');
+    const suggestionEditHint = document.getElementById('suggestionEditHint');
+    const suggestionEditPanel = document.getElementById('suggestionEditPanel');
+    const suggestionEditForm = document.getElementById('suggestionEditForm');
+    const closeSuggestionDetailBtn = document.getElementById('closeSuggestionDetailBtn');
+    const cancelSuggestionEditBtn = document.getElementById('cancelSuggestionEditBtn');
 
     let profileSchoolTypeFilter = '';
     let profileSearchTimer = null;
@@ -1750,6 +1776,150 @@
         renderPosts();
     }
 
+    function renderSuggestionList() {
+        if (!suggestionList) {
+            return;
+        }
+        if (!suggestions.length) {
+            suggestionList.innerHTML = '<div class="empty-state">아직 등록한 건의가 없습니다.</div>';
+            if (selectedSuggestionId) {
+                closeSuggestionDetail();
+            }
+            return;
+        }
+
+        suggestionList.innerHTML = suggestions.map(item => `
+            <div class="suggestion-item ${selectedSuggestionId === item.id ? 'active' : ''}" data-id="${item.id}" role="button" tabindex="0">
+                <div class="suggestion-item-header">
+                    <h3 class="suggestion-item-title">${escapeHtml(item.title)}</h3>
+                    <div class="suggestion-item-badges">
+                        <span class="badge badge-suggestion-cat">${SUGGESTION_CATEGORY_LABELS[item.category] || item.category}</span>
+                        <span class="badge badge-${item.status}">${SUGGESTION_STATUS_LABELS[item.status] || item.status}</span>
+                    </div>
+                </div>
+                <div class="suggestion-item-meta">
+                    ${formatDateTime(item.createdAt)}${item.adminReply ? ' · 답변 있음' : ''}
+                </div>
+            </div>
+        `).join('');
+
+        suggestionList.querySelectorAll('.suggestion-item').forEach(item => {
+            item.addEventListener('click', () => openSuggestionDetail(Number(item.dataset.id)));
+            item.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    openSuggestionDetail(Number(item.dataset.id));
+                }
+            });
+        });
+    }
+
+    async function loadSuggestions() {
+        if (!suggestionList) {
+            return;
+        }
+        suggestions = await api('/api/teacher/suggestions');
+        renderSuggestionList();
+        if (selectedSuggestionId && suggestions.some(item => item.id === selectedSuggestionId)) {
+            await openSuggestionDetail(selectedSuggestionId, false);
+        } else if (selectedSuggestionId) {
+            closeSuggestionDetail();
+        }
+    }
+
+    function isSuggestionOpen(post) {
+        return post && String(post.status).toUpperCase() === 'OPEN';
+    }
+
+    async function openSuggestionDetail(id, scroll = true) {
+        selectedSuggestionId = id;
+        renderSuggestionList();
+        suggestionEditPanel?.classList.add('hidden');
+
+        try {
+            const post = await api(`/api/teacher/suggestions/${id}`);
+            suggestionDetail.classList.remove('hidden');
+
+            suggestionDetailBody.innerHTML = `
+                <div class="suggestion-detail-header">
+                    <h3>${escapeHtml(post.title)}</h3>
+                    <div class="suggestion-detail-badges">
+                        <span class="badge badge-suggestion-cat">${SUGGESTION_CATEGORY_LABELS[post.category] || post.category}</span>
+                        <span class="badge badge-${post.status}">${SUGGESTION_STATUS_LABELS[post.status] || post.status}</span>
+                    </div>
+                </div>
+                <p class="post-meta">작성 ${formatDateTime(post.createdAt)}${post.updatedAt && post.updatedAt !== post.createdAt ? ` · 수정 ${formatDateTime(post.updatedAt)}` : ''}</p>
+                <div class="detail-content">${escapeHtml(post.content)}</div>
+            `;
+
+            if (post.adminReply) {
+                suggestionDetailReply.classList.remove('hidden');
+                suggestionDetailReply.innerHTML = `
+                    <strong>관리자 답변</strong>
+                    <p class="post-meta">${post.repliedByUsername ? `${escapeHtml(post.repliedByUsername)} · ` : ''}${formatDateTime(post.repliedAt)}</p>
+                    <div>${escapeHtml(post.adminReply)}</div>
+                `;
+            } else {
+                suggestionDetailReply.classList.add('hidden');
+                suggestionDetailReply.innerHTML = '';
+            }
+
+            currentSuggestionPost = post;
+            if (isSuggestionOpen(post)) {
+                suggestionDetailActions?.classList.remove('hidden');
+                suggestionEditHint?.classList.add('hidden');
+            } else {
+                suggestionDetailActions?.classList.add('hidden');
+                suggestionEditHint?.classList.remove('hidden');
+            }
+
+            if (scroll) {
+                suggestionDetail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        } catch (error) {
+            selectedSuggestionId = null;
+            currentSuggestionPost = null;
+            renderSuggestionList();
+            suggestionDetail.classList.add('hidden');
+            showError(error.message);
+        }
+    }
+
+    function openSuggestionEditForm(post) {
+        document.getElementById('suggestionEditId').value = post.id;
+        document.getElementById('suggestionEditCategory').value = post.category;
+        document.getElementById('suggestionEditTitle').value = post.title;
+        document.getElementById('suggestionEditContent').value = post.content;
+        suggestionEditPanel?.classList.remove('hidden');
+        suggestionEditPanel?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    async function deleteSuggestion(id) {
+        if (!confirm('이 건의 글을 삭제할까요?')) {
+            return;
+        }
+        clearMessages();
+        try {
+            await api(`/api/teacher/suggestions/${id}`, { method: 'DELETE' });
+            showSuccess('건의 글이 삭제되었습니다.');
+            selectedSuggestionId = null;
+            currentSuggestionPost = null;
+            suggestionDetail.classList.add('hidden');
+            suggestionEditPanel?.classList.add('hidden');
+            await loadSuggestions();
+        } catch (error) {
+            showError(error.message);
+        }
+    }
+
+    function closeSuggestionDetail() {
+        selectedSuggestionId = null;
+        currentSuggestionPost = null;
+        suggestionDetail.classList.add('hidden');
+        suggestionEditPanel?.classList.add('hidden');
+        renderSuggestionList();
+    }
+
     async function updateStatus(id, status) {
         clearMessages();
         try {
@@ -1825,6 +1995,75 @@
         }
     });
 
+    if (suggestionForm) {
+        suggestionForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            clearMessages();
+            const category = document.getElementById('suggestionCategory').value;
+            const title = document.getElementById('suggestionTitle').value.trim();
+            const content = document.getElementById('suggestionContent').value.trim();
+            if (!category) {
+                showError('건의 분류를 선택해 주세요.');
+                return;
+            }
+            try {
+                const created = await api('/api/teacher/suggestions', {
+                    method: 'POST',
+                    body: JSON.stringify({ category, title, content })
+                });
+                suggestionForm.reset();
+                showSuccess('건의가 등록되었습니다.');
+                await loadSuggestions();
+                await openSuggestionDetail(created.id);
+            } catch (error) {
+                showError(error.message);
+            }
+        });
+    }
+
+    if (closeSuggestionDetailBtn) {
+        closeSuggestionDetailBtn.addEventListener('click', closeSuggestionDetail);
+    }
+
+    document.getElementById('editSuggestionBtn')?.addEventListener('click', () => {
+        if (isSuggestionOpen(currentSuggestionPost)) {
+            openSuggestionEditForm(currentSuggestionPost);
+        }
+    });
+
+    document.getElementById('deleteSuggestionBtn')?.addEventListener('click', () => {
+        if (isSuggestionOpen(currentSuggestionPost)) {
+            deleteSuggestion(currentSuggestionPost.id).catch(error => showError(error.message));
+        }
+    });
+
+    if (suggestionEditForm) {
+        suggestionEditForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            clearMessages();
+            const id = document.getElementById('suggestionEditId').value;
+            const category = document.getElementById('suggestionEditCategory').value;
+            const title = document.getElementById('suggestionEditTitle').value.trim();
+            const content = document.getElementById('suggestionEditContent').value.trim();
+            try {
+                await api(`/api/teacher/suggestions/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ category, title, content })
+                });
+                showSuccess('건의 글이 수정되었습니다.');
+                suggestionEditPanel?.classList.add('hidden');
+                await loadSuggestions();
+                await openSuggestionDetail(Number(id), false);
+            } catch (error) {
+                showError(error.message);
+            }
+        });
+    }
+
+    cancelSuggestionEditBtn?.addEventListener('click', () => {
+        suggestionEditPanel?.classList.add('hidden');
+    });
+
     submitReplyBtn.addEventListener('click', async () => {
         if (!selectedPost) return;
         clearMessages();
@@ -1862,6 +2101,11 @@
 
     loadCurrentUser().catch(() => {
         userGreeting.textContent = '교사 홈';
+    });
+    loadSuggestions().catch(() => {
+        if (suggestionList) {
+            suggestionList.innerHTML = '<div class="empty-state">건의 목록을 불러올 수 없습니다.</div>';
+        }
     });
 
     document.getElementById('moodTabRow').addEventListener('click', (event) => {
