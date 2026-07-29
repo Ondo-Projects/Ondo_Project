@@ -2,6 +2,7 @@ package com.ondo.domain.user.service;
 
 import com.ondo.domain.user.dto.GuardianSmsSendRequestDTO;
 import com.ondo.global.error.BusinessException;
+import com.ondo.global.sms.SmsOtpRateLimiter;
 import com.ondo.global.sms.SmsPhoneUtils;
 import com.ondo.global.sms.SolapiSmsSender;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +23,12 @@ public class GuardianSmsVerificationService {
 
     private final StringRedisTemplate redisTemplate;
     private final SolapiSmsSender solapiSmsSender;
+    private final SmsOtpRateLimiter smsOtpRateLimiter;
 
-    public void sendVerificationCode(GuardianSmsSendRequestDTO request) {
+    public void sendVerificationCode(GuardianSmsSendRequestDTO request, String clientIp) {
         String phone = SmsPhoneUtils.normalizePhone(request.getPhone());
         SmsPhoneUtils.validatePhone(phone);
+        smsOtpRateLimiter.assertCanSend(phone, clientIp);
 
         String code = generateCode();
         redisTemplate.opsForValue().set(CODE_PREFIX + phone, code, Duration.ofMinutes(5));
@@ -40,6 +43,7 @@ public class GuardianSmsVerificationService {
                 5분 내에 입력해 주세요.
                 """.formatted(request.getStudentName().trim(), request.getGuardianName().trim(), code);
 
+        smsOtpRateLimiter.recordSend(phone, clientIp);
         solapiSmsSender.sendSms(phone, message);
     }
 

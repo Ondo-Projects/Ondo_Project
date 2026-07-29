@@ -10,6 +10,17 @@ class GlobalExceptionHandlerTest {
     private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
 
     @Test
+    void handleTooManyRequestsException_returns429WithErrorResponse() {
+        var response = handler.handleTooManyRequestsException(
+                new TooManyRequestsException("잠시 후 다시 시도해 주세요.")
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getMessage()).isEqualTo("잠시 후 다시 시도해 주세요.");
+    }
+
+    @Test
     void handleForbiddenException_returns403WithErrorResponse() {
         var response = handler.handleForbiddenException(new ForbiddenException("접근 권한이 없습니다."));
 
