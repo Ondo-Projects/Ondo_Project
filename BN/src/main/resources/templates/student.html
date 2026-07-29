@@ -241,9 +241,6 @@
             border-top: 1px solid #e5e7eb;
         }
         .detail-panel.open { display: block; }
-        #detailCard {
-            scroll-margin-top: 12px;
-        }
         .detail-card-header {
             display: flex;
             justify-content: space-between;
@@ -376,9 +373,49 @@
                 padding: 8px 0 12px;
                 margin: 0 -4px 12px;
             }
+            #quickActionBar {
+                width: 100%;
+            }
+            .quick-action-btn {
+                flex: 1 1 calc(50% - 4px);
+            }
         }
         @media (max-width: 360px) {
             .mood-picker { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .quick-action-btn {
+                flex: 1 1 100%;
+            }
+        }
+        #quickActionBar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .quick-action-btn {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 14px;
+            cursor: pointer;
+            min-height: 44px;
+            min-width: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            background: #e5e7eb;
+            color: #111827;
+        }
+        #section-today,
+        #section-mood,
+        #section-notice,
+        #section-assignment,
+        #section-pre-counsel,
+        #section-counsel-create,
+        #section-counsel-list,
+        #section-counsel-detail {
+            scroll-margin-top: 16px;
         }
         .notice-item {
             border: 1px solid #e5e7eb;
@@ -641,6 +678,14 @@
     <div class="message" id="pageError"></div>
     <div class="success-message" id="pageSuccess"></div>
 
+    <nav class="quick-action-bar" id="quickActionBar" aria-label="빠른 이동">
+        <button type="button" class="quick-action-btn" data-target="section-today">오늘</button>
+        <button type="button" class="quick-action-btn" data-target="section-mood">마음</button>
+        <button type="button" class="quick-action-btn" data-target="section-notice">알림</button>
+        <button type="button" class="quick-action-btn" data-target="section-counsel-create">상담</button>
+        <button type="button" class="quick-action-btn" data-target="section-pre-counsel">사전카드</button>
+    </nav>
+
     <div class="card hidden" id="schoolChangeCard">
         <section>
             <h2>학교 변경</h2>
@@ -664,7 +709,7 @@
         </section>
     </div>
 
-    <div class="card">
+    <div class="card" id="section-today">
         <section>
             <h2>1. 오늘 한눈에</h2>
             <p class="helper" id="mealSchoolHint">우리 학교 급식과 지역 날씨입니다.</p>
@@ -686,7 +731,7 @@
         </section>
     </div>
 
-    <div class="card">
+    <div class="card" id="section-mood">
         <section>
             <h2>2. 오늘의 마음 날씨</h2>
             <p class="helper">하루에 한 번, 지금 마음 상태를 기록해 주세요. 담당 교사만 볼 수 있습니다.</p>
@@ -701,7 +746,7 @@
         </section>
     </div>
 
-    <div class="card">
+    <div class="card" id="section-notice">
         <section>
             <h2>3. 선생님 알림판</h2>
             <p class="helper" id="noticeDisabledHint">담당 교사 등록 후 알림을 확인할 수 있습니다.</p>
@@ -711,7 +756,7 @@
         </section>
     </div>
 
-    <div class="card">
+    <div class="card" id="section-assignment">
         <section>
             <h2>4. 담당 교사</h2>
             <div id="assignmentRegister">
@@ -734,7 +779,7 @@
         </section>
     </div>
 
-    <div class="card">
+    <div class="card" id="section-pre-counsel">
         <section>
             <h2>5. 사전 상담 카드</h2>
             <p class="helper">상담 전에 나를 소개하는 카드를 작성합니다. 담당 교사만 열람할 수 있습니다.</p>
@@ -833,7 +878,7 @@
         </section>
     </div>
 
-    <div class="card" id="createSection">
+    <div class="card" id="section-counsel-create">
         <section>
             <h2>6. 상담 신청</h2>
             <p class="helper" id="createDisabledHint">담당 교사 등록 후 상담을 신청할 수 있습니다.</p>
@@ -870,7 +915,7 @@
         </section>
     </div>
 
-    <div class="card">
+    <div class="card" id="section-counsel-list">
         <section>
             <h2>7. 내 상담 목록</h2>
             <div class="post-list" id="postList">
@@ -879,7 +924,7 @@
         </section>
     </div>
 
-    <div class="card hidden" id="detailCard">
+    <div class="card hidden" id="section-counsel-detail">
         <section>
             <div class="detail-card-header">
                 <h2>상담 상세</h2>
@@ -966,7 +1011,7 @@
     const createForm = document.getElementById('createForm');
     const createDisabledHint = document.getElementById('createDisabledHint');
     const postList = document.getElementById('postList');
-    const detailCard = document.getElementById('detailCard');
+    const detailCard = document.getElementById('section-counsel-detail');
     const detailBody = document.getElementById('detailBody');
     const detailActions = document.getElementById('detailActions');
     const editPanel = document.getElementById('editPanel');
@@ -1712,6 +1757,67 @@
 
     syncPreCounselSections();
     preCounselDesktopQuery.addEventListener('change', syncPreCounselSections);
+
+    const quickActionBar = document.getElementById('quickActionBar');
+    const SECTION_IDS = new Set([
+        'section-today',
+        'section-mood',
+        'section-notice',
+        'section-assignment',
+        'section-pre-counsel',
+        'section-counsel-create',
+        'section-counsel-list',
+        'section-counsel-detail'
+    ]);
+
+    function openPreCounselSectionForNav() {
+        if (!preCounselSections.length) {
+            return;
+        }
+        if (preCounselDesktopQuery.matches) {
+            preCounselSections.forEach(section => {
+                section.open = true;
+            });
+            return;
+        }
+        preCounselSections.forEach((section, index) => {
+            section.open = index === 0;
+        });
+    }
+
+    function scrollToSection(sectionId) {
+        const target = document.getElementById(sectionId);
+        if (!target) {
+            return;
+        }
+        if (sectionId === 'section-pre-counsel') {
+            openPreCounselSectionForNav();
+        }
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    if (quickActionBar) {
+        quickActionBar.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-target]');
+            if (!button) {
+                return;
+            }
+            scrollToSection(button.dataset.target);
+        });
+    }
+
+    function handleInitialHashNavigation() {
+        const sectionId = window.location.hash.replace('#', '');
+        if (!SECTION_IDS.has(sectionId)) {
+            return;
+        }
+        window.requestAnimationFrame(() => {
+            scrollToSection(sectionId);
+        });
+    }
+
+    handleInitialHashNavigation();
+    window.addEventListener('hashchange', handleInitialHashNavigation);
 
     closeDetailBtn.addEventListener('click', closeDetail);
 
