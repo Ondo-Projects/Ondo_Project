@@ -521,6 +521,92 @@
             </div>
         </section>
     </div>
+
+    <div class="card">
+        <section id="section-suggestion">
+            <h2>7. 운영 건의</h2>
+            <p class="helper">학생·교사가 남긴 운영 건의를 조회하고 상태 변경·관리자 답변을 처리합니다.</p>
+
+            <div class="inline-actions search-fields" style="margin-bottom: 12px;">
+                <div class="field" style="flex:1; min-width: 160px; margin:0;">
+                    <label for="suggestionKeyword">제목·내용</label>
+                    <input type="text" id="suggestionKeyword" placeholder="검색어">
+                </div>
+            </div>
+
+            <div class="filter-row" id="suggestionStatusFilter">
+                <button type="button" class="filter-chip active" data-status="">전체</button>
+                <button type="button" class="filter-chip" data-status="OPEN">접수</button>
+                <button type="button" class="filter-chip" data-status="IN_REVIEW">검토 중</button>
+                <button type="button" class="filter-chip" data-status="RESOLVED">처리 완료</button>
+                <button type="button" class="filter-chip" data-status="CLOSED">종료</button>
+            </div>
+
+            <div class="filter-row" id="suggestionCategoryFilter">
+                <button type="button" class="filter-chip active" data-category="">전체</button>
+                <button type="button" class="filter-chip" data-category="BUG">버그 / 오류</button>
+                <button type="button" class="filter-chip" data-category="FEATURE">기능 개선</button>
+                <button type="button" class="filter-chip" data-category="OPERATION">운영 문의</button>
+                <button type="button" class="filter-chip" data-category="OTHER">기타</button>
+            </div>
+
+            <div class="filter-row" id="suggestionRoleFilter">
+                <button type="button" class="filter-chip active" data-role="">전체</button>
+                <button type="button" class="filter-chip" data-role="STUDENT">학생</button>
+                <button type="button" class="filter-chip" data-role="TEACHER">교사</button>
+            </div>
+
+            <div class="search-actions">
+                <button type="button" class="btn-primary" id="searchSuggestionsBtn">검색</button>
+            </div>
+
+            <div id="suggestionTableWrap" style="margin-top: 16px;">
+                <div class="empty-state">불러오는 중...</div>
+            </div>
+
+            <div class="pager hidden" id="suggestionPager">
+                <span class="helper" id="suggestionPagerInfo">-</span>
+                <div class="pager-actions inline-actions">
+                    <button type="button" class="btn-muted" id="suggestionPrevBtn">이전</button>
+                    <button type="button" class="btn-muted" id="suggestionNextBtn">다음</button>
+                </div>
+            </div>
+
+            <div class="hidden" id="suggestionDetail">
+                <div class="detail-card-header">
+                    <h3>건의 상세</h3>
+                    <button type="button" class="btn-secondary detail-close-btn" id="closeSuggestionDetailBtn" aria-label="건의 상세 닫기">닫기</button>
+                </div>
+                <div id="suggestionDetailBody"></div>
+
+                <div class="management-box" id="suggestionStatusBox">
+                    <h3 style="font-size:15px; margin:0 0 10px;">상태 변경</h3>
+                    <div class="inline-actions">
+                        <div class="field" style="flex:1; min-width: 140px; margin:0;">
+                            <label for="suggestionStatusSelect">처리 상태</label>
+                            <select id="suggestionStatusSelect">
+                                <option value="OPEN">접수</option>
+                                <option value="IN_REVIEW">검토 중</option>
+                                <option value="RESOLVED">처리 완료</option>
+                                <option value="CLOSED">종료</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn-primary" id="suggestionStatusBtn">상태 변경</button>
+                    </div>
+                    <p class="helper hidden" id="suggestionStatusClosedHint">종료된 건의는 상태를 더 이상 변경할 수 없습니다.</p>
+                </div>
+
+                <div class="reply-box" id="suggestionReplyBox">
+                    <div class="existing-reply hidden" id="suggestionExistingReply"></div>
+                    <label for="suggestionReplyContent">관리자 답변</label>
+                    <textarea id="suggestionReplyContent" maxlength="2000" placeholder="건의자에게 전달할 답변을 작성해 주세요."></textarea>
+                    <div class="inline-actions" style="margin-top: 10px;">
+                        <button type="button" class="btn-primary" id="suggestionReplyBtn">답변 등록</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
 </div>
 
 <script>
