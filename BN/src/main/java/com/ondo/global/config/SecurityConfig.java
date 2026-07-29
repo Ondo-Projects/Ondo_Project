@@ -49,6 +49,7 @@ public class SecurityConfig {
                             "/api/auth/username/**",
                             "/api/schools/**"
                     ).permitAll();
+                    auth.requestMatchers("/api/common/**").hasAnyRole("STUDENT", "TEACHER");
                     auth.requestMatchers("/api/teacher/**").hasRole("TEACHER");
                     auth.requestMatchers("/api/student/**").hasRole("STUDENT");
                     auth.requestMatchers("/api/admin/**").hasRole("ADMIN");

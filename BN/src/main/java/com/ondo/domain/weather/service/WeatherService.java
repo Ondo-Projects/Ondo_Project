@@ -24,8 +24,17 @@ public class WeatherService {
     private final UserRepository userRepository;
 
     public WeatherTodayResponseDTO getTodayWeather(String username) {
-        User student = getStudent(username);
-        School school = student.getSchool();
+        User student = getUserWithRole(username, Role.STUDENT, "학생만 날씨 정보를 조회할 수 있습니다.");
+        return fetchTodayWeather(student);
+    }
+
+    public WeatherTodayResponseDTO getTodayWeatherForHome(String username) {
+        User user = getUserWithAnyRole(username, Role.STUDENT, Role.TEACHER);
+        return fetchTodayWeather(user);
+    }
+
+    private WeatherTodayResponseDTO fetchTodayWeather(User user) {
+        School school = user.getSchool();
         String region = weatherGridLookupService.requireRegionLabel(school.getRegion());
 
         if (weatherProperties.isDevMode()) {
@@ -48,12 +57,23 @@ public class WeatherService {
         );
     }
 
-    private User getStudent(String username) {
+    private User getUserWithRole(String username, Role role, String errorMessage) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다."));
-        if (user.getRole() != Role.STUDENT) {
-            throw new BusinessException("학생만 날씨 정보를 조회할 수 있습니다.");
+        if (user.getRole() != role) {
+            throw new BusinessException(errorMessage);
         }
         return user;
+    }
+
+    private User getUserWithAnyRole(String username, Role... roles) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다."));
+        for (Role role : roles) {
+            if (user.getRole() == role) {
+                return user;
+            }
+        }
+        throw new BusinessException("날씨 정보를 조회할 수 없습니다.");
     }
 }
