@@ -131,4 +131,24 @@ class ApiSecurityIntegrationTest {
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("접근 권한이 없습니다."));
     }
+
+    @Test
+    void adminSuggestions_returnsForbiddenForStudentToken() throws Exception {
+        String token = jwtProvider.createAccessToken("student01", Role.STUDENT);
+
+        mockMvc.perform(get("/api/admin/suggestions")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("접근 권한이 없습니다."));
+    }
+
+    @Test
+    void adminSuggestions_returnsForbiddenForTeacherToken() throws Exception {
+        String token = jwtProvider.createAccessToken("teacher01", Role.TEACHER);
+
+        mockMvc.perform(get("/api/admin/suggestions")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("접근 권한이 없습니다."));
+    }
 }
