@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ondo.domain.meal.dto.MealItemResponseDTO;
 import com.ondo.domain.schoollife.dto.SchoolScheduleItemResponseDTO;
+import com.ondo.domain.schoollife.dto.TimetablePeriodResponseDTO;
 import com.ondo.global.config.NeisProperties;
 import com.ondo.global.error.BusinessException;
 import lombok.RequiredArgsConstructor;
@@ -226,6 +227,75 @@ public class NeisApiClient {
         return eventsByDate.values().stream()
                 .sorted(Comparator.comparing(SchoolScheduleItemResponseDTO::getDate))
                 .toList();
+    }
+
+    public List<TimetablePeriodResponseDTO> fetchTimetable(
+            String officeCode,
+            String standardSchoolCode,
+            String schoolType,
+            LocalDate date,
+            int grade,
+            int classNumber
+    ) {
+        String rootKey = resolveTimetableRootKey(schoolType);
+        URI uri = UriComponentsBuilder
+                .fromUriString(neisProperties.getBaseUrl() + "/" + rootKey)
+                .queryParam("KEY", requireApiKey())
+                .queryParam("Type", "json")
+                .queryParam("pIndex", 1)
+                .queryParam("pSize", 100)
+                .queryParam("ATPT_OFCDC_SC_CODE", officeCode)
+                .queryParam("SD_SCHUL_CODE", standardSchoolCode)
+                .queryParam("ALL_TI_YMD", NEIS_DATE.format(date))
+                .queryParam("GRADE", String.valueOf(grade))
+                .queryParam("CLASS_NM", String.valueOf(classNumber))
+                .build()
+                .encode()
+                .toUri();
+
+        JsonNode rows = fetchRows(uri, rootKey);
+        Map<Integer, TimetablePeriodResponseDTO> periodsByNumber = new LinkedHashMap<>();
+        for (JsonNode row : rows) {
+            LocalDate timetableDate = parseNeisDate(textValue(row, "ALL_TI_YMD"));
+            if (timetableDate != null && !timetableDate.equals(date)) {
+                continue;
+            }
+            Integer period = parsePeriod(textValue(row, "PERIO"));
+            if (period == null) {
+                continue;
+            }
+            String subject = textValue(row, "ITRT_CNTNT");
+            if (subject == null || subject.isBlank()) {
+                continue;
+            }
+            String classroom = textValue(row, "CLRM_NM");
+            periodsByNumber.putIfAbsent(period, new TimetablePeriodResponseDTO(period, subject, classroom));
+        }
+
+        return periodsByNumber.values().stream()
+                .sorted(Comparator.comparingInt(TimetablePeriodResponseDTO::getPeriod))
+                .toList();
+    }
+
+    private String resolveTimetableRootKey(String schoolType) {
+        if ("고".equals(schoolType)) {
+            return "hisTimetable";
+        }
+        if ("중".equals(schoolType)) {
+            return "misTimetable";
+        }
+        return "misTimetable";
+    }
+
+    private Integer parsePeriod(String rawPeriod) {
+        if (rawPeriod == null || rawPeriod.isBlank()) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(rawPeriod.trim());
+        } catch (NumberFormatException exception) {
+            return null;
+        }
     }
 
     private LocalDate parseNeisDate(String rawDate) {

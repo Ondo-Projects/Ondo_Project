@@ -521,6 +521,7 @@
         #section-mood,
         #section-notice,
         #section-school-calendar,
+        #section-timetable,
         #section-assignment,
         #section-pre-counsel,
         #section-counsel-create,
@@ -848,6 +849,41 @@
             overflow-wrap: anywhere;
             word-break: keep-all;
         }
+        .timetable-list-item {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+        }
+        .timetable-list-item:last-child {
+            margin-bottom: 0;
+        }
+        .timetable-period {
+            flex-shrink: 0;
+            min-width: 44px;
+            min-height: 44px;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: #1e3a8a;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .timetable-subject {
+            margin: 0 0 4px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #111827;
+        }
+        .timetable-classroom {
+            margin: 0;
+            font-size: 13px;
+            color: #6b7280;
+        }
         .schedule-status-info {
             background: #f8fafc;
             border: 1px solid #e5e7eb;
@@ -900,6 +936,7 @@
         <button type="button" class="quick-action-btn" data-target="section-counsel-create">상담</button>
         <button type="button" class="quick-action-btn" data-target="section-pre-counsel">사전카드</button>
         <button type="button" class="quick-action-btn" data-target="section-school-calendar">일정</button>
+        <button type="button" class="quick-action-btn" data-target="section-timetable">시간표</button>
     </nav>
 
     <div class="card" id="todayTodoCard">
@@ -990,6 +1027,16 @@
             <p class="helper">앞으로 2주간 학교 주요 행사입니다.</p>
             <div id="schoolScheduleList">
                 <div class="empty-state">학사일정을 불러오는 중...</div>
+            </div>
+        </section>
+    </div>
+
+    <div class="card" id="section-timetable">
+        <section>
+            <h2>오늘 시간표</h2>
+            <p class="helper" id="timetableProfileHint">학년·반이 등록되면 오늘 수업을 확인할 수 있습니다.</p>
+            <div id="timetableList">
+                <div class="empty-state">시간표를 불러오는 중...</div>
             </div>
         </section>
     </div>
@@ -1275,6 +1322,7 @@
     let selectedMood = null;
     let cachedMealData = null;
     let cachedSchoolScheduleData = null;
+    let cachedTimetableData = null;
     let todayMoodRecorded = false;
     let todayMoodSummary = '';
     let todayNoticeCount = null;
@@ -1305,6 +1353,8 @@
     const noticeDisabledHint = document.getElementById('noticeDisabledHint');
     const mealList = document.getElementById('mealList');
     const schoolScheduleList = document.getElementById('schoolScheduleList');
+    const timetableList = document.getElementById('timetableList');
+    const timetableProfileHint = document.getElementById('timetableProfileHint');
     const mealSchoolHint = document.getElementById('mealSchoolHint');
     const weatherBox = document.getElementById('weatherBox');
     const weatherRegionHint = document.getElementById('weatherRegionHint');
@@ -1796,6 +1846,96 @@
         }
     }
 
+    function resolveTimetableStatus(data) {
+        if (data.status) {
+            return data.status;
+        }
+        if (data.periods && data.periods.length) {
+            return 'OK';
+        }
+        return 'NO_CLASSES';
+    }
+
+    function timetableDisplayMessage(data, status) {
+        if (data.message) {
+            return data.message;
+        }
+        switch (status) {
+            case 'NO_CLASSES':
+                return '오늘 등록된 시간표가 없습니다. 방학·주말·공휴일에는 수업이 없을 수 있습니다.';
+            case 'PROFILE_INCOMPLETE':
+                return '학년·반을 입력하면 시간표를 볼 수 있습니다.';
+            case 'MAPPING_FAILED':
+                return '시간표 연동 준비 중입니다. 학교 시간표 정보가 곧 표시됩니다.';
+            case 'UNAVAILABLE':
+                return '시간표를 일시적으로 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.';
+            default:
+                return '오늘 등록된 시간표가 없습니다.';
+        }
+    }
+
+    function timetableStatusClass(status) {
+        if (status === 'MAPPING_FAILED' || status === 'UNAVAILABLE') {
+            return 'empty-state schedule-status-warn';
+        }
+        if (status === 'NO_CLASSES' || status === 'PROFILE_INCOMPLETE') {
+            return 'empty-state schedule-status-info';
+        }
+        return 'empty-state';
+    }
+
+    function renderTimetable(data) {
+        cachedTimetableData = data;
+        refreshTodayTodo();
+
+        if (!timetableList) {
+            return;
+        }
+
+        const status = resolveTimetableStatus(data);
+        if (timetableProfileHint) {
+            if (status === 'OK' && data.grade && data.classNumber) {
+                timetableProfileHint.textContent = `${data.grade}학년 ${data.classNumber}반 오늘 수업입니다.`;
+            } else if (status === 'PROFILE_INCOMPLETE') {
+                timetableProfileHint.textContent = '아래 학년·반 카드에서 입력하면 시간표를 볼 수 있습니다.';
+            } else {
+                timetableProfileHint.textContent = '학년·반이 등록되면 오늘 수업을 확인할 수 있습니다.';
+            }
+        }
+
+        if (status !== 'OK' || !data.periods || !data.periods.length) {
+            timetableList.innerHTML = `<div class="${timetableStatusClass(status)}">${escapeHtml(timetableDisplayMessage(data, status))}</div>`;
+            return;
+        }
+
+        timetableList.innerHTML = data.periods.map(period => `
+            <div class="timetable-list-item">
+                <div class="timetable-period">${escapeHtml(String(period.period))}</div>
+                <div>
+                    <p class="timetable-subject">${escapeHtml(period.subject)}</p>
+                    ${period.classroom ? `<p class="timetable-classroom">${escapeHtml(period.classroom)}</p>` : ''}
+                </div>
+            </div>
+        `).join('');
+
+        if (data.message) {
+            timetableList.innerHTML += `<p class="helper">${escapeHtml(data.message)}</p>`;
+        }
+    }
+
+    async function loadTimetable() {
+        try {
+            const data = await api('/api/student/timetable/today');
+            renderTimetable(data);
+        } catch (error) {
+            cachedTimetableData = { status: 'UNAVAILABLE', message: error.message };
+            refreshTodayTodo();
+            if (timetableList) {
+                timetableList.innerHTML = `<div class="empty-state">${escapeHtml(error.message)}</div>`;
+            }
+        }
+    }
+
     function formatSchoolTypeLabel(schoolType) {
         if (schoolType === '중') return '중학교';
         if (schoolType === '고') return '고등학교';
@@ -1861,6 +2001,11 @@
         });
         renderClassProfile(data);
         showSuccess(data.message || '학년·반이 저장되었습니다.');
+        loadTimetable().catch(() => {
+            if (timetableList) {
+                timetableList.innerHTML = '<div class="empty-state">시간표를 불러올 수 없습니다.</div>';
+            }
+        });
     }
 
     async function clearClassProfile() {
@@ -1870,6 +2015,11 @@
         });
         renderClassProfile(data);
         showSuccess(data.message || '학년·반 정보가 초기화되었습니다.');
+        loadTimetable().catch(() => {
+            if (timetableList) {
+                timetableList.innerHTML = '<div class="empty-state">시간표를 불러올 수 없습니다.</div>';
+            }
+        });
     }
 
     function resetProfileSchoolChange() {
@@ -1959,6 +2109,11 @@
             loadSchoolSchedule().catch(() => {
                 if (schoolScheduleList) {
                     schoolScheduleList.innerHTML = '<div class="empty-state">학사일정을 불러올 수 없습니다.</div>';
+                }
+            }),
+            loadTimetable().catch(() => {
+                if (timetableList) {
+                    timetableList.innerHTML = '<div class="empty-state">시간표를 불러올 수 없습니다.</div>';
                 }
             })
         ]);
@@ -2058,6 +2213,35 @@
         return { label: '학사일정', status: '확인하기', tone: 'pending', target: 'section-school-calendar' };
     }
 
+    function buildTimetableTodoItem() {
+        if (!cachedTimetableData) {
+            return { label: '오늘 시간표', status: '불러오는 중...', tone: '', target: 'section-timetable', disabled: true };
+        }
+        const status = resolveTimetableStatus(cachedTimetableData);
+        if (status === 'PROFILE_INCOMPLETE') {
+            return { label: '오늘 시간표', status: '학년·반 입력', tone: 'warn', target: 'section-class-profile' };
+        }
+        if (status === 'OK' && cachedTimetableData.periods && cachedTimetableData.periods.length) {
+            const firstPeriod = cachedTimetableData.periods[0];
+            const summary = cachedTimetableData.periods.length === 1
+                ? `${firstPeriod.period}교시 ${firstPeriod.subject}`
+                : `${cachedTimetableData.periods.length}교시`;
+            return { label: '오늘 시간표', status: summary, tone: 'done', target: 'section-timetable' };
+        }
+        if (status === 'NO_CLASSES') {
+            return { label: '오늘 시간표', status: '수업 없음', tone: 'done', target: 'section-timetable' };
+        }
+        if (status === 'MAPPING_FAILED' || status === 'UNAVAILABLE') {
+            return {
+                label: '오늘 시간표',
+                status: status === 'MAPPING_FAILED' ? '연동 준비 중' : '일시 오류',
+                tone: 'warn',
+                target: 'section-timetable'
+            };
+        }
+        return { label: '오늘 시간표', status: '확인하기', tone: 'pending', target: 'section-timetable' };
+    }
+
     function buildCounselTodoItem() {
         if (!hasAssignment) {
             return { label: '상담', status: '담당 교사 등록 후', tone: 'warn', target: 'section-assignment' };
@@ -2103,6 +2287,7 @@
             buildAssignmentTodoItem(),
             buildMealTodoItem(),
             buildSchoolScheduleTodoItem(),
+            buildTimetableTodoItem(),
             buildMoodTodoItem(),
             buildNoticeTodoItem(),
             buildPreCounselTodoItem(),
@@ -2419,6 +2604,8 @@
         'section-mood',
         'section-notice',
         'section-school-calendar',
+        'section-timetable',
+        'section-class-profile',
         'section-assignment',
         'section-pre-counsel',
         'section-counsel-create',
@@ -2567,6 +2754,11 @@
     loadSchoolSchedule().catch(() => {
         if (schoolScheduleList) {
             schoolScheduleList.innerHTML = '<div class="empty-state">학사일정을 불러올 수 없습니다.</div>';
+        }
+    });
+    loadTimetable().catch(() => {
+        if (timetableList) {
+            timetableList.innerHTML = '<div class="empty-state">시간표를 불러올 수 없습니다.</div>';
         }
     });
     loadTodayMood().catch(() => updateMoodStatus(null));
