@@ -14,7 +14,7 @@ import com.ondo.domain.user.entity.User;
 import com.ondo.domain.user.repository.UserRepository;
 import com.ondo.global.crypto.FieldEncryptionService;
 import com.ondo.global.error.BusinessException;
-import com.ondo.global.sms.NcpSensSmsSender;
+import com.ondo.global.sms.SmsPhoneUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -185,8 +185,8 @@ public class PreCounselingProfileService {
     }
 
     private String normalizePhone(String phone) {
-        String normalized = NcpSensSmsSender.normalizePhone(phone);
-        NcpSensSmsSender.validatePhone(normalized);
+        String normalized = SmsPhoneUtils.normalizePhone(phone);
+        SmsPhoneUtils.validatePhone(normalized);
         return normalized;
     }
 

@@ -2,7 +2,9 @@ package com.ondo.domain.user.service;
 
 import com.ondo.domain.user.dto.GuardianSmsSendRequestDTO;
 import com.ondo.global.error.BusinessException;
-import com.ondo.global.sms.NcpSensSmsSender;
+import com.ondo.global.sms.SmsOtpRateLimiter;
+import com.ondo.global.sms.SmsPhoneUtils;
+import com.ondo.global.sms.SolapiSmsSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -20,11 +22,13 @@ public class GuardianSmsVerificationService {
     private static final String VERIFIED_PREFIX = "sms:verified:";
 
     private final StringRedisTemplate redisTemplate;
-    private final NcpSensSmsSender ncpSensSmsSender;
+    private final SolapiSmsSender solapiSmsSender;
+    private final SmsOtpRateLimiter smsOtpRateLimiter;
 
-    public void sendVerificationCode(GuardianSmsSendRequestDTO request) {
-        String phone = NcpSensSmsSender.normalizePhone(request.getPhone());
-        NcpSensSmsSender.validatePhone(phone);
+    public void sendVerificationCode(GuardianSmsSendRequestDTO request, String clientIp) {
+        String phone = SmsPhoneUtils.normalizePhone(request.getPhone());
+        SmsPhoneUtils.validatePhone(phone);
+        smsOtpRateLimiter.assertCanSend(phone, clientIp);
 
         String code = generateCode();
         redisTemplate.opsForValue().set(CODE_PREFIX + phone, code, Duration.ofMinutes(5));
@@ -39,12 +43,13 @@ public class GuardianSmsVerificationService {
                 5분 내에 입력해 주세요.
                 """.formatted(request.getStudentName().trim(), request.getGuardianName().trim(), code);
 
-        ncpSensSmsSender.sendSms(phone, message);
+        smsOtpRateLimiter.recordSend(phone, clientIp);
+        solapiSmsSender.sendSms(phone, message);
     }
 
     public void verifyCode(String phone, String code) {
-        String normalizedPhone = NcpSensSmsSender.normalizePhone(phone);
-        NcpSensSmsSender.validatePhone(normalizedPhone);
+        String normalizedPhone = SmsPhoneUtils.normalizePhone(phone);
+        SmsPhoneUtils.validatePhone(normalizedPhone);
 
         String savedCode = redisTemplate.opsForValue().get(CODE_PREFIX + normalizedPhone);
         if (savedCode == null) {
@@ -62,7 +67,7 @@ public class GuardianSmsVerificationService {
         if (phone == null || phone.isBlank()) {
             return false;
         }
-        String normalizedPhone = NcpSensSmsSender.normalizePhone(phone);
+        String normalizedPhone = SmsPhoneUtils.normalizePhone(phone);
         return Boolean.TRUE.toString().equals(redisTemplate.opsForValue().get(VERIFIED_PREFIX + normalizedPhone));
     }
 
@@ -70,7 +75,7 @@ public class GuardianSmsVerificationService {
         if (phone == null || phone.isBlank()) {
             return;
         }
-        String normalizedPhone = NcpSensSmsSender.normalizePhone(phone);
+        String normalizedPhone = SmsPhoneUtils.normalizePhone(phone);
         redisTemplate.delete(CODE_PREFIX + normalizedPhone);
         redisTemplate.delete(VERIFIED_PREFIX + normalizedPhone);
     }
