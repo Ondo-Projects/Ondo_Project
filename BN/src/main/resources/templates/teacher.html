@@ -98,6 +98,18 @@
             border-radius: 12px;
             padding: 16px;
         }
+        button.today-summary-item {
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            font: inherit;
+            color: inherit;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        button.today-summary-item:hover {
+            border-color: #2563eb;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.1);
+        }
         .today-summary-item.highlight {
             background: #fff7ed;
             border-color: #fed7aa;
@@ -253,8 +265,26 @@
         .badge-CONFIRMED { background: #dbeafe; color: #1d4ed8; }
         .badge-COMPLETED { background: #dcfce7; color: #166534; }
         .badge-CANCELLED { background: #f3f4f6; color: #4b5563; }
+        .badge-OPEN { background: #fef3c7; color: #92400e; }
+        .badge-IN_REVIEW { background: #dbeafe; color: #1d4ed8; }
+        .badge-RESOLVED { background: #dcfce7; color: #166534; }
+        .badge-CLOSED { background: #f3f4f6; color: #4b5563; }
+        .badge-suggestion-cat {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        .detail-panel {
+            display: none;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .detail-panel.open { display: block; }
         .post-meta { color: #6b7280; font-size: 13px; margin-top: 8px; }
         #detailCard {
+            scroll-margin-top: 12px;
+        }
+        #section-suggestion {
             scroll-margin-top: 12px;
         }
         .detail-card-header {
@@ -667,6 +697,168 @@
             font-weight: 700;
             color: #374151;
         }
+        .suggestion-subheading {
+            font-size: 16px;
+            font-weight: 700;
+            color: #374151;
+            margin: 24px 0 12px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .suggestion-subheading--compact {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+        #section-suggestion .field {
+            margin-bottom: 10px;
+        }
+        #section-suggestion label {
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        #section-suggestion input[type="text"],
+        #section-suggestion select,
+        #section-suggestion textarea {
+            padding: 10px 12px;
+            font-size: 14px;
+        }
+        #section-suggestion select {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-family: inherit;
+            background: #fff;
+        }
+        #section-suggestion textarea {
+            min-height: 96px;
+        }
+        #section-suggestion .btn-primary#suggestionSubmitBtn {
+            font-size: 14px;
+            padding: 10px 16px;
+            min-height: 44px;
+        }
+        #suggestionDetail {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+        #suggestionDetail .detail-card-header h3 {
+            margin: 0;
+            font-size: 16px;
+            flex: 1;
+            min-width: 0;
+        }
+        #suggestionDetailActions {
+            margin-top: 16px;
+        }
+        #suggestionEditHint {
+            margin-top: 12px;
+        }
+        #suggestionDetailBody .suggestion-detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        #suggestionDetailBody .suggestion-detail-header h3 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 700;
+            flex: 1;
+            min-width: 0;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+        #suggestionDetailBody .suggestion-detail-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        #suggestionDetailBody .detail-content {
+            margin-top: 12px;
+        }
+        #suggestionDetailReply {
+            margin-top: 12px;
+            padding: 14px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
+        }
+        .suggestion-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 14px 16px;
+            min-height: 56px;
+            cursor: pointer;
+            transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+            -webkit-tap-highlight-color: rgba(37, 99, 235, 0.12);
+        }
+        .suggestion-item:hover,
+        .suggestion-item.active {
+            border-color: #2563eb;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12);
+        }
+        .suggestion-item:active {
+            background: #f8fafc;
+        }
+        .suggestion-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .suggestion-item-title {
+            margin: 0;
+            font-size: 16px;
+            flex: 1;
+            min-width: 0;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+        .suggestion-item-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .suggestion-item-meta {
+            color: #6b7280;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+        @media (max-width: 640px) {
+            #section-suggestion .inline-actions {
+                width: 100%;
+            }
+            #section-suggestion .inline-actions button {
+                flex: 1 1 calc(50% - 4px);
+            }
+            #suggestionDetailActions {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+            }
+            #suggestionDetailActions button {
+                width: 100%;
+            }
+            .suggestion-item-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .suggestion-item-badges {
+                width: 100%;
+            }
+            #suggestionDetailBody .suggestion-detail-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            #suggestionDetailBody .suggestion-detail-badges {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -730,6 +922,11 @@
                     <div class="today-summary-value" id="summaryPreCounselPendingCount">0</div>
                     <p class="today-summary-hint">담당 학생 중 미작성</p>
                 </div>
+                <button type="button" class="today-summary-item" id="summarySuggestionCard" aria-label="운영 건의 섹션으로 이동">
+                    <div class="today-summary-label">운영 건의</div>
+                    <div class="today-summary-value" id="summarySuggestionCount">-</div>
+                    <p class="today-summary-hint" id="summarySuggestionHint">불러오는 중...</p>
+                </button>
             </div>
         </section>
     </div>
@@ -851,6 +1048,81 @@
             </div>
         </section>
     </div>
+
+    <div class="card" id="section-suggestion" style="margin-bottom: 20px;">
+        <section>
+            <h2>6. 운영 건의</h2>
+            <p class="helper">서비스 버그, 기능 개선, 운영 문의를 운영팀에 남길 수 있습니다. 담당 관리자만 확인합니다.</p>
+
+            <form id="suggestionForm">
+                <div class="field">
+                    <label for="suggestionCategory">분류</label>
+                    <select id="suggestionCategory" required>
+                        <option value="">선택해 주세요</option>
+                        <option value="BUG">버그 / 오류</option>
+                        <option value="FEATURE">기능 개선</option>
+                        <option value="OPERATION">운영 문의</option>
+                        <option value="OTHER">기타</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="suggestionTitle">제목</label>
+                    <input type="text" id="suggestionTitle" maxlength="100" required placeholder="건의 제목을 입력해 주세요.">
+                </div>
+                <div class="field">
+                    <label for="suggestionContent">내용</label>
+                    <textarea id="suggestionContent" maxlength="2000" required placeholder="어떤 문제인지, 어떤 점이 불편했는지 구체적으로 적어 주세요."></textarea>
+                </div>
+                <button type="submit" class="btn-primary" id="suggestionSubmitBtn">건의 등록하기</button>
+            </form>
+
+            <h3 class="suggestion-subheading">내 건의</h3>
+            <div class="post-list" id="suggestionList">
+                <div class="empty-state">불러오는 중...</div>
+            </div>
+
+            <div class="hidden" id="suggestionDetail">
+                <div class="detail-card-header">
+                    <h3>건의 상세</h3>
+                    <button type="button" class="btn-secondary detail-close-btn" id="closeSuggestionDetailBtn" aria-label="건의 상세 닫기">닫기</button>
+                </div>
+                <div id="suggestionDetailBody"></div>
+                <div class="reply-box hidden" id="suggestionDetailReply"></div>
+                <p class="helper hidden" id="suggestionEditHint">검토 중이거나 처리된 건의는 수정할 수 없습니다.</p>
+                <div class="inline-actions hidden" id="suggestionDetailActions">
+                    <button type="button" class="btn-primary" id="editSuggestionBtn">수정</button>
+                    <button type="button" class="btn-danger" id="deleteSuggestionBtn">삭제</button>
+                </div>
+                <div class="detail-panel open hidden" id="suggestionEditPanel">
+                    <h3 class="suggestion-subheading suggestion-subheading--compact">건의 수정</h3>
+                    <form id="suggestionEditForm">
+                        <input type="hidden" id="suggestionEditId">
+                        <div class="field">
+                            <label for="suggestionEditCategory">분류</label>
+                            <select id="suggestionEditCategory" required>
+                                <option value="BUG">버그 / 오류</option>
+                                <option value="FEATURE">기능 개선</option>
+                                <option value="OPERATION">운영 문의</option>
+                                <option value="OTHER">기타</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="suggestionEditTitle">제목</label>
+                            <input type="text" id="suggestionEditTitle" maxlength="100" required>
+                        </div>
+                        <div class="field">
+                            <label for="suggestionEditContent">내용</label>
+                            <textarea id="suggestionEditContent" maxlength="2000" required></textarea>
+                        </div>
+                        <div class="inline-actions">
+                            <button type="submit" class="btn-primary" id="suggestionEditSaveBtn">저장</button>
+                            <button type="button" class="btn-secondary" id="cancelSuggestionEditBtn">취소</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
 </div>
 
 <script>
@@ -871,10 +1143,26 @@
         COMPLETED: '완료',
         CANCELLED: '취소'
     };
+    const SUGGESTION_CATEGORY_LABELS = {
+        BUG: '버그 / 오류',
+        FEATURE: '기능 개선',
+        OPERATION: '운영 문의',
+        OTHER: '기타'
+    };
+    const SUGGESTION_STATUS_LABELS = {
+        OPEN: '접수',
+        IN_REVIEW: '검토 중',
+        RESOLVED: '처리 완료',
+        CLOSED: '종료'
+    };
 
     let currentFilter = '';
     let posts = [];
     let selectedPost = null;
+    let suggestions = [];
+    let selectedSuggestionId = null;
+    let currentSuggestionPost = null;
+    let suggestionsLoaded = false;
 
     const pageError = document.getElementById('pageError');
     const pageSuccess = document.getElementById('pageSuccess');
@@ -906,10 +1194,24 @@
     const summaryUnreadBadge = document.getElementById('summaryUnreadBadge');
     const summaryWaitingCount = document.getElementById('summaryWaitingCount');
     const summaryPreCounselPendingCount = document.getElementById('summaryPreCounselPendingCount');
+    const summarySuggestionCard = document.getElementById('summarySuggestionCard');
+    const summarySuggestionCount = document.getElementById('summarySuggestionCount');
+    const summarySuggestionHint = document.getElementById('summarySuggestionHint');
     const profileSchoolKeyword = document.getElementById('profileSchoolKeyword');
     const profileSchoolResults = document.getElementById('profileSchoolResults');
     const profileSelectedSchoolCode = document.getElementById('profileSelectedSchoolCode');
     const confirmSchoolChangeBtn = document.getElementById('confirmSchoolChangeBtn');
+    const suggestionForm = document.getElementById('suggestionForm');
+    const suggestionList = document.getElementById('suggestionList');
+    const suggestionDetail = document.getElementById('suggestionDetail');
+    const suggestionDetailBody = document.getElementById('suggestionDetailBody');
+    const suggestionDetailReply = document.getElementById('suggestionDetailReply');
+    const suggestionDetailActions = document.getElementById('suggestionDetailActions');
+    const suggestionEditHint = document.getElementById('suggestionEditHint');
+    const suggestionEditPanel = document.getElementById('suggestionEditPanel');
+    const suggestionEditForm = document.getElementById('suggestionEditForm');
+    const closeSuggestionDetailBtn = document.getElementById('closeSuggestionDetailBtn');
+    const cancelSuggestionEditBtn = document.getElementById('cancelSuggestionEditBtn');
 
     let profileSchoolTypeFilter = '';
     let profileSearchTimer = null;
@@ -1299,6 +1601,35 @@
         summaryWaitingCount.textContent = posts.filter(post => post.status === 'WAITING').length;
     }
 
+    function refreshSuggestionSummary() {
+        if (!summarySuggestionCount || !summarySuggestionHint) {
+            return;
+        }
+        if (!suggestionsLoaded) {
+            summarySuggestionCount.textContent = '-';
+            summarySuggestionHint.textContent = '불러오는 중...';
+            summarySuggestionCard?.classList.remove('highlight');
+            return;
+        }
+        const withReplyCount = suggestions.filter(item => item.adminReply).length;
+        const awaitingReplyCount = suggestions.filter(item => !item.adminReply && item.status !== 'CLOSED').length;
+        if (withReplyCount > 0) {
+            summarySuggestionCount.textContent = withReplyCount;
+            summarySuggestionHint.textContent = '관리자 답변';
+            summarySuggestionCard?.classList.add('highlight');
+            return;
+        }
+        if (awaitingReplyCount > 0) {
+            summarySuggestionCount.textContent = awaitingReplyCount;
+            summarySuggestionHint.textContent = '접수 중';
+            summarySuggestionCard?.classList.remove('highlight');
+            return;
+        }
+        summarySuggestionCount.textContent = '0';
+        summarySuggestionHint.textContent = '건의하기';
+        summarySuggestionCard?.classList.remove('highlight');
+    }
+
     function renderUserGreeting(me) {
         const displayName = me.name && me.name.trim() ? me.name.trim() : me.username;
         const schoolLabel = me.schoolName && me.schoolName.trim() ? me.schoolName.trim() : '학교 미등록';
@@ -1495,6 +1826,152 @@
         renderPosts();
     }
 
+    function renderSuggestionList() {
+        if (!suggestionList) {
+            return;
+        }
+        if (!suggestions.length) {
+            suggestionList.innerHTML = '<div class="empty-state">아직 등록한 건의가 없습니다.</div>';
+            if (selectedSuggestionId) {
+                closeSuggestionDetail();
+            }
+            return;
+        }
+
+        suggestionList.innerHTML = suggestions.map(item => `
+            <div class="suggestion-item ${selectedSuggestionId === item.id ? 'active' : ''}" data-id="${item.id}" role="button" tabindex="0">
+                <div class="suggestion-item-header">
+                    <h3 class="suggestion-item-title">${escapeHtml(item.title)}</h3>
+                    <div class="suggestion-item-badges">
+                        <span class="badge badge-suggestion-cat">${SUGGESTION_CATEGORY_LABELS[item.category] || item.category}</span>
+                        <span class="badge badge-${item.status}">${SUGGESTION_STATUS_LABELS[item.status] || item.status}</span>
+                    </div>
+                </div>
+                <div class="suggestion-item-meta">
+                    ${formatDateTime(item.createdAt)}${item.adminReply ? ' · 답변 있음' : ''}
+                </div>
+            </div>
+        `).join('');
+
+        suggestionList.querySelectorAll('.suggestion-item').forEach(item => {
+            item.addEventListener('click', () => openSuggestionDetail(Number(item.dataset.id)));
+            item.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    openSuggestionDetail(Number(item.dataset.id));
+                }
+            });
+        });
+    }
+
+    async function loadSuggestions() {
+        if (!suggestionList) {
+            return;
+        }
+        suggestions = await api('/api/teacher/suggestions');
+        suggestionsLoaded = true;
+        renderSuggestionList();
+        refreshSuggestionSummary();
+        if (selectedSuggestionId && suggestions.some(item => item.id === selectedSuggestionId)) {
+            await openSuggestionDetail(selectedSuggestionId, false);
+        } else if (selectedSuggestionId) {
+            closeSuggestionDetail();
+        }
+    }
+
+    function isSuggestionOpen(post) {
+        return post && String(post.status).toUpperCase() === 'OPEN';
+    }
+
+    async function openSuggestionDetail(id, scroll = true) {
+        selectedSuggestionId = id;
+        renderSuggestionList();
+        suggestionEditPanel?.classList.add('hidden');
+
+        try {
+            const post = await api(`/api/teacher/suggestions/${id}`);
+            suggestionDetail.classList.remove('hidden');
+
+            suggestionDetailBody.innerHTML = `
+                <div class="suggestion-detail-header">
+                    <h3>${escapeHtml(post.title)}</h3>
+                    <div class="suggestion-detail-badges">
+                        <span class="badge badge-suggestion-cat">${SUGGESTION_CATEGORY_LABELS[post.category] || post.category}</span>
+                        <span class="badge badge-${post.status}">${SUGGESTION_STATUS_LABELS[post.status] || post.status}</span>
+                    </div>
+                </div>
+                <p class="post-meta">작성 ${formatDateTime(post.createdAt)}${post.updatedAt && post.updatedAt !== post.createdAt ? ` · 수정 ${formatDateTime(post.updatedAt)}` : ''}</p>
+                <div class="detail-content">${escapeHtml(post.content)}</div>
+            `;
+
+            if (post.adminReply) {
+                suggestionDetailReply.classList.remove('hidden');
+                suggestionDetailReply.innerHTML = `
+                    <strong>관리자 답변</strong>
+                    <p class="post-meta">${post.repliedByUsername ? `${escapeHtml(post.repliedByUsername)} · ` : ''}${formatDateTime(post.repliedAt)}</p>
+                    <div>${escapeHtml(post.adminReply)}</div>
+                `;
+            } else {
+                suggestionDetailReply.classList.add('hidden');
+                suggestionDetailReply.innerHTML = '';
+            }
+
+            currentSuggestionPost = post;
+            if (isSuggestionOpen(post)) {
+                suggestionDetailActions?.classList.remove('hidden');
+                suggestionEditHint?.classList.add('hidden');
+            } else {
+                suggestionDetailActions?.classList.add('hidden');
+                suggestionEditHint?.classList.remove('hidden');
+            }
+
+            if (scroll) {
+                suggestionDetail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        } catch (error) {
+            selectedSuggestionId = null;
+            currentSuggestionPost = null;
+            renderSuggestionList();
+            suggestionDetail.classList.add('hidden');
+            showError(error.message);
+        }
+    }
+
+    function openSuggestionEditForm(post) {
+        document.getElementById('suggestionEditId').value = post.id;
+        document.getElementById('suggestionEditCategory').value = post.category;
+        document.getElementById('suggestionEditTitle').value = post.title;
+        document.getElementById('suggestionEditContent').value = post.content;
+        suggestionEditPanel?.classList.remove('hidden');
+        suggestionEditPanel?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    async function deleteSuggestion(id) {
+        if (!confirm('이 건의 글을 삭제할까요?')) {
+            return;
+        }
+        clearMessages();
+        try {
+            await api(`/api/teacher/suggestions/${id}`, { method: 'DELETE' });
+            showSuccess('건의 글이 삭제되었습니다.');
+            selectedSuggestionId = null;
+            currentSuggestionPost = null;
+            suggestionDetail.classList.add('hidden');
+            suggestionEditPanel?.classList.add('hidden');
+            await loadSuggestions();
+        } catch (error) {
+            showError(error.message);
+        }
+    }
+
+    function closeSuggestionDetail() {
+        selectedSuggestionId = null;
+        currentSuggestionPost = null;
+        suggestionDetail.classList.add('hidden');
+        suggestionEditPanel?.classList.add('hidden');
+        renderSuggestionList();
+    }
+
     async function updateStatus(id, status) {
         clearMessages();
         try {
@@ -1570,6 +2047,75 @@
         }
     });
 
+    if (suggestionForm) {
+        suggestionForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            clearMessages();
+            const category = document.getElementById('suggestionCategory').value;
+            const title = document.getElementById('suggestionTitle').value.trim();
+            const content = document.getElementById('suggestionContent').value.trim();
+            if (!category) {
+                showError('건의 분류를 선택해 주세요.');
+                return;
+            }
+            try {
+                const created = await api('/api/teacher/suggestions', {
+                    method: 'POST',
+                    body: JSON.stringify({ category, title, content })
+                });
+                suggestionForm.reset();
+                showSuccess('건의가 등록되었습니다.');
+                await loadSuggestions();
+                await openSuggestionDetail(created.id);
+            } catch (error) {
+                showError(error.message);
+            }
+        });
+    }
+
+    if (closeSuggestionDetailBtn) {
+        closeSuggestionDetailBtn.addEventListener('click', closeSuggestionDetail);
+    }
+
+    document.getElementById('editSuggestionBtn')?.addEventListener('click', () => {
+        if (isSuggestionOpen(currentSuggestionPost)) {
+            openSuggestionEditForm(currentSuggestionPost);
+        }
+    });
+
+    document.getElementById('deleteSuggestionBtn')?.addEventListener('click', () => {
+        if (isSuggestionOpen(currentSuggestionPost)) {
+            deleteSuggestion(currentSuggestionPost.id).catch(error => showError(error.message));
+        }
+    });
+
+    if (suggestionEditForm) {
+        suggestionEditForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            clearMessages();
+            const id = document.getElementById('suggestionEditId').value;
+            const category = document.getElementById('suggestionEditCategory').value;
+            const title = document.getElementById('suggestionEditTitle').value.trim();
+            const content = document.getElementById('suggestionEditContent').value.trim();
+            try {
+                await api(`/api/teacher/suggestions/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ category, title, content })
+                });
+                showSuccess('건의 글이 수정되었습니다.');
+                suggestionEditPanel?.classList.add('hidden');
+                await loadSuggestions();
+                await openSuggestionDetail(Number(id), false);
+            } catch (error) {
+                showError(error.message);
+            }
+        });
+    }
+
+    cancelSuggestionEditBtn?.addEventListener('click', () => {
+        suggestionEditPanel?.classList.add('hidden');
+    });
+
     submitReplyBtn.addEventListener('click', async () => {
         if (!selectedPost) return;
         clearMessages();
@@ -1605,8 +2151,25 @@
     closeDetailBtn.addEventListener('click', closeDetail);
     closePreCounselDetailBtn.addEventListener('click', closePreCounselDetail);
 
+    if (summarySuggestionCard) {
+        summarySuggestionCard.addEventListener('click', () => {
+            document.getElementById('section-suggestion')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    }
+
     loadCurrentUser().catch(() => {
         userGreeting.textContent = '교사 홈';
+    });
+    loadSuggestions().catch(() => {
+        if (suggestionList) {
+            suggestionList.innerHTML = '<div class="empty-state">건의 목록을 불러올 수 없습니다.</div>';
+        }
+        if (summarySuggestionHint) {
+            summarySuggestionHint.textContent = '불러오기 실패';
+        }
+        if (summarySuggestionCount) {
+            summarySuggestionCount.textContent = '-';
+        }
     });
 
     document.getElementById('moodTabRow').addEventListener('click', (event) => {
