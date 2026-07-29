@@ -74,6 +74,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**").permitAll();
+                    auth.requestMatchers("/home").hasAnyRole("STUDENT", "TEACHER");
                     auth.requestMatchers("/student").hasRole("STUDENT");
                     auth.requestMatchers("/teacher").hasRole("TEACHER");
                     auth.requestMatchers("/admin").hasRole("ADMIN");

@@ -61,7 +61,7 @@ class CustomSucessHandlerTest {
         customSucessHandler.onAuthenticationSuccess(request, response, authentication);
 
         verify(tokenCookieService).writeTokens(response, "access-token", "refresh-token");
-        assertThat(response.getRedirectedUrl()).isEqualTo("/student");
+        assertThat(response.getRedirectedUrl()).isEqualTo("/home");
     }
 
     @Test
@@ -85,7 +85,7 @@ class CustomSucessHandlerTest {
 
         customSucessHandler.onAuthenticationSuccess(new MockHttpServletRequest(), response, authentication);
 
-        assertThat(response.getRedirectedUrl()).isEqualTo("/teacher");
+        assertThat(response.getRedirectedUrl()).isEqualTo("/home");
     }
 
     @Test
