@@ -104,6 +104,9 @@
         .student-meal-summary {
             margin-bottom: 4px;
         }
+        .student-timetable-summary {
+            margin: 12px 0 4px;
+        }
         .meal-summary-line {
             margin: 0 0 8px;
             font-size: 14px;
@@ -385,6 +388,9 @@
         <div class="student-meal-summary" id="studentMealSummary">
             <div class="empty-state">급식 정보를 불러오는 중...</div>
         </div>
+        <div class="student-timetable-summary" id="studentTimetableSummary">
+            <div class="empty-state">시간표를 불러오는 중...</div>
+        </div>
         <div class="quick-links" id="studentQuickLinks">
             <a class="btn-quick" href="/student#section-today">오늘</a>
             <a class="btn-quick" href="/student#section-mood">마음</a>
@@ -392,6 +398,7 @@
             <a class="btn-quick" href="/student#section-counsel-create">상담</a>
             <a class="btn-quick" href="/student#section-pre-counsel">사전카드</a>
             <a class="btn-quick" href="/student#section-school-calendar">일정</a>
+            <a class="btn-quick" href="/student#section-timetable">시간표</a>
         </div>
         <div class="role-block-actions">
             <a class="btn-primary" href="/student">학생 홈 전체 보기</a>
@@ -439,6 +446,7 @@
     const weatherBox = document.getElementById('weatherBox');
     const schoolScheduleBox = document.getElementById('schoolScheduleBox');
     const studentMealSummary = document.getElementById('studentMealSummary');
+    const studentTimetableSummary = document.getElementById('studentTimetableSummary');
     const teacherSummaryGrid = document.getElementById('teacherSummaryGrid');
     const teacherUnreadCount = document.getElementById('teacherUnreadCount');
     const teacherWaitingCount = document.getElementById('teacherWaitingCount');
@@ -668,9 +676,82 @@
         }
     }
 
+    function resolveTimetableStatus(data) {
+        if (data.status) {
+            return data.status;
+        }
+        if (data.periods && data.periods.length) {
+            return 'OK';
+        }
+        return 'NO_CLASSES';
+    }
+
+    function timetableDisplayMessage(data, status) {
+        if (data.message) {
+            return data.message;
+        }
+        switch (status) {
+            case 'NO_CLASSES':
+                return '오늘 등록된 시간표가 없습니다.';
+            case 'PROFILE_INCOMPLETE':
+                return '학년·반을 입력하면 시간표를 볼 수 있습니다.';
+            case 'MAPPING_FAILED':
+                return '시간표 연동 준비 중입니다.';
+            case 'UNAVAILABLE':
+                return '시간표를 일시적으로 불러올 수 없습니다.';
+            default:
+                return '오늘 등록된 시간표가 없습니다.';
+        }
+    }
+
+    function timetableStatusClass(status) {
+        if (status === 'MAPPING_FAILED' || status === 'UNAVAILABLE') {
+            return 'empty-state schedule-status-warn';
+        }
+        if (status === 'NO_CLASSES' || status === 'PROFILE_INCOMPLETE') {
+            return 'empty-state schedule-status-info';
+        }
+        return 'empty-state';
+    }
+
+    function renderTimetableSummary(data) {
+        const status = resolveTimetableStatus(data);
+
+        if (status !== 'OK' || !data.periods || !data.periods.length) {
+            studentTimetableSummary.innerHTML = `<div class="${timetableStatusClass(status)}">${escapeHtml(timetableDisplayMessage(data, status))}</div>`;
+            return;
+        }
+
+        const lines = data.periods.slice(0, 3).map(period => `
+            <p class="schedule-summary-line">
+                <strong>${escapeHtml(String(period.period))}교시</strong>
+                ${escapeHtml(truncateText(period.subject, 24))}
+            </p>
+        `).join('');
+
+        const extraCount = data.periods.length - 3;
+        const extraLine = extraCount > 0
+            ? `<p class="helper">외 ${extraCount}교시 더 있어요 · 학생 홈에서 전체 보기</p>`
+            : '';
+
+        studentTimetableSummary.innerHTML = `<div>${lines}${extraLine}</div>`;
+    }
+
+    async function loadStudentTimetableSummary() {
+        try {
+            const data = await api('/api/student/timetable/today');
+            renderTimetableSummary(data);
+        } catch (error) {
+            studentTimetableSummary.innerHTML = `<div class="empty-state">${escapeHtml(error.message)}</div>`;
+        }
+    }
+
     function loadStudentBlock() {
         loadStudentMealSummary().catch(() => {
             studentMealSummary.innerHTML = '<div class="empty-state">급식 정보를 불러올 수 없습니다.</div>';
+        });
+        loadStudentTimetableSummary().catch(() => {
+            studentTimetableSummary.innerHTML = '<div class="empty-state">시간표를 불러올 수 없습니다.</div>';
         });
     }
 
