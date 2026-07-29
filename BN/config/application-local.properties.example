@@ -19,3 +19,9 @@ ondo.admin.bootstrap.enabled=true
 ondo.admin.bootstrap.username=admin
 ondo.admin.bootstrap.password=change-me-admin-password
 ondo.admin.bootstrap.name=시스템관리자
+
+# Solapi SMS (https://console.solapi.com/)
+ondo.solapi.dev-mode=false
+ondo.solapi.api-key=your-solapi-api-key = 
+ondo.solapi.api-secret=your-solapi-api-secret = 
+ondo.solapi.sender-phone=01032828624

@@ -53,6 +53,9 @@ dependencies {
 	//REDIS (JWT refresh, 인증번호, 블랙리스트)
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+	// Solapi SMS
+	implementation 'com.solapi:sdk:1.0.3'
+
 
 }
 
