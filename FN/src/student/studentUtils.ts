@@ -203,6 +203,16 @@ export function buildTimetableProfileHint(data: TimetableDayResponse): string {
   return '학년·반이 등록되면 오늘 수업을 확인할 수 있습니다.';
 }
 
+export function formatTeacherDisplay(assignment: {
+  teacherName?: string | null;
+  teacherUsername: string;
+}): string {
+  if (assignment.teacherName?.trim()) {
+    return assignment.teacherName.trim();
+  }
+  return assignment.teacherUsername || '-';
+}
+
 export function scrollToStudentSection(sectionId: string) {
   document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }

@@ -1,10 +1,14 @@
+import { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
+import type { StudentAssignment } from '../api/types/student';
 import { useAuth } from '../auth/AuthProvider';
 import AuthLoading from '../auth/AuthLoading';
 import AppLayout from '../components/layout/AppLayout';
 import { PATHS } from '../routes/paths';
 import ComingSoonSection from './components/ComingSoonSection';
 import QuickActionBar from './components/QuickActionBar';
+import SectionAssignment from './components/SectionAssignment';
+import SectionClassProfile from './components/SectionClassProfile';
 import SectionNotice from './components/SectionNotice';
 import SectionSchoolCalendar from './components/SectionSchoolCalendar';
 import SectionTimetable from './components/SectionTimetable';
@@ -17,8 +21,35 @@ import { useStudentSchoolLife } from './useStudentSchoolLife';
 
 export default function StudentHomePage() {
   const { user, logout } = useAuth();
-  const schoolLife = useStudentSchoolLife(Boolean(user));
+  const {
+    reloadTimetable,
+    applyAssignment,
+    ...schoolLife
+  } = useStudentSchoolLife(Boolean(user));
   useStudentHashScroll();
+  const [pageSuccess, setPageSuccess] = useState<string | null>(null);
+  const [sectionError, setSectionError] = useState<string | null>(null);
+
+  const handleSuccess = useCallback((message: string) => {
+    setSectionError(null);
+    setPageSuccess(message);
+  }, []);
+
+  const handleError = useCallback((message: string) => {
+    setPageSuccess(null);
+    setSectionError(message);
+  }, []);
+
+  const handleProfileChanged = useCallback(async () => {
+    await reloadTimetable();
+  }, [reloadTimetable]);
+
+  const handleAssignmentChanged = useCallback(
+    async (assignment: StudentAssignment) => {
+      await applyAssignment(assignment);
+    },
+    [applyAssignment],
+  );
 
   if (!user) {
     return <AuthLoading message="학생 홈을 준비하고 있어요" />;
@@ -58,6 +89,18 @@ export default function StudentHomePage() {
           </p>
         ) : null}
 
+        {sectionError ? (
+          <p className="student-message student-message--error" role="alert">
+            {sectionError}
+          </p>
+        ) : null}
+
+        {pageSuccess ? (
+          <p className="student-message student-message--success" role="status">
+            {pageSuccess}
+          </p>
+        ) : null}
+
         <div className="student-hero">
           <QuickActionBar />
           <SectionToday
@@ -85,15 +128,16 @@ export default function StudentHomePage() {
         </div>
 
         <div className="student-setup-grid">
-          <ComingSoonSection
-            id={STUDENT_SECTIONS.CLASS_PROFILE}
-            title="학년 · 반"
-            helper="시간표 등 학교생활 기능에 사용됩니다."
+          <SectionClassProfile
+            onSuccess={handleSuccess}
+            onError={handleError}
+            onProfileChanged={handleProfileChanged}
           />
-          <ComingSoonSection
-            id={STUDENT_SECTIONS.ASSIGNMENT}
-            title="담당 교사"
-            helper="교사가 알려준 초대 코드로 등록합니다."
+          <SectionAssignment
+            assignment={schoolLife.assignment}
+            onSuccess={handleSuccess}
+            onError={handleError}
+            onAssignmentChanged={handleAssignmentChanged}
           />
         </div>
 

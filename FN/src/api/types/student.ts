@@ -13,3 +13,19 @@ export interface StudentAssignment {
   schoolName: string;
   assignedAt: string;
 }
+
+export interface StudentClassProfile {
+  grade: number | null;
+  classNumber: number | null;
+  completed: boolean;
+  message?: string | null;
+}
+
+export interface StudentClassProfileUpdateRequest {
+  grade: number | null;
+  classNumber: number | null;
+}
+
+export interface StudentAssignmentRegisterRequest {
+  inviteCode: string;
+}

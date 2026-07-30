@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { ProfileSchoolResponse } from '../api/types/home';
 import type {
   MealDayResponse,
@@ -6,7 +6,7 @@ import type {
   TimetableDayResponse,
   WeatherTodayResponse,
 } from '../api/types/home';
-import type { StudentNotice } from '../api/types/student';
+import type { StudentAssignment, StudentNotice } from '../api/types/student';
 import { ApiError } from '../api/types/api-error';
 import {
   getStudentAssignmentOptional,
@@ -22,6 +22,7 @@ export interface StudentSchoolLifeState {
   isLoading: boolean;
   pageError: string | null;
   schoolProfile: ProfileSchoolResponse | null;
+  assignment: StudentAssignment | null;
   hasAssignment: boolean;
   meals: MealDayResponse | null;
   mealsError: string | null;
@@ -39,6 +40,7 @@ const initialState: StudentSchoolLifeState = {
   isLoading: true,
   pageError: null,
   schoolProfile: null,
+  assignment: null,
   hasAssignment: false,
   meals: null,
   mealsError: null,
@@ -62,8 +64,65 @@ function resolveErrorMessage(error: unknown, fallback: string): string {
   return fallback;
 }
 
-export function useStudentSchoolLife(enabled: boolean): StudentSchoolLifeState {
+async function loadNoticesSafe(): Promise<{ notices: StudentNotice[] } | { error: string }> {
+  try {
+    const notices = await getStudentNotices();
+    return { notices };
+  } catch (error) {
+    return { error: resolveErrorMessage(error, '알림을 불러올 수 없습니다.') };
+  }
+}
+
+async function loadTimetableSafe(): Promise<
+  { timetable: TimetableDayResponse } | { error: string }
+> {
+  try {
+    const timetable = await getStudentTodayTimetable();
+    return { timetable };
+  } catch (error) {
+    return { error: resolveErrorMessage(error, '시간표를 불러올 수 없습니다.') };
+  }
+}
+
+export function useStudentSchoolLife(enabled: boolean) {
   const [state, setState] = useState<StudentSchoolLifeState>(initialState);
+  const [reloadToken, setReloadToken] = useState(0);
+
+  const reload = useCallback(() => {
+    setReloadToken((value) => value + 1);
+  }, []);
+
+  const reloadTimetable = useCallback(async () => {
+    const result = await loadTimetableSafe();
+    setState((prev) => {
+      if ('error' in result) {
+        return { ...prev, timetable: null, timetableError: result.error };
+      }
+      return { ...prev, timetable: result.timetable, timetableError: null };
+    });
+  }, []);
+
+  const applyAssignment = useCallback(async (assignment: StudentAssignment | null) => {
+    if (!assignment) {
+      setState((prev) => ({
+        ...prev,
+        assignment: null,
+        hasAssignment: false,
+        notices: null,
+        noticesError: null,
+      }));
+      return;
+    }
+
+    const noticesResult = await loadNoticesSafe();
+    setState((prev) => ({
+      ...prev,
+      assignment,
+      hasAssignment: true,
+      notices: 'notices' in noticesResult ? noticesResult.notices : [],
+      noticesError: 'error' in noticesResult ? noticesResult.error : null,
+    }));
+  }, []);
 
   useEffect(() => {
     if (!enabled) {
@@ -77,39 +136,25 @@ export function useStudentSchoolLife(enabled: boolean): StudentSchoolLifeState {
 
       try {
         const [schoolProfile, assignment] = await Promise.all([
-          getStudentProfileSchool().catch((error) => {
-            throw error;
-          }),
+          getStudentProfileSchool(),
           getStudentAssignmentOptional(),
         ]);
 
         const hasAssignment = assignment !== null;
 
-        const mealsPromise = getStudentTodayMeals().catch((error) => ({
-          error: resolveErrorMessage(error, '급식 정보를 불러올 수 없습니다.'),
-        }));
-        const weatherPromise = getStudentTodayWeather().catch((error) => ({
-          error: resolveErrorMessage(error, '날씨 정보를 불러올 수 없습니다.'),
-        }));
-        const schedulePromise = getStudentUpcomingSchoolSchedule(14).catch((error) => ({
-          error: resolveErrorMessage(error, '학사일정을 불러올 수 없습니다.'),
-        }));
-        const timetablePromise = getStudentTodayTimetable().catch((error) => ({
-          error: resolveErrorMessage(error, '시간표를 불러올 수 없습니다.'),
-        }));
-        const noticesPromise = hasAssignment
-          ? getStudentNotices().catch((error) => ({
-              error: resolveErrorMessage(error, '알림을 불러올 수 없습니다.'),
-            }))
-          : Promise.resolve(null);
-
         const [mealsResult, weatherResult, scheduleResult, timetableResult, noticesResult] =
           await Promise.all([
-            mealsPromise,
-            weatherPromise,
-            schedulePromise,
-            timetablePromise,
-            noticesPromise,
+            getStudentTodayMeals().catch((error) => ({
+              error: resolveErrorMessage(error, '급식 정보를 불러올 수 없습니다.'),
+            })),
+            getStudentTodayWeather().catch((error) => ({
+              error: resolveErrorMessage(error, '날씨 정보를 불러올 수 없습니다.'),
+            })),
+            getStudentUpcomingSchoolSchedule(14).catch((error) => ({
+              error: resolveErrorMessage(error, '학사일정을 불러올 수 없습니다.'),
+            })),
+            loadTimetableSafe(),
+            hasAssignment ? loadNoticesSafe() : Promise.resolve(null),
           ]);
 
         if (cancelled) {
@@ -120,6 +165,7 @@ export function useStudentSchoolLife(enabled: boolean): StudentSchoolLifeState {
           isLoading: false,
           pageError: null,
           schoolProfile,
+          assignment,
           hasAssignment,
           meals: null,
           mealsError: null,
@@ -154,14 +200,14 @@ export function useStudentSchoolLife(enabled: boolean): StudentSchoolLifeState {
         if ('error' in timetableResult) {
           nextState.timetableError = timetableResult.error;
         } else {
-          nextState.timetable = timetableResult;
+          nextState.timetable = timetableResult.timetable;
         }
 
         if (noticesResult) {
           if ('error' in noticesResult) {
             nextState.noticesError = noticesResult.error;
           } else {
-            nextState.notices = noticesResult;
+            nextState.notices = noticesResult.notices;
           }
         }
 
@@ -182,7 +228,12 @@ export function useStudentSchoolLife(enabled: boolean): StudentSchoolLifeState {
     return () => {
       cancelled = true;
     };
-  }, [enabled]);
+  }, [enabled, reloadToken]);
 
-  return state;
+  return {
+    ...state,
+    reload,
+    reloadTimetable,
+    applyAssignment,
+  };
 }

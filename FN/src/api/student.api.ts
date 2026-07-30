@@ -2,6 +2,11 @@ import { apiClient } from './client';
 import { ApiError } from './types/api-error';
 import type { ProfileSchoolResponse } from './types/home';
 import type { StudentAssignment, StudentNotice } from './types/student';
+import type {
+  StudentAssignmentRegisterRequest,
+  StudentClassProfile,
+  StudentClassProfileUpdateRequest,
+} from './types/student';
 
 export {
   getTodayMeals as getStudentTodayMeals,
@@ -36,4 +41,22 @@ export async function getStudentAssignmentOptional(): Promise<StudentAssignment 
     }
     throw error;
   }
+}
+
+export function getStudentClassProfile() {
+  return apiClient<StudentClassProfile>('/api/student/profile/class');
+}
+
+export function updateStudentClassProfile(body: StudentClassProfileUpdateRequest) {
+  return apiClient<StudentClassProfile>('/api/student/profile/class', {
+    method: 'PATCH',
+    body,
+  });
+}
+
+export function registerStudentAssignment(body: StudentAssignmentRegisterRequest) {
+  return apiClient<StudentAssignment>('/api/student/assignment', {
+    method: 'POST',
+    body,
+  });
 }
