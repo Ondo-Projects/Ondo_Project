@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, String> {
@@ -18,6 +19,14 @@ public interface UserRepository extends JpaRepository<User, String> {
     boolean existsByUsername(String username);
 
     boolean existsByEmail(String email);
+
+    Optional<User> findByEmailAndNameAndBirthDateAndActiveTrue(
+            String email,
+            String name,
+            LocalDate birthDate
+    );
+
+    Optional<User> findByUsernameAndEmailAndActiveTrue(String username, String email);
 
     long countByRole(Role role);
 

@@ -5,6 +5,7 @@ import { useAuth } from '../auth/AuthProvider';
 import AuthLoading from '../auth/AuthLoading';
 import AppLayout from '../components/layout/AppLayout';
 import BrandMark from '../components/BrandMark';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { PATHS } from '../routes/paths';
 import QuickActionBar from './components/QuickActionBar';
 import SectionAssignment from './components/SectionAssignment';
@@ -33,6 +34,7 @@ import { useStudentTodayTodo } from './useStudentTodayTodo';
 
 export default function StudentHomePage() {
   const { user, logout } = useAuth();
+  usePageTitle('학생 홈 | 온도');
   const {
     reloadTimetable,
     applyAssignment,

@@ -167,4 +167,11 @@ public class User {
         this.phone = phone;
         this.smsNotifyEnabled = smsNotifyEnabled;
     }
+
+    public void changePassword(String encodedPassword) {
+        if (encodedPassword == null || encodedPassword.isBlank()) {
+            throw new IllegalArgumentException("encodedPassword must not be blank");
+        }
+        this.password = encodedPassword;
+    }
 }

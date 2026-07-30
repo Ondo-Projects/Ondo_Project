@@ -48,6 +48,7 @@ public class SecurityConfig {
                             "/api/auth/email/**",
                             "/api/auth/sms/**",
                             "/api/auth/username/**",
+                            "/api/auth/recovery/**",
                             "/api/schools/**"
                     ).permitAll();
                     auth.requestMatchers("/api/common/**").hasAnyRole("STUDENT", "TEACHER");
