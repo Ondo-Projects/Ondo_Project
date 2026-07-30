@@ -3,6 +3,30 @@
   margin: 0 auto;
 }
 
+.join-skip-link {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.join-skip-link:focus-visible {
+  position: fixed;
+  left: var(--space-4);
+  top: var(--space-4);
+  z-index: var(--z-modal);
+  width: auto;
+  height: auto;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-primary-600);
+  color: #ffffff;
+  font-weight: var(--font-weight-label);
+  text-decoration: none;
+}
+
 .join-card {
   background: var(--color-bg-card);
   border: var(--card-border);
@@ -21,9 +45,40 @@
 
 .join-card__subtitle {
   margin: 0 0 var(--space-6);
+  font-size: var(--font-size-body-lg);
+  line-height: var(--line-height-body-lg);
+  color: var(--color-neutral-600);
+}
+
+.join-error-summary {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-error-bg);
+  color: var(--color-error);
+}
+
+.join-error-summary__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-error);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.join-error-summary__text {
+  margin: 0;
   font-size: var(--font-size-body);
   line-height: var(--line-height-body);
-  color: var(--color-neutral-600);
 }
 
 .join-form {
@@ -75,15 +130,40 @@
   background: var(--color-bg-card);
 }
 
-.join-field__input:focus,
-.join-field__select:focus {
+.join-field__input:focus-visible,
+.join-field__select:focus-visible {
   border-color: var(--input-focus-border);
   box-shadow: var(--input-focus-ring);
-  outline: none;
+  outline: 3px solid var(--color-primary-100);
+  outline-offset: 2px;
 }
 
 .join-field__input--error {
   border-color: var(--color-error);
+}
+
+.join-field__error {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  margin: 0;
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+  color: var(--color-error);
+}
+
+.join-field__error-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-error);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
 .join-field__helper {
@@ -93,11 +173,18 @@
   color: var(--color-neutral-600);
 }
 
-.join-field__error {
+.join-role-fieldset {
   margin: 0;
-  font-size: var(--font-size-caption);
-  line-height: var(--line-height-caption);
-  color: var(--color-error);
+  padding: 0;
+  border: none;
+}
+
+.join-role-fieldset__legend {
+  margin-bottom: var(--space-3);
+  font-size: var(--font-size-label);
+  line-height: var(--line-height-label);
+  font-weight: var(--font-weight-label);
+  color: var(--color-neutral-800);
 }
 
 .join-role-group {
@@ -236,6 +323,10 @@
   }
 }
 
+.join-search-result-item--active {
+  background: var(--color-primary-100);
+}
+
 .join-search-result-item__name {
   margin-bottom: var(--space-1);
   font-weight: var(--font-weight-label);
@@ -359,11 +450,19 @@
 }
 
 .join-message {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
   margin: 0 0 var(--space-4);
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
   font-size: var(--font-size-body);
   line-height: var(--line-height-body);
+}
+
+.join-message__icon {
+  flex-shrink: 0;
+  font-weight: 700;
 }
 
 .join-message--error {
@@ -425,7 +524,16 @@
 }
 
 .join-password-rules li {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
   margin-bottom: var(--space-1);
+}
+
+.join-password-rules__marker {
+  flex-shrink: 0;
+  width: 1rem;
+  text-align: center;
 }
 
 .join-password-rules li.is-valid {
@@ -459,5 +567,28 @@
 @media (hover: hover) {
   .join-footer__link:hover {
     text-decoration: underline;
+  }
+}
+
+.join-btn:focus-visible,
+.join-filter-chip:focus-visible,
+.join-search-clear:focus-visible,
+.join-search-result-item:focus-visible,
+.join-role-option input:focus-visible,
+.join-checkbox-row input:focus-visible,
+.join-footer__link:focus-visible,
+.join-terms-item summary:focus-visible {
+  outline: 3px solid var(--color-primary-100);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .join-btn,
+  .join-filter-chip {
+    transition: none;
+  }
+
+  .join-btn:active:not(:disabled) {
+    transform: none;
   }
 }

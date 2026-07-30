@@ -53,10 +53,8 @@ export default function AccountSection() {
 
   return (
     <JoinSection title={`${sectionNumber}. 계정 정보`}>
-      <JoinField id="username" label="아이디" error={fieldErrors.username}>
+      <JoinField id="username" label="아이디" error={fieldErrors.username} required>
         <input
-          id="username"
-          className={`join-field__input${fieldErrors.username ? ' join-field__input--error' : ''}`}
           type="text"
           name="username"
           minLength={4}
@@ -80,14 +78,15 @@ export default function AccountSection() {
 
       {state.usernameChecked && state.usernameAvailable ? (
         <p className="join-message join-message--success" role="status">
-          사용 가능한 아이디예요.
+          <span className="join-message__icon" aria-hidden="true">
+            ✓
+          </span>
+          <span>사용 가능한 아이디예요.</span>
         </p>
       ) : null}
 
-      <JoinField id="password" label="비밀번호" error={fieldErrors.password}>
+      <JoinField id="password" label="비밀번호" error={fieldErrors.password} required>
         <input
-          id="password"
-          className={`join-field__input${fieldErrors.password ? ' join-field__input--error' : ''}`}
           type="password"
           name="password"
           minLength={8}
@@ -96,23 +95,25 @@ export default function AccountSection() {
           value={state.password}
           onChange={(event) => actions.setPassword(event.target.value)}
         />
-        <ul className="join-password-rules" aria-label="비밀번호 규칙">
-          {passwordRules.map((rule) => (
-            <li key={rule.id} className={rule.valid ? 'is-valid' : undefined}>
-              {rule.label}
-            </li>
-          ))}
-        </ul>
       </JoinField>
+      <ul className="join-password-rules" aria-label="비밀번호 규칙">
+        {passwordRules.map((rule) => (
+          <li key={rule.id} className={rule.valid ? 'is-valid' : undefined}>
+            <span className="join-password-rules__marker" aria-hidden="true">
+              {rule.valid ? '✓' : '○'}
+            </span>
+            <span>{rule.label}</span>
+          </li>
+        ))}
+      </ul>
 
       <JoinField
         id="passwordConfirm"
         label="비밀번호 확인"
         error={fieldErrors.passwordConfirm}
+        required
       >
         <input
-          id="passwordConfirm"
-          className={`join-field__input${fieldErrors.passwordConfirm ? ' join-field__input--error' : ''}`}
           type="password"
           name="passwordConfirm"
           minLength={8}

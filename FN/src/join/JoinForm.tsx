@@ -1,11 +1,13 @@
-import { type FormEvent } from 'react';
+import { type FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AppLayout from '../components/layout/AppLayout';
 import { getSignupSuccessMessage } from '../auth/loginNavigation';
 import { PATHS } from '../routes/paths';
+import { scrollToFirstJoinError } from './joinA11y';
 import { useJoinForm } from './JoinFormProvider';
 import AccountSection from './components/AccountSection';
 import GuardianSection from './components/GuardianSection';
+import JoinErrorSummary from './components/JoinErrorSummary';
 import ProfileNameSection from './components/ProfileNameSection';
 import RoleSection from './components/RoleSection';
 import SchoolSearchSection from './components/SchoolSearchSection';
@@ -16,11 +18,13 @@ import './join.css';
 
 export default function JoinForm() {
   const navigate = useNavigate();
-  const { submitError, isSubmitting, actions } = useJoinForm();
+  const { state, fieldErrors, submitError, isSubmitting, actions } = useJoinForm();
+  const [showValidationSummary, setShowValidationSummary] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     actions.clearSubmitError();
+    setShowValidationSummary(true);
 
     try {
       const response = await actions.submitSignup();
@@ -33,12 +37,18 @@ export default function JoinForm() {
         },
       });
     } catch {
-      // fieldErrors / submitError are set in useJoinForm
+      const validation = actions.validateClient();
+      if (!validation.valid) {
+        scrollToFirstJoinError(validation.errors, state.role);
+      }
     }
   }
 
   return (
     <AppLayout>
+      <a className="join-skip-link" href="#join-form-main">
+        회원가입 양식으로 바로가기
+      </a>
       <div className="join-shell">
         <div className="join-card">
           <h1 className="join-card__title">회원가입</h1>
@@ -46,13 +56,24 @@ export default function JoinForm() {
             학교 선택, 계정 정보, 약관 동의 후 가입을 완료해 주세요.
           </p>
 
+          <JoinErrorSummary errors={fieldErrors} visible={showValidationSummary} />
+
           {submitError ? (
-            <p className="join-message join-message--error" role="alert">
-              {submitError}
+            <p className="join-message join-message--error" id="join-submit-error" role="alert">
+              <span className="join-message__icon" aria-hidden="true">
+                !
+              </span>
+              <span>{submitError}</span>
             </p>
           ) : null}
 
-          <form className="join-form" onSubmit={handleSubmit} noValidate>
+          <form
+            id="join-form-main"
+            className="join-form"
+            onSubmit={handleSubmit}
+            noValidate
+            aria-busy={isSubmitting}
+          >
             <RoleSection />
             <SchoolSearchSection />
             <ProfileNameSection />
@@ -66,6 +87,7 @@ export default function JoinForm() {
               className="join-btn join-btn--primary join-submit"
               type="submit"
               disabled={isSubmitting}
+              aria-describedby={submitError ? 'join-submit-error' : undefined}
             >
               {isSubmitting ? '가입 처리 중…' : '가입하기'}
             </button>

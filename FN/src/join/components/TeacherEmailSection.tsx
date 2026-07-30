@@ -83,13 +83,13 @@ export default function TeacherEmailSection() {
         id="teacherEmail"
         label="교사 이메일"
         error={fieldErrors.email ?? fieldErrors.emailVerification}
+        required
       >
         <input
-          id="teacherEmail"
-          className={`join-field__input${fieldErrors.email || fieldErrors.emailVerification ? ' join-field__input--error' : ''}`}
           type="email"
           name="email"
           placeholder="example@korea.kr"
+          autoComplete="email"
           value={state.email}
           onChange={(event) => {
             actions.setEmail(event.target.value);
@@ -123,12 +123,11 @@ export default function TeacherEmailSection() {
 
       <JoinField id="teacherVerificationCode" label="인증번호 6자리">
         <input
-          id="teacherVerificationCode"
-          className="join-field__input"
           type="text"
           inputMode="numeric"
           maxLength={6}
           placeholder="123456"
+          autoComplete="one-time-code"
           value={verificationCode}
           onChange={(event) => setVerificationCode(event.target.value.replace(/\D/g, ''))}
         />
@@ -136,13 +135,19 @@ export default function TeacherEmailSection() {
 
       {state.emailVerified ? (
         <p className="join-message join-message--success" role="status">
-          이메일 인증이 완료되었어요.
+          <span className="join-message__icon" aria-hidden="true">
+            ✓
+          </span>
+          <span>이메일 인증이 완료되었어요.</span>
         </p>
       ) : null}
 
       {statusMessage && !state.emailVerified ? (
         <p className="join-message join-message--error" role="alert">
-          {statusMessage}
+          <span className="join-message__icon" aria-hidden="true">
+            !
+          </span>
+          <span>{statusMessage}</span>
         </p>
       ) : null}
     </JoinSection>

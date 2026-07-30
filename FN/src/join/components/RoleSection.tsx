@@ -11,28 +11,31 @@ export default function RoleSection() {
 
   return (
     <JoinSection title="1. 가입 유형">
-      <div className="join-role-group" role="radiogroup" aria-label="가입 유형">
-        <label className="join-role-option">
-          <input
-            type="radio"
-            name="role"
-            value="STUDENT"
-            checked={state.role === 'STUDENT'}
-            onChange={() => handleRoleChange('STUDENT')}
-          />
-          학생
-        </label>
-        <label className="join-role-option">
-          <input
-            type="radio"
-            name="role"
-            value="TEACHER"
-            checked={state.role === 'TEACHER'}
-            onChange={() => handleRoleChange('TEACHER')}
-          />
-          교사
-        </label>
-      </div>
+      <fieldset className="join-role-fieldset">
+        <legend className="join-role-fieldset__legend">가입 유형 (필수)</legend>
+        <div className="join-role-group">
+          <label className="join-role-option">
+            <input
+              type="radio"
+              name="role"
+              value="STUDENT"
+              checked={state.role === 'STUDENT'}
+              onChange={() => handleRoleChange('STUDENT')}
+            />
+            학생
+          </label>
+          <label className="join-role-option">
+            <input
+              type="radio"
+              name="role"
+              value="TEACHER"
+              checked={state.role === 'TEACHER'}
+              onChange={() => handleRoleChange('TEACHER')}
+            />
+            교사
+          </label>
+        </div>
+      </fieldset>
     </JoinSection>
   );
 }

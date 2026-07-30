@@ -79,10 +79,8 @@ export default function GuardianSection() {
         만 14세 미만 학생은 보호자 SMS 인증 후 가입할 수 있습니다.
       </p>
 
-      <JoinField id="guardianName" label="보호자 성명" error={fieldErrors.guardianName}>
+      <JoinField id="guardianName" label="보호자 성명" error={fieldErrors.guardianName} required>
         <input
-          id="guardianName"
-          className={`join-field__input${fieldErrors.guardianName ? ' join-field__input--error' : ''}`}
           type="text"
           name="guardianName"
           maxLength={50}
@@ -92,14 +90,13 @@ export default function GuardianSection() {
         />
       </JoinField>
 
-      <JoinField id="guardianPhone" label="보호자 휴대전화" error={fieldErrors.guardianPhone}>
+      <JoinField id="guardianPhone" label="보호자 휴대전화" error={fieldErrors.guardianPhone} required>
         <input
-          id="guardianPhone"
-          className={`join-field__input${fieldErrors.guardianPhone ? ' join-field__input--error' : ''}`}
           type="tel"
           name="guardianPhone"
           maxLength={20}
           placeholder="010-1234-5678"
+          autoComplete="tel"
           value={state.guardianPhone}
           onChange={(event) => {
             actions.setGuardianPhone(event.target.value);
@@ -109,10 +106,8 @@ export default function GuardianSection() {
         />
       </JoinField>
 
-      <JoinField id="guardianRelation" label="학생과의 관계" error={fieldErrors.guardianRelation}>
+      <JoinField id="guardianRelation" label="학생과의 관계" error={fieldErrors.guardianRelation} required>
         <select
-          id="guardianRelation"
-          className={`join-field__select${fieldErrors.guardianRelation ? ' join-field__input--error' : ''}`}
           name="guardianRelation"
           value={state.guardianRelation}
           onChange={(event) =>
@@ -140,6 +135,7 @@ export default function GuardianSection() {
 
       <label className="join-checkbox-row">
         <input
+          id="agreeGuardianChildPrivacy"
           type="checkbox"
           checked={state.agreeGuardianChildPrivacy}
           onChange={(event) => actions.setAgreeGuardianChildPrivacy(event.target.checked)}
@@ -148,12 +144,16 @@ export default function GuardianSection() {
       </label>
       {fieldErrors.agreeGuardianChildPrivacy ? (
         <p className="join-field__error" role="alert">
-          {fieldErrors.agreeGuardianChildPrivacy}
+          <span className="join-field__error-icon" aria-hidden="true">
+            !
+          </span>
+          <span>{fieldErrors.agreeGuardianChildPrivacy}</span>
         </p>
       ) : null}
 
       <label className="join-checkbox-row">
         <input
+          id="agreeGuardianChildSensitive"
           type="checkbox"
           checked={state.agreeGuardianChildSensitive}
           onChange={(event) => actions.setAgreeGuardianChildSensitive(event.target.checked)}
@@ -162,12 +162,16 @@ export default function GuardianSection() {
       </label>
       {fieldErrors.agreeGuardianChildSensitive ? (
         <p className="join-field__error" role="alert">
-          {fieldErrors.agreeGuardianChildSensitive}
+          <span className="join-field__error-icon" aria-hidden="true">
+            !
+          </span>
+          <span>{fieldErrors.agreeGuardianChildSensitive}</span>
         </p>
       ) : null}
 
       <label className="join-checkbox-row">
         <input
+          id="agreeGuardianIdentity"
           type="checkbox"
           checked={state.agreeGuardianIdentity}
           onChange={(event) => actions.setAgreeGuardianIdentity(event.target.checked)}
@@ -176,7 +180,10 @@ export default function GuardianSection() {
       </label>
       {fieldErrors.agreeGuardianIdentity ? (
         <p className="join-field__error" role="alert">
-          {fieldErrors.agreeGuardianIdentity}
+          <span className="join-field__error-icon" aria-hidden="true">
+            !
+          </span>
+          <span>{fieldErrors.agreeGuardianIdentity}</span>
         </p>
       ) : null}
 
@@ -205,12 +212,11 @@ export default function GuardianSection() {
         error={fieldErrors.smsVerification}
       >
         <input
-          id="smsVerificationCode"
-          className={`join-field__input${fieldErrors.smsVerification ? ' join-field__input--error' : ''}`}
           type="text"
           inputMode="numeric"
           maxLength={6}
           placeholder="123456"
+          autoComplete="one-time-code"
           value={verificationCode}
           onChange={(event) => setVerificationCode(event.target.value.replace(/\D/g, ''))}
         />
@@ -218,13 +224,19 @@ export default function GuardianSection() {
 
       {state.smsVerified ? (
         <p className="join-message join-message--success" role="status">
-          법정대리인 SMS 인증이 완료되었어요.
+          <span className="join-message__icon" aria-hidden="true">
+            ✓
+          </span>
+          <span>법정대리인 SMS 인증이 완료되었어요.</span>
         </p>
       ) : null}
 
       {statusMessage && !state.smsVerified ? (
         <p className="join-message join-message--error" role="alert">
-          {statusMessage}
+          <span className="join-message__icon" aria-hidden="true">
+            !
+          </span>
+          <span>{statusMessage}</span>
         </p>
       ) : null}
     </JoinSection>

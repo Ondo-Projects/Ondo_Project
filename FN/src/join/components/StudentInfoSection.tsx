@@ -82,10 +82,9 @@ export default function StudentInfoSection() {
         label="생년월일"
         helper="만 14세 미만인 경우 법정대리인(보호자) SMS 동의가 필요합니다."
         error={fieldErrors.birthDate}
+        required
       >
         <input
-          id="birthDate"
-          className={`join-field__input${fieldErrors.birthDate ? ' join-field__input--error' : ''}`}
           type="date"
           name="birthDate"
           value={state.birthDate}
@@ -98,13 +97,13 @@ export default function StudentInfoSection() {
         label="이메일"
         helper="가입 전 이메일 인증이 필요합니다."
         error={fieldErrors.email ?? fieldErrors.emailVerification}
+        required
       >
         <input
-          id="studentEmail"
-          className={`join-field__input${fieldErrors.email || fieldErrors.emailVerification ? ' join-field__input--error' : ''}`}
           type="email"
           name="email"
           placeholder="example@gmail.com"
+          autoComplete="email"
           value={state.email}
           onChange={(event) => {
             actions.setEmail(event.target.value);
@@ -138,12 +137,11 @@ export default function StudentInfoSection() {
 
       <JoinField id="studentVerificationCode" label="인증번호 6자리">
         <input
-          id="studentVerificationCode"
-          className="join-field__input"
           type="text"
           inputMode="numeric"
           maxLength={6}
           placeholder="123456"
+          autoComplete="one-time-code"
           value={verificationCode}
           onChange={(event) => setVerificationCode(event.target.value.replace(/\D/g, ''))}
         />
@@ -151,13 +149,19 @@ export default function StudentInfoSection() {
 
       {state.emailVerified ? (
         <p className="join-message join-message--success" role="status">
-          이메일 인증이 완료되었어요.
+          <span className="join-message__icon" aria-hidden="true">
+            ✓
+          </span>
+          <span>이메일 인증이 완료되었어요.</span>
         </p>
       ) : null}
 
       {statusMessage && !state.emailVerified ? (
         <p className="join-message join-message--error" role="alert">
-          {statusMessage}
+          <span className="join-message__icon" aria-hidden="true">
+            !
+          </span>
+          <span>{statusMessage}</span>
         </p>
       ) : null}
     </JoinSection>

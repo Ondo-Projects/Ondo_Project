@@ -67,13 +67,19 @@ export default function LoginPage() {
 
           {successMessage ? (
             <p className="auth-message auth-message--success" role="status">
-              {successMessage}
+              <span className="auth-message__icon" aria-hidden="true">
+                ✓
+              </span>
+              <span>{successMessage}</span>
             </p>
           ) : null}
 
           {errorMessage ? (
             <p className="auth-message auth-message--error" role="alert">
-              {errorMessage}
+              <span className="auth-message__icon" aria-hidden="true">
+                !
+              </span>
+              <span>{errorMessage}</span>
             </p>
           ) : null}
 

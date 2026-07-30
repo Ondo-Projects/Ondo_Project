@@ -13,10 +13,9 @@ export default function ProfileNameSection() {
         label={isTeacher ? '교사 성명' : '성명'}
         helper="담당 교사 등록 및 상담 안내에 사용됩니다."
         error={fieldErrors.name}
+        required
       >
         <input
-          id="name"
-          className={`join-field__input${fieldErrors.name ? ' join-field__input--error' : ''}`}
           type="text"
           name="name"
           maxLength={50}

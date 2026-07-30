@@ -79,6 +79,7 @@ export default function TermsSection() {
 
           <label className="join-checkbox-row">
             <input
+              id={term.errorKey}
               type="checkbox"
               checked={state[term.checkedKey]}
               onChange={(event) => setters[term.checkedKey](event.target.checked)}
@@ -88,7 +89,10 @@ export default function TermsSection() {
 
           {fieldErrors[term.errorKey] ? (
             <p className="join-field__error" role="alert">
-              {fieldErrors[term.errorKey]}
+              <span className="join-field__error-icon" aria-hidden="true">
+                !
+              </span>
+              <span>{fieldErrors[term.errorKey]}</span>
             </p>
           ) : null}
         </div>
