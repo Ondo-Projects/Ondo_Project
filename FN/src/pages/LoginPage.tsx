@@ -1,29 +1,36 @@
 import { type FormEvent, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
+import {
+  getSignupSuccessMessage,
+  type LoginLocationState,
+} from '../auth/loginNavigation';
 import { getPostLoginPath } from '../auth/redirects';
 import { ApiError } from '../api/types/api-error';
 import AppLayout from '../components/layout/AppLayout';
 import { PATHS } from '../routes/paths';
 import '../auth/auth.css';
 
-interface LoginLocationState {
-  from?: string;
-}
-
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const locationState = (location.state as LoginLocationState | null) ?? null;
   const { login } = useAuth();
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState(locationState?.username ?? '');
   const [password, setPassword] = useState('');
+  const [successMessage, setSuccessMessage] = useState<string | null>(
+    locationState?.signupSuccess
+      ? getSignupSuccessMessage(locationState.message)
+      : null,
+  );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const redirectPath = (location.state as LoginLocationState | null)?.from ?? null;
+  const redirectPath = locationState?.from ?? null;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setSuccessMessage(null);
     setErrorMessage(null);
 
     const trimmedUsername = username.trim();
@@ -58,9 +65,21 @@ export default function LoginPage() {
             학생·교사 계정으로 온도에 접속해요.
           </p>
 
+          {successMessage ? (
+            <p className="auth-message auth-message--success" role="status">
+              <span className="auth-message__icon" aria-hidden="true">
+                ✓
+              </span>
+              <span>{successMessage}</span>
+            </p>
+          ) : null}
+
           {errorMessage ? (
             <p className="auth-message auth-message--error" role="alert">
-              {errorMessage}
+              <span className="auth-message__icon" aria-hidden="true">
+                !
+              </span>
+              <span>{errorMessage}</span>
             </p>
           ) : null}
 
