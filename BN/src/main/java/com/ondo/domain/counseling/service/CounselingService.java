@@ -33,6 +33,7 @@ public class CounselingService {
     private final CounselingAccessLogRepository counselingAccessLogRepository;
     private final StudentTeacherAssignmentRepository assignmentRepository;
     private final UserRepository userRepository;
+    private final CounselingNotificationService counselingNotificationService;
 
     @Transactional
     public CounselingResponseDTO create(String username, CounselingCreateDTO request) {
@@ -55,7 +56,9 @@ public class CounselingService {
                 .updatedAt(now)
                 .build();
 
-        return new CounselingResponseDTO(counselingPostRepository.save(post));
+        CounselingPost saved = counselingPostRepository.save(post);
+        counselingNotificationService.notifyTeacherNewRequest(saved);
+        return new CounselingResponseDTO(saved);
     }
 
     public List<CounselingResponseDTO> getMyPosts(String username) {
