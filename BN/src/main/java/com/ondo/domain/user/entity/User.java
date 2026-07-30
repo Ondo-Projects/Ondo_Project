@@ -91,6 +91,9 @@ public class User {
     private boolean active = true;
 
     @Column
+    private LocalDateTime withdrawnAt;
+
+    @Column
     private Integer grade;
 
     @Column
@@ -119,6 +122,7 @@ public class User {
             boolean agreeSensitive,
             LocalDateTime agreedAt,
             Boolean active,
+            LocalDateTime withdrawnAt,
             Integer grade,
             Integer classNumber
     ) {
@@ -143,6 +147,7 @@ public class User {
         this.agreeSensitive = agreeSensitive;
         this.agreedAt = agreedAt;
         this.active = active != null ? active : true;
+        this.withdrawnAt = withdrawnAt;
         this.grade = grade;
         this.classNumber = classNumber;
     }
@@ -173,5 +178,16 @@ public class User {
             throw new IllegalArgumentException("encodedPassword must not be blank");
         }
         this.password = encodedPassword;
+    }
+
+    public void withdraw(LocalDateTime withdrawnAt) {
+        if (withdrawnAt == null) {
+            throw new IllegalArgumentException("withdrawnAt must not be null");
+        }
+        if (!this.active) {
+            throw new IllegalStateException("already withdrawn or inactive");
+        }
+        this.active = false;
+        this.withdrawnAt = withdrawnAt;
     }
 }
