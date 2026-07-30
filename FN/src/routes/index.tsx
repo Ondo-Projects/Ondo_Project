@@ -11,6 +11,7 @@ import ResetPasswordPage from '../pages/ResetPasswordPage';
 import RootPage from '../pages/RootPage';
 import StudentPage from '../pages/StudentPage';
 import TeacherPage from '../pages/TeacherPage';
+import WithdrawPage from '../pages/WithdrawPage';
 import { PATHS } from './paths';
 
 export default function AppRoutes() {
@@ -80,6 +81,14 @@ export default function AppRoutes() {
           element={
             <RequireAuth roles={['ADMIN']}>
               <AdminPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path={PATHS.WITHDRAW}
+          element={
+            <RequireAuth roles={['STUDENT', 'TEACHER']}>
+              <WithdrawPage />
             </RequireAuth>
           }
         />
