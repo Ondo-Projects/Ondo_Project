@@ -11,7 +11,7 @@ import AppLayout from '../components/layout/AppLayout';
 import { PATHS } from '../routes/paths';
 
 import ComingSoonSection from './components/ComingSoonSection';
-
+import SectionCounselWorkspace from './components/SectionCounselWorkspace';
 import QuickActionBar from './components/QuickActionBar';
 
 import SectionInviteCode from './components/SectionInviteCode';
@@ -188,32 +188,14 @@ export default function TeacherHomePage() {
 
         <SectionInviteCode onSuccess={handleSuccess} onError={handleError} />
 
-
-
-        <div className="teacher-counsel-layout">
-
-          <ComingSoonSection
-
-            id={TEACHER_SECTIONS.POST_LIST}
-
-            helper="담당 학생의 상담 신청 목록과 상태 필터입니다."
-
-          />
-
-          <ComingSoonSection
-
-            id={TEACHER_SECTIONS.DETAIL_CARD}
-
-            helper="상담 상세·상태 변경·교사 답변을 처리합니다."
-
-          />
-
-        </div>
-
-
+        <SectionCounselWorkspace
+          refreshToken={summaryRefreshKey}
+          onSuccess={handleSuccess}
+          onError={handleError}
+          onDataChange={refreshSummary}
+        />
 
         <ComingSoonSection
-
           id={TEACHER_SECTIONS.MOOD_SUMMARY}
 
           helper="담당 학생들의 오늘·주간 마음 날씨를 확인합니다."
