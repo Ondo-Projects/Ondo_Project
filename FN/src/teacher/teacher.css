@@ -514,9 +514,268 @@
   scroll-margin-top: var(--space-4);
 }
 
+#preCounselDetailPanel {
+  scroll-margin-top: var(--space-4);
+}
+
+.teacher-mood-tab-row {
+  margin-bottom: var(--space-3);
+}
+
+.teacher-mood-summary-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.teacher-mood-summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-md);
+}
+
+.teacher-mood-summary-item__name {
+  font-weight: var(--font-weight-label);
+  color: var(--color-neutral-900);
+}
+
+.teacher-mood-summary-item__value {
+  font-size: var(--font-size-body);
+  color: var(--color-neutral-700);
+  white-space: nowrap;
+}
+
+.teacher-mood-summary-item__value.is-empty {
+  color: var(--color-neutral-400);
+}
+
+.teacher-weekly-period {
+  margin: 0 0 var(--space-4);
+  font-size: var(--font-size-body);
+  color: var(--color-neutral-500);
+}
+
+.teacher-mood-distribution {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.teacher-mood-distribution-item {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr 2.25rem;
+  gap: var(--space-2);
+  align-items: center;
+  font-size: var(--font-size-body);
+}
+
+.teacher-mood-distribution-bar {
+  height: 0.625rem;
+  background: var(--color-neutral-200);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.teacher-mood-distribution-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #60a5fa, #2563eb);
+  border-radius: 999px;
+}
+
+.teacher-weekly-student-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.teacher-weekly-student-card {
+  padding: var(--space-4);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-md);
+}
+
+.teacher-weekly-student-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.teacher-weekly-student-card__header strong {
+  font-size: var(--font-size-body);
+}
+
+.teacher-weekly-student-card__meta {
+  font-size: var(--font-size-caption);
+  color: var(--color-neutral-500);
+}
+
+.teacher-weekly-day-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 calc(-1 * var(--space-1));
+  padding: 0 var(--space-1) var(--space-2);
+}
+
+.teacher-weekly-day-row {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.teacher-weekly-day-cell {
+  text-align: center;
+  border-radius: var(--radius-md);
+  background: var(--color-neutral-50);
+  padding: var(--space-2) var(--space-1);
+  min-width: 0;
+}
+
+.teacher-weekly-day-cell__label {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-size: 0.6875rem;
+  color: var(--color-neutral-500);
+}
+
+.teacher-weekly-day-cell__emoji {
+  display: block;
+  font-size: 1.125rem;
+  line-height: 1.2;
+}
+
+.teacher-weekly-day-cell__empty {
+  color: var(--color-neutral-300);
+  font-size: var(--font-size-caption);
+}
+
+.teacher-pre-counsel-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.teacher-pre-counsel-item {
+  display: block;
+  width: 100%;
+  padding: var(--space-4);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-md);
+  background: var(--color-neutral-50);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+.teacher-pre-counsel-item.is-active,
+.teacher-pre-counsel-item:focus-visible {
+  border-color: var(--color-primary-400);
+  background: var(--color-primary-50);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12);
+}
+
+.teacher-pre-counsel-item__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.teacher-pre-counsel-item__header strong {
+  font-size: var(--font-size-body);
+}
+
+.teacher-pre-counsel-item__meta {
+  margin: var(--space-2) 0 0;
+  font-size: var(--font-size-caption);
+  color: var(--color-neutral-500);
+}
+
+.teacher-pre-counsel-badge {
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 0.2rem 0.625rem;
+  border-radius: 999px;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-label);
+}
+
+.teacher-pre-counsel-badge.is-done {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.teacher-pre-counsel-badge.is-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.teacher-pre-counsel-detail-panel {
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-neutral-200);
+}
+
+.teacher-pre-counsel-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.teacher-pre-counsel-detail-header__title {
+  margin: 0;
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-h3);
+  font-weight: var(--font-weight-h3);
+  color: var(--color-neutral-900);
+}
+
+.teacher-pre-counsel-detail {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.teacher-pre-counsel-block {
+  padding: var(--space-4);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-md);
+  background: var(--color-neutral-50);
+}
+
+.teacher-pre-counsel-block h3 {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-label);
+  color: var(--color-neutral-900);
+}
+
+.teacher-pre-counsel-block p {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-body);
+  line-height: 1.6;
+  color: var(--color-neutral-800);
+  white-space: pre-wrap;
+}
+
+.teacher-pre-counsel-block p:last-child {
+  margin-bottom: 0;
+}
+
+.teacher-pre-counsel-label {
+  display: inline-block;
+  margin-right: var(--space-2);
+  font-weight: var(--font-weight-label);
+  color: var(--color-neutral-600);
+}
+
 .teacher-quick-bar__btn:focus-visible,
 .teacher-filter-chip:focus-visible,
 .teacher-post-item:focus-visible,
+.teacher-pre-counsel-item:focus-visible,
 .teacher-btn:focus-visible {
   outline: 3px solid var(--color-primary-100);
   outline-offset: 2px;
@@ -549,6 +808,10 @@
   }
 
   .teacher-post-item:hover:not(.is-active) {
+    border-color: var(--color-primary-300);
+  }
+
+  .teacher-pre-counsel-item:hover:not(.is-active) {
     border-color: var(--color-primary-300);
   }
 

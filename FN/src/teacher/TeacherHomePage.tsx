@@ -11,6 +11,8 @@ import AppLayout from '../components/layout/AppLayout';
 import { PATHS } from '../routes/paths';
 
 import ComingSoonSection from './components/ComingSoonSection';
+import SectionMoodSummary from './components/SectionMoodSummary';
+import SectionPreCounselRead from './components/SectionPreCounselRead';
 import SectionCounselWorkspace from './components/SectionCounselWorkspace';
 import QuickActionBar from './components/QuickActionBar';
 
@@ -195,27 +197,11 @@ export default function TeacherHomePage() {
           onDataChange={refreshSummary}
         />
 
-        <ComingSoonSection
-          id={TEACHER_SECTIONS.MOOD_SUMMARY}
+        <SectionMoodSummary onError={handleError} />
 
-          helper="담당 학생들의 오늘·주간 마음 날씨를 확인합니다."
-
-        />
-
-
+        <SectionPreCounselRead refreshToken={summaryRefreshKey} onError={handleError} />
 
         <ComingSoonSection
-
-          id={TEACHER_SECTIONS.PRE_COUNSEL_SUMMARY}
-
-          helper="담당 학생이 작성한 사전 상담 카드를 열람합니다."
-
-        />
-
-
-
-        <ComingSoonSection
-
           id={TEACHER_SECTIONS.NOTICE_LIST}
 
           helper="담당 학생에게 공지할 알림을 작성합니다."
