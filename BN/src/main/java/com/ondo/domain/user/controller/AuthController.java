@@ -5,13 +5,17 @@ import com.ondo.domain.user.dto.LoginResponseDTO;
 import com.ondo.domain.user.dto.LogoutRequestDTO;
 import com.ondo.domain.user.dto.MeResponseDTO;
 import com.ondo.domain.user.dto.RefreshTokenRequestDTO;
+import com.ondo.domain.user.dto.SignUpRequestDTO;
+import com.ondo.domain.user.dto.SignUpResponseDTO;
 import com.ondo.domain.user.dto.TokenRefreshResponseDTO;
 import com.ondo.domain.user.service.AuthService;
 import com.ondo.domain.user.service.LogoutService;
+import com.ondo.domain.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +33,14 @@ public class AuthController {
 
     private final AuthService authService;
     private final LogoutService logoutService;
+    private final UserService userService;
+
+    @PostMapping("/signup")
+    public ResponseEntity<SignUpResponseDTO> signUp(@Valid @RequestBody SignUpRequestDTO request) {
+        userService.signUp(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(SignUpResponseDTO.of(request.getUsername(), request.getRole()));
+    }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
