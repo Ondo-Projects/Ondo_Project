@@ -7,6 +7,7 @@ import PageHeader from '../components/PageHeader';
 import { usePageTitle } from '../hooks/usePageTitle';
 import SectionAccessLogs from './components/SectionAccessLogs';
 import SectionActivityLogs from './components/SectionActivityLogs';
+import SectionAnnouncementAdmin from './components/SectionAnnouncementAdmin';
 import SectionDashboard from './components/SectionDashboard';
 import SectionSchoolSearch from './components/SectionSchoolSearch';
 import SectionStatistics from './components/SectionStatistics';
@@ -52,7 +53,7 @@ export default function AdminHomePage() {
           tone="admin"
           eyebrow={`${user.name?.trim() || user.username} · 관리자`}
           title="관리자 콘솔"
-          subtitle="회원·학교 현황과 민감정보 접근 기록을 조회합니다."
+          subtitle="회원·학교 현황, 플랫폼 공지, 민감정보 접근 기록을 관리합니다."
           actions={
             <button
               type="button"
@@ -95,6 +96,11 @@ export default function AdminHomePage() {
           onSuccess={handleSuccess}
           onError={handleError}
           onDataChange={refreshData}
+        />
+        <SectionAnnouncementAdmin
+          refreshToken={refreshToken}
+          onSuccess={handleSuccess}
+          onError={handleError}
         />
       </div>
     </AppLayout>
