@@ -16,11 +16,16 @@ import { scrollToStudentSection } from '../studentUtils';
 import StudentSectionCard from './StudentSectionCard';
 
 interface SectionPreCounselProps {
+  navFocusToken?: number;
   onSuccess: (message: string) => void;
   onError: (message: string) => void;
 }
 
-export default function SectionPreCounsel({ onSuccess, onError }: SectionPreCounselProps) {
+export default function SectionPreCounsel({
+  navFocusToken = 0,
+  onSuccess,
+  onError,
+}: SectionPreCounselProps) {
   const [profileMeta, setProfileMeta] = useState<Pick<
     PreCounselingProfile,
     'studentName' | 'birthDate' | 'completed'
@@ -50,6 +55,21 @@ export default function SectionPreCounsel({ onSuccess, onError }: SectionPreCoun
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (navFocusToken === 0) {
+      return;
+    }
+
+    const sections = document.querySelectorAll<HTMLDetailsElement>(
+      '.student-pre-counsel-form .student-form-section',
+    );
+    const expandAll = window.matchMedia('(min-width: 641px)').matches;
+
+    sections.forEach((section, index) => {
+      section.open = expandAll || index === 0;
+    });
+  }, [navFocusToken]);
 
   function applyProfile(profile: PreCounselingProfile) {
     setProfileMeta({

@@ -55,6 +55,9 @@ export default function StudentHomeBlock({
         <Link className="home-btn home-btn--quick" to={`${PATHS.STUDENT}#section-timetable`}>
           시간표
         </Link>
+        <Link className="home-btn home-btn--quick" to={`${PATHS.STUDENT}#section-suggestion`}>
+          건의
+        </Link>
       </nav>
 
       <div className="home-role-actions">

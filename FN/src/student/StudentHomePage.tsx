@@ -5,7 +5,6 @@ import { useAuth } from '../auth/AuthProvider';
 import AuthLoading from '../auth/AuthLoading';
 import AppLayout from '../components/layout/AppLayout';
 import { PATHS } from '../routes/paths';
-import ComingSoonSection from './components/ComingSoonSection';
 import QuickActionBar from './components/QuickActionBar';
 import SectionAssignment from './components/SectionAssignment';
 import SectionClassProfile from './components/SectionClassProfile';
@@ -15,8 +14,10 @@ import SectionMood from './components/SectionMood';
 import SectionNotice from './components/SectionNotice';
 import SectionPreCounsel from './components/SectionPreCounsel';
 import SectionSchoolCalendar from './components/SectionSchoolCalendar';
+import SectionSuggestion from './components/SectionSuggestion';
 import SectionTimetable from './components/SectionTimetable';
 import SectionToday from './components/SectionToday';
+import SectionTodayTodo from './components/SectionTodayTodo';
 import StudentWorkspaceTabs from './components/StudentWorkspaceTabs';
 import {
   resolveWorkspaceTabForSection,
@@ -27,6 +28,7 @@ import './student.css';
 import { buildMealSchoolHint, scrollToStudentSection } from './studentUtils';
 import { useStudentHashScroll } from './useStudentHashScroll';
 import { useStudentSchoolLife } from './useStudentSchoolLife';
+import { useStudentTodayTodo } from './useStudentTodayTodo';
 
 export default function StudentHomePage() {
   const { user, logout } = useAuth();
@@ -37,23 +39,46 @@ export default function StudentHomePage() {
   } = useStudentSchoolLife(Boolean(user));
   const [workspaceTab, setWorkspaceTab] = useState<StudentWorkspaceTab>('pre-counsel');
   const [counselRefreshKey, setCounselRefreshKey] = useState(0);
+  const [todoRefreshKey, setTodoRefreshKey] = useState(0);
+  const [assignmentOpenRequest, setAssignmentOpenRequest] = useState(0);
+  const [preCounselNavRequest, setPreCounselNavRequest] = useState(0);
   const [pageSuccess, setPageSuccess] = useState<string | null>(null);
   const [sectionError, setSectionError] = useState<string | null>(null);
+
+  const refreshTodo = useCallback(() => {
+    setTodoRefreshKey((key) => key + 1);
+  }, []);
+
+  const { items: todayTodoItems } = useStudentTodayTodo(
+    schoolLife,
+    Boolean(user),
+    todoRefreshKey,
+  );
 
   const navigateToSection = useCallback((sectionId: string) => {
     const tab = resolveWorkspaceTabForSection(sectionId);
     if (tab) {
       setWorkspaceTab(tab);
     }
+    if (sectionId === STUDENT_SECTIONS.ASSIGNMENT) {
+      setAssignmentOpenRequest((value) => value + 1);
+    }
+    if (sectionId === STUDENT_SECTIONS.PRE_COUNSEL) {
+      setPreCounselNavRequest((value) => value + 1);
+    }
     scrollToStudentSection(sectionId);
   }, []);
 
   useStudentHashScroll(navigateToSection);
 
-  const handleSuccess = useCallback((message: string) => {
-    setSectionError(null);
-    setPageSuccess(message);
-  }, []);
+  const handleSuccess = useCallback(
+    (message: string) => {
+      setSectionError(null);
+      setPageSuccess(message);
+      refreshTodo();
+    },
+    [refreshTodo],
+  );
 
   const handleError = useCallback((message: string) => {
     setPageSuccess(null);
@@ -62,22 +87,25 @@ export default function StudentHomePage() {
 
   const handleProfileChanged = useCallback(async () => {
     await reloadTimetable();
-  }, [reloadTimetable]);
+    refreshTodo();
+  }, [reloadTimetable, refreshTodo]);
 
   const handleAssignmentChanged = useCallback(
     async (assignment: StudentAssignment) => {
       await applyAssignment(assignment);
+      refreshTodo();
     },
-    [applyAssignment],
+    [applyAssignment, refreshTodo],
   );
 
   const handleCounselingCreated = useCallback(() => {
     setCounselRefreshKey((key) => key + 1);
+    refreshTodo();
     setWorkspaceTab('counsel-list');
     window.setTimeout(() => {
       scrollToStudentSection(STUDENT_SECTIONS.COUNSEL_LIST);
     }, 0);
-  }, []);
+  }, [refreshTodo]);
 
   const handleWorkspaceTabChange = useCallback((tab: StudentWorkspaceTab) => {
     setWorkspaceTab(tab);
@@ -144,6 +172,7 @@ export default function StudentHomePage() {
 
         <div className="student-hero">
           <QuickActionBar onNavigate={navigateToSection} />
+          <SectionTodayTodo items={todayTodoItems} onNavigate={navigateToSection} />
           <SectionToday
             mealHint={mealHint}
             meals={schoolLife.meals}
@@ -172,6 +201,7 @@ export default function StudentHomePage() {
           />
           <SectionAssignment
             assignment={schoolLife.assignment}
+            openRequest={assignmentOpenRequest}
             onSuccess={handleSuccess}
             onError={handleError}
             onAssignmentChanged={handleAssignmentChanged}
@@ -182,7 +212,11 @@ export default function StudentHomePage() {
           <StudentWorkspaceTabs activeTab={workspaceTab} onChange={handleWorkspaceTabChange} />
 
           <div className={workspaceTab === 'pre-counsel' ? undefined : 'student-tab-hidden'}>
-            <SectionPreCounsel onSuccess={handleSuccess} onError={handleError} />
+            <SectionPreCounsel
+              navFocusToken={preCounselNavRequest}
+              onSuccess={handleSuccess}
+              onError={handleError}
+            />
           </div>
 
           <div className={workspaceTab === 'counsel-create' ? undefined : 'student-tab-hidden'}>
@@ -202,13 +236,9 @@ export default function StudentHomePage() {
               onError={handleError}
             />
           </div>
-
-          <ComingSoonSection
-            id={STUDENT_SECTIONS.SUGGESTION}
-            title="운영 건의"
-            helper="서비스 이용 중 불편한 점을 전달합니다."
-          />
         </div>
+
+        <SectionSuggestion onSuccess={handleSuccess} onError={handleError} />
       </div>
     </AppLayout>
   );

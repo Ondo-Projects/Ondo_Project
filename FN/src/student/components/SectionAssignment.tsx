@@ -11,6 +11,7 @@ import StudentSectionCard from './StudentSectionCard';
 
 interface SectionAssignmentProps {
   assignment: StudentAssignment | null;
+  openRequest?: number;
   onSuccess: (message: string) => void;
   onError: (message: string) => void;
   onAssignmentChanged: (assignment: StudentAssignment) => Promise<void>;
@@ -18,6 +19,7 @@ interface SectionAssignmentProps {
 
 export default function SectionAssignment({
   assignment,
+  openRequest = 0,
   onSuccess,
   onError,
   onAssignmentChanged,
@@ -37,6 +39,12 @@ export default function SectionAssignment({
       setIsOpen(true);
     }
   }, [assignment]);
+
+  useEffect(() => {
+    if (openRequest > 0) {
+      setIsOpen(true);
+    }
+  }, [openRequest]);
 
   async function handleRegister() {
     const normalizedCode = inviteCode.trim();
