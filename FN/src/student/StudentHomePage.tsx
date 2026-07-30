@@ -9,7 +9,9 @@ import ComingSoonSection from './components/ComingSoonSection';
 import QuickActionBar from './components/QuickActionBar';
 import SectionAssignment from './components/SectionAssignment';
 import SectionClassProfile from './components/SectionClassProfile';
+import SectionMood from './components/SectionMood';
 import SectionNotice from './components/SectionNotice';
+import SectionPreCounsel from './components/SectionPreCounsel';
 import SectionSchoolCalendar from './components/SectionSchoolCalendar';
 import SectionTimetable from './components/SectionTimetable';
 import SectionToday from './components/SectionToday';
@@ -113,11 +115,7 @@ export default function StudentHomePage() {
         </div>
 
         <div className="student-daily-grid">
-          <ComingSoonSection
-            id={STUDENT_SECTIONS.MOOD}
-            title="마음 날씨"
-            helper="하루에 한 번, 지금 마음 상태를 기록해 주세요."
-          />
+          <SectionMood onSuccess={handleSuccess} onError={handleError} />
           <SectionNotice
             hasAssignment={schoolLife.hasAssignment}
             notices={schoolLife.notices}
@@ -142,11 +140,7 @@ export default function StudentHomePage() {
         </div>
 
         <div className="student-workspace">
-          <ComingSoonSection
-            id={STUDENT_SECTIONS.PRE_COUNSEL}
-            title="사전 상담 카드"
-            helper="상담 전에 나를 소개하는 카드를 작성합니다."
-          />
+          <SectionPreCounsel onSuccess={handleSuccess} onError={handleError} />
           <ComingSoonSection
             id={STUDENT_SECTIONS.COUNSEL_CREATE}
             title="상담 신청"

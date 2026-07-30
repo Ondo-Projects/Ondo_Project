@@ -6,6 +6,12 @@ import type {
   StudentAssignmentRegisterRequest,
   StudentClassProfile,
   StudentClassProfileUpdateRequest,
+  MoodLevelCode,
+  MoodRecordResponse,
+  MoodTodayResponse,
+  PreCounselingProfile,
+  PreCounselingProfileSaveRequest,
+  PreCounselingProfileSaveResponse,
 } from './types/student';
 
 export {
@@ -57,6 +63,28 @@ export function updateStudentClassProfile(body: StudentClassProfileUpdateRequest
 export function registerStudentAssignment(body: StudentAssignmentRegisterRequest) {
   return apiClient<StudentAssignment>('/api/student/assignment', {
     method: 'POST',
+    body,
+  });
+}
+
+export function getStudentTodayMood() {
+  return apiClient<MoodTodayResponse>('/api/student/mood/today');
+}
+
+export function saveStudentTodayMood(moodLevel: MoodLevelCode) {
+  return apiClient<MoodRecordResponse>('/api/student/mood', {
+    method: 'POST',
+    body: { moodLevel },
+  });
+}
+
+export function getStudentPreCounselingProfile() {
+  return apiClient<PreCounselingProfile>('/api/student/pre-counseling-profile');
+}
+
+export function saveStudentPreCounselingProfile(body: PreCounselingProfileSaveRequest) {
+  return apiClient<PreCounselingProfileSaveResponse>('/api/student/pre-counseling-profile', {
+    method: 'PUT',
     body,
   });
 }

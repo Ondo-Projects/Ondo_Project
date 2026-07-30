@@ -25,3 +25,17 @@ export const STUDENT_QUICK_ACTIONS = [
 
 export const SCHEDULE_SUMMARY_LIMIT = 2;
 export const TIMETABLE_SUMMARY_LIMIT = 3;
+
+export const MOOD_OPTIONS = [
+  { code: 'SUNNY' as const, emoji: '☀️', label: '맑음' },
+  { code: 'FAIR' as const, emoji: '🌤️', label: '보통' },
+  { code: 'CLOUDY' as const, emoji: '☁️', label: '흐림' },
+  { code: 'RAINY' as const, emoji: '🌧️', label: '우울' },
+  { code: 'STORMY' as const, emoji: '⛈️', label: '힘듦' },
+];
+
+export const PRE_COUNSEL_SECTIONS = {
+  BASIC: 'preCounselSection1',
+  SELF: 'preCounselSection2',
+  SCHOOL: 'preCounselSection3',
+} as const;
