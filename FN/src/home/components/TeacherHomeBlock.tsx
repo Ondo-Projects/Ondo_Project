@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { PATHS } from '../../routes/paths';
+import { TEACHER_HOME_QUICK_LINKS } from '../../teacher/constants';
 import type { TeacherSummaryState } from '../useHomeData';
 
 interface TeacherHomeBlockProps {
@@ -9,9 +10,13 @@ interface TeacherHomeBlockProps {
 export default function TeacherHomeBlock({ summary }: TeacherHomeBlockProps) {
   return (
     <section className="home-card home-role-block" aria-labelledby="teacher-home-title">
+      <p className="home-role-block__eyebrow">학교 홈 · 교사</p>
       <h2 id="teacher-home-title" className="home-role-block__title">
         오늘 확인할 것
       </h2>
+      <p className="home-role-block__description">
+        학교 홈에서 보는 요약입니다. 상담·마음·사전카드 전체 기능은 교사 홈에서 이용할 수 있어요.
+      </p>
 
       {summary.error ? (
         <div className="home-status">{summary.error}</div>
@@ -38,15 +43,15 @@ export default function TeacherHomeBlock({ summary }: TeacherHomeBlockProps) {
       )}
 
       <nav className="home-quick-links" aria-label="교사 빠른 이동">
-        <Link className="home-btn home-btn--quick" to={`${PATHS.TEACHER}#postList`}>
-          상담
-        </Link>
-        <Link className="home-btn home-btn--quick" to={`${PATHS.TEACHER}#moodSummaryList`}>
-          마음
-        </Link>
-        <Link className="home-btn home-btn--quick" to={`${PATHS.TEACHER}#preCounselSummaryList`}>
-          사전카드
-        </Link>
+        {TEACHER_HOME_QUICK_LINKS.map((link) => (
+          <Link
+            key={link.target}
+            className="home-btn home-btn--quick"
+            to={`${PATHS.TEACHER}#${link.target}`}
+          >
+            {link.label}
+          </Link>
+        ))}
       </nav>
 
       <div className="home-role-actions">

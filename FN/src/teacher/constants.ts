@@ -21,6 +21,13 @@ export const TEACHER_QUICK_ACTIONS = [
   { label: '건의', target: TEACHER_SECTIONS.SUGGESTION },
 ] as const;
 
+/** BN `home.html` `#teacherQuickLinks` — hash must match `TEACHER_SECTIONS`. */
+export const TEACHER_HOME_QUICK_LINKS = [
+  { label: '상담', target: TEACHER_SECTIONS.POST_LIST },
+  { label: '마음', target: TEACHER_SECTIONS.MOOD_SUMMARY },
+  { label: '사전카드', target: TEACHER_SECTIONS.PRE_COUNSEL_SUMMARY },
+] as const;
+
 export const TEACHER_SECTION_LABELS: Record<string, string> = {
   [TEACHER_SECTIONS.NOTIFICATION_SETTINGS]: '상담 SMS 알림',
   [TEACHER_SECTIONS.TODAY_SUMMARY]: '오늘 확인할 것',

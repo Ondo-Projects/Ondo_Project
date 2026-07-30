@@ -8,6 +8,8 @@ import AuthLoading from '../auth/AuthLoading';
 
 import AppLayout from '../components/layout/AppLayout';
 
+import { usePageTitle } from '../hooks/usePageTitle';
+
 import { PATHS } from '../routes/paths';
 
 import SectionNoticeBoard from './components/SectionNoticeBoard';
@@ -45,7 +47,7 @@ export default function TeacherHomePage() {
 
   const { summary } = useTeacherDashboard(Boolean(user), summaryRefreshKey);
 
-
+  usePageTitle('교사 홈 | 온도');
 
   const refreshSummary = useCallback(() => {
 
@@ -113,7 +115,7 @@ export default function TeacherHomePage() {
 
     <AppLayout>
 
-      <div className="teacher-page">
+      <div className="teacher-page" data-page="teacher-home">
 
         <header className="teacher-header">
 

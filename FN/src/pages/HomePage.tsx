@@ -1,8 +1,9 @@
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import { getPostLoginPath } from '../auth/redirects';
 import AuthLoading from '../auth/AuthLoading';
 import AppLayout from '../components/layout/AppLayout';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { ScheduleSummary, WeatherWidget } from '../home/components/CommonStripWidgets';
 import StudentHomeBlock from '../home/components/StudentHomeBlock';
 import TeacherHomeBlock from '../home/components/TeacherHomeBlock';
@@ -14,6 +15,8 @@ import { PATHS } from '../routes/paths';
 export default function HomePage() {
   const { user, logout } = useAuth();
   const homeData = useHomeData(user);
+
+  usePageTitle('학교 홈 | 온도');
 
   if (!user) {
     return <AuthLoading message="홈을 준비하고 있어요" />;
@@ -28,7 +31,7 @@ export default function HomePage() {
 
   return (
     <AppLayout>
-      <div className="home-page">
+      <div className="home-page" data-page="school-home">
         <header className="home-header">
           <div className="home-header__main">
             <p className="home-greeting">{homeData.isLoading ? '불러오는 중…' : greeting}</p>
@@ -36,6 +39,16 @@ export default function HomePage() {
             <p className="home-subtitle">오늘의 학교 생활을 한곳에서 시작하세요.</p>
           </div>
           <div className="home-header__actions">
+            {user.role === 'TEACHER' ? (
+              <Link className="home-btn home-btn--ghost" to={PATHS.TEACHER}>
+                교사 홈
+              </Link>
+            ) : null}
+            {user.role === 'STUDENT' ? (
+              <Link className="home-btn home-btn--ghost" to={PATHS.STUDENT}>
+                학생 홈
+              </Link>
+            ) : null}
             <button type="button" className="home-btn home-btn--secondary" onClick={handleLogout}>
               로그아웃
             </button>

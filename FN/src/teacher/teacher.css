@@ -510,11 +510,13 @@
   color: var(--color-neutral-800);
 }
 
-#detailCard {
-  scroll-margin-top: var(--space-4);
-}
-
-#preCounselDetailPanel {
+#detailCard,
+#postList,
+#moodSummaryList,
+#preCounselSummaryList,
+#preCounselDetailPanel,
+#noticeList,
+#section-suggestion {
   scroll-margin-top: var(--space-4);
 }
 
@@ -895,14 +897,6 @@
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-label);
   color: var(--color-neutral-900);
-}
-
-#section-suggestion {
-  scroll-margin-top: var(--space-4);
-}
-
-#noticeList {
-  scroll-margin-top: var(--space-4);
 }
 
 .teacher-quick-bar__btn:focus-visible,
