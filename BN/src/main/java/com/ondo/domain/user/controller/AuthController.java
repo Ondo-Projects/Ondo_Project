@@ -1,5 +1,6 @@
 package com.ondo.domain.user.controller;
 
+import com.ondo.domain.user.dto.AccountWithdrawRequestDTO;
 import com.ondo.domain.user.dto.LoginRequestDTO;
 import com.ondo.domain.user.dto.LoginResponseDTO;
 import com.ondo.domain.user.dto.LogoutRequestDTO;
@@ -8,6 +9,7 @@ import com.ondo.domain.user.dto.RefreshTokenRequestDTO;
 import com.ondo.domain.user.dto.SignUpRequestDTO;
 import com.ondo.domain.user.dto.SignUpResponseDTO;
 import com.ondo.domain.user.dto.TokenRefreshResponseDTO;
+import com.ondo.domain.user.service.AccountWithdrawService;
 import com.ondo.domain.user.service.AuthService;
 import com.ondo.domain.user.service.LogoutService;
 import com.ondo.domain.user.service.UserService;
@@ -34,6 +36,7 @@ public class AuthController {
     private final AuthService authService;
     private final LogoutService logoutService;
     private final UserService userService;
+    private final AccountWithdrawService accountWithdrawService;
 
     @PostMapping("/signup")
     public ResponseEntity<SignUpResponseDTO> signUp(@Valid @RequestBody SignUpRequestDTO request) {
@@ -50,6 +53,21 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<MeResponseDTO> me(Authentication authentication) {
         return ResponseEntity.ok(authService.getMe(authentication.getName()));
+    }
+
+    @PostMapping("/me/withdraw")
+    public ResponseEntity<Map<String, String>> withdraw(
+            Authentication authentication,
+            @Valid @RequestBody AccountWithdrawRequestDTO request,
+            HttpServletRequest httpRequest,
+            HttpServletResponse httpResponse
+    ) {
+        return ResponseEntity.ok(accountWithdrawService.withdraw(
+                authentication.getName(),
+                request,
+                httpRequest,
+                httpResponse
+        ));
     }
 
     @PostMapping("/refresh")
