@@ -4,6 +4,7 @@ export const PATHS = {
   JOIN: '/join',
   FIND_ID: '/find-id',
   RESET_PASSWORD: '/reset-password',
+  WITHDRAW: '/withdraw',
   HOME: '/home',
   STUDENT: '/student',
   TEACHER: '/teacher',

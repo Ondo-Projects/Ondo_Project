@@ -150,6 +150,9 @@ export default function StudentHomePage() {
             <Link className="student-btn student-btn--ghost" to={PATHS.HOME}>
               공통 홈
             </Link>
+            <Link className="student-btn student-btn--ghost" to={PATHS.WITHDRAW}>
+              회원 탈퇴
+            </Link>
             <button type="button" className="student-btn student-btn--secondary" onClick={() => logout()}>
               로그아웃
             </button>

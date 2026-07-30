@@ -144,6 +144,12 @@ export default function TeacherHomePage() {
 
             </Link>
 
+            <Link className="teacher-btn teacher-btn--ghost" to={PATHS.WITHDRAW}>
+
+              회원 탈퇴
+
+            </Link>
+
             <button type="button" className="teacher-btn teacher-btn--secondary" onClick={() => logout()}>
 
               로그아웃
