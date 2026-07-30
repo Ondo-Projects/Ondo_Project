@@ -1,4 +1,5 @@
 import { useJoinForm } from '../JoinFormProvider';
+import JoinCheckboxField from './JoinCheckboxField';
 import JoinSection from './JoinSection';
 
 const STUDENT_TERMS = [
@@ -59,8 +60,7 @@ export default function TermsSection() {
   const { state, fieldErrors, computed, actions } = useJoinForm();
   const isTeacher = state.role === 'TEACHER';
   const terms = isTeacher ? TEACHER_TERMS : STUDENT_TERMS;
-  const sectionNumber =
-    isTeacher ? '6' : computed.canShowGuardianSection ? '7' : '6';
+  const sectionNumber = isTeacher ? '6' : computed.canShowGuardianSection ? '7' : '6';
 
   const setters = {
     agreeService: actions.setAgreeService,
@@ -77,24 +77,13 @@ export default function TermsSection() {
             <div className="join-terms-item__body">{term.body}</div>
           </details>
 
-          <label className="join-checkbox-row">
-            <input
-              id={term.errorKey}
-              type="checkbox"
-              checked={state[term.checkedKey]}
-              onChange={(event) => setters[term.checkedKey](event.target.checked)}
-            />
-            <span>{term.label}</span>
-          </label>
-
-          {fieldErrors[term.errorKey] ? (
-            <p className="join-field__error" role="alert">
-              <span className="join-field__error-icon" aria-hidden="true">
-                !
-              </span>
-              <span>{fieldErrors[term.errorKey]}</span>
-            </p>
-          ) : null}
+          <JoinCheckboxField
+            id={term.errorKey}
+            label={term.label}
+            checked={state[term.checkedKey]}
+            error={fieldErrors[term.errorKey]}
+            onChange={setters[term.checkedKey]}
+          />
         </div>
       ))}
     </JoinSection>
