@@ -10,7 +10,8 @@ import AppLayout from '../components/layout/AppLayout';
 
 import { PATHS } from '../routes/paths';
 
-import ComingSoonSection from './components/ComingSoonSection';
+import SectionNoticeBoard from './components/SectionNoticeBoard';
+import SectionSuggestion from './components/SectionSuggestion';
 import SectionMoodSummary from './components/SectionMoodSummary';
 import SectionPreCounselRead from './components/SectionPreCounselRead';
 import SectionCounselWorkspace from './components/SectionCounselWorkspace';
@@ -21,8 +22,6 @@ import SectionInviteCode from './components/SectionInviteCode';
 import SectionNotificationSettings from './components/SectionNotificationSettings';
 
 import SectionTodaySummary from './components/SectionTodaySummary';
-
-import { TEACHER_SECTIONS } from './constants';
 
 import './teacher.css';
 
@@ -201,21 +200,12 @@ export default function TeacherHomePage() {
 
         <SectionPreCounselRead refreshToken={summaryRefreshKey} onError={handleError} />
 
-        <ComingSoonSection
-          id={TEACHER_SECTIONS.NOTICE_LIST}
+        <SectionNoticeBoard onSuccess={handleSuccess} onError={handleError} />
 
-          helper="담당 학생에게 공지할 알림을 작성합니다."
-
-        />
-
-
-
-        <ComingSoonSection
-
-          id={TEACHER_SECTIONS.SUGGESTION}
-
-          helper="서비스 버그·기능 개선·운영 문의를 운영팀에 남깁니다."
-
+        <SectionSuggestion
+          refreshToken={summaryRefreshKey}
+          onSuccess={handleSuccess}
+          onError={handleError}
         />
 
       </div>

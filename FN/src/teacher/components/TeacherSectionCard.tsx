@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 interface TeacherSectionCardProps {
-  id: string;
+  id?: string;
   title: string;
   helper?: string;
   children: ReactNode;
@@ -19,9 +19,9 @@ export default function TeacherSectionCard({
     <section
       id={id}
       className={`teacher-card${compact ? ' teacher-card--compact' : ''}`}
-      aria-labelledby={`${id}-title`}
+      aria-labelledby={id ? `${id}-title` : undefined}
     >
-      <h2 id={`${id}-title`} className="teacher-card__title">
+      <h2 id={id ? `${id}-title` : undefined} className="teacher-card__title">
         {title}
       </h2>
       {helper ? <p className="teacher-card__helper">{helper}</p> : null}
