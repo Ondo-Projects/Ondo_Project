@@ -9,6 +9,7 @@ export const STUDENT_SECTIONS = {
   PRE_COUNSEL: 'section-pre-counsel',
   COUNSEL_CREATE: 'section-counsel-create',
   COUNSEL_LIST: 'section-counsel-list',
+  COUNSEL_DETAIL: 'section-counsel-detail',
   SUGGESTION: 'section-suggestion',
 } as const;
 

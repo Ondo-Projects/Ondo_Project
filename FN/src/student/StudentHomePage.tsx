@@ -9,15 +9,22 @@ import ComingSoonSection from './components/ComingSoonSection';
 import QuickActionBar from './components/QuickActionBar';
 import SectionAssignment from './components/SectionAssignment';
 import SectionClassProfile from './components/SectionClassProfile';
+import SectionCounselCreate from './components/SectionCounselCreate';
+import SectionCounselList from './components/SectionCounselList';
 import SectionMood from './components/SectionMood';
 import SectionNotice from './components/SectionNotice';
 import SectionPreCounsel from './components/SectionPreCounsel';
 import SectionSchoolCalendar from './components/SectionSchoolCalendar';
 import SectionTimetable from './components/SectionTimetable';
 import SectionToday from './components/SectionToday';
+import StudentWorkspaceTabs from './components/StudentWorkspaceTabs';
+import {
+  resolveWorkspaceTabForSection,
+  type StudentWorkspaceTab,
+} from './counselingLabels';
 import { STUDENT_SECTIONS } from './constants';
 import './student.css';
-import { buildMealSchoolHint } from './studentUtils';
+import { buildMealSchoolHint, scrollToStudentSection } from './studentUtils';
 import { useStudentHashScroll } from './useStudentHashScroll';
 import { useStudentSchoolLife } from './useStudentSchoolLife';
 
@@ -28,9 +35,20 @@ export default function StudentHomePage() {
     applyAssignment,
     ...schoolLife
   } = useStudentSchoolLife(Boolean(user));
-  useStudentHashScroll();
+  const [workspaceTab, setWorkspaceTab] = useState<StudentWorkspaceTab>('pre-counsel');
+  const [counselRefreshKey, setCounselRefreshKey] = useState(0);
   const [pageSuccess, setPageSuccess] = useState<string | null>(null);
   const [sectionError, setSectionError] = useState<string | null>(null);
+
+  const navigateToSection = useCallback((sectionId: string) => {
+    const tab = resolveWorkspaceTabForSection(sectionId);
+    if (tab) {
+      setWorkspaceTab(tab);
+    }
+    scrollToStudentSection(sectionId);
+  }, []);
+
+  useStudentHashScroll(navigateToSection);
 
   const handleSuccess = useCallback((message: string) => {
     setSectionError(null);
@@ -52,6 +70,27 @@ export default function StudentHomePage() {
     },
     [applyAssignment],
   );
+
+  const handleCounselingCreated = useCallback(() => {
+    setCounselRefreshKey((key) => key + 1);
+    setWorkspaceTab('counsel-list');
+    window.setTimeout(() => {
+      scrollToStudentSection(STUDENT_SECTIONS.COUNSEL_LIST);
+    }, 0);
+  }, []);
+
+  const handleWorkspaceTabChange = useCallback((tab: StudentWorkspaceTab) => {
+    setWorkspaceTab(tab);
+    const sectionId =
+      tab === 'pre-counsel'
+        ? STUDENT_SECTIONS.PRE_COUNSEL
+        : tab === 'counsel-create'
+          ? STUDENT_SECTIONS.COUNSEL_CREATE
+          : STUDENT_SECTIONS.COUNSEL_LIST;
+    window.setTimeout(() => {
+      scrollToStudentSection(sectionId);
+    }, 0);
+  }, []);
 
   if (!user) {
     return <AuthLoading message="학생 홈을 준비하고 있어요" />;
@@ -104,7 +143,7 @@ export default function StudentHomePage() {
         ) : null}
 
         <div className="student-hero">
-          <QuickActionBar />
+          <QuickActionBar onNavigate={navigateToSection} />
           <SectionToday
             mealHint={mealHint}
             meals={schoolLife.meals}
@@ -140,17 +179,30 @@ export default function StudentHomePage() {
         </div>
 
         <div className="student-workspace">
-          <SectionPreCounsel onSuccess={handleSuccess} onError={handleError} />
-          <ComingSoonSection
-            id={STUDENT_SECTIONS.COUNSEL_CREATE}
-            title="상담 신청"
-            helper="담당 교사에게 상담을 요청합니다."
-          />
-          <ComingSoonSection
-            id={STUDENT_SECTIONS.COUNSEL_LIST}
-            title="내 상담"
-            helper="작성한 상담 신청을 확인합니다."
-          />
+          <StudentWorkspaceTabs activeTab={workspaceTab} onChange={handleWorkspaceTabChange} />
+
+          <div className={workspaceTab === 'pre-counsel' ? undefined : 'student-tab-hidden'}>
+            <SectionPreCounsel onSuccess={handleSuccess} onError={handleError} />
+          </div>
+
+          <div className={workspaceTab === 'counsel-create' ? undefined : 'student-tab-hidden'}>
+            <SectionCounselCreate
+              hasAssignment={schoolLife.hasAssignment}
+              onSuccess={handleSuccess}
+              onError={handleError}
+              onCreated={handleCounselingCreated}
+            />
+          </div>
+
+          <div className={workspaceTab === 'counsel-list' ? undefined : 'student-tab-hidden'}>
+            <SectionCounselList
+              isActive={workspaceTab === 'counsel-list'}
+              refreshToken={counselRefreshKey}
+              onSuccess={handleSuccess}
+              onError={handleError}
+            />
+          </div>
+
           <ComingSoonSection
             id={STUDENT_SECTIONS.SUGGESTION}
             title="운영 건의"

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { scrollToStudentSection } from './studentUtils';
 
-export function useStudentHashScroll() {
+export function useStudentHashScroll(onNavigateSection?: (sectionId: string) => void) {
   const location = useLocation();
 
   useEffect(() => {
@@ -12,9 +12,10 @@ export function useStudentHashScroll() {
     }
 
     const timer = window.setTimeout(() => {
+      onNavigateSection?.(sectionId);
       scrollToStudentSection(sectionId);
     }, 120);
 
     return () => window.clearTimeout(timer);
-  }, [location.hash, location.pathname]);
+  }, [location.hash, location.pathname, onNavigateSection]);
 }
