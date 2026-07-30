@@ -124,6 +124,12 @@ export default function LoginPage() {
           </form>
 
           <div className="auth-footer">
+            <Link className="auth-footer__link" to={PATHS.FIND_ID}>
+              아이디 찾기
+            </Link>
+            <Link className="auth-footer__link" to={PATHS.RESET_PASSWORD}>
+              비밀번호 재설정
+            </Link>
             <Link className="auth-footer__link" to={PATHS.JOIN}>
               회원가입
             </Link>

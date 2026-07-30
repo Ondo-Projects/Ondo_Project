@@ -2,10 +2,12 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import GuestRoute from '../auth/GuestRoute';
 import RequireAuth from '../auth/RequireAuth';
 import AdminPage from '../pages/AdminPage';
+import FindIdPage from '../pages/FindIdPage';
 import HomePage, { RootRedirect } from '../pages/HomePage';
 import JoinPage from '../pages/JoinPage';
 import LoginPage from '../pages/LoginPage';
 import NotFoundPage from '../pages/NotFoundPage';
+import ResetPasswordPage from '../pages/ResetPasswordPage';
 import RootPage from '../pages/RootPage';
 import StudentPage from '../pages/StudentPage';
 import TeacherPage from '../pages/TeacherPage';
@@ -30,6 +32,22 @@ export default function AppRoutes() {
           element={
             <GuestRoute>
               <JoinPage />
+            </GuestRoute>
+          }
+        />
+        <Route
+          path={PATHS.FIND_ID}
+          element={
+            <GuestRoute>
+              <FindIdPage />
+            </GuestRoute>
+          }
+        />
+        <Route
+          path={PATHS.RESET_PASSWORD}
+          element={
+            <GuestRoute>
+              <ResetPasswordPage />
             </GuestRoute>
           }
         />

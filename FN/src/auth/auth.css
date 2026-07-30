@@ -153,6 +153,103 @@
   text-decoration: none;
 }
 
+.auth-inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.auth-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--btn-min-height-student);
+  padding: var(--btn-padding-y) var(--btn-padding-x);
+  border-radius: var(--btn-radius);
+  border: none;
+  font-size: var(--btn-font-size);
+  font-weight: var(--btn-font-weight);
+  cursor: pointer;
+}
+
+.auth-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.auth-btn--secondary {
+  background: var(--color-neutral-100);
+  color: var(--color-neutral-800);
+  border: 1px solid var(--color-neutral-200);
+}
+
+.auth-btn:focus-visible {
+  outline: 3px solid var(--color-primary-100);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .auth-btn--secondary:hover:not(:disabled) {
+    background: var(--color-neutral-200);
+  }
+}
+
+.auth-result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-neutral-50);
+}
+
+.auth-result__label {
+  margin: 0;
+  font-size: var(--font-size-caption);
+  color: var(--color-neutral-600);
+}
+
+.auth-result__value {
+  margin: 0;
+  font-size: var(--font-size-h2);
+  line-height: var(--line-height-h2);
+  font-weight: var(--font-weight-h2);
+  color: var(--color-neutral-900);
+  word-break: break-all;
+}
+
+.auth-result__link {
+  margin-top: var(--space-2);
+  text-decoration: none;
+}
+
+.auth-password-rules {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-caption);
+  color: var(--color-neutral-600);
+}
+
+.auth-password-rules li {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.auth-password-rules li.is-valid {
+  color: var(--color-success);
+}
+
+.auth-password-rules__marker {
+  flex-shrink: 0;
+  width: 1rem;
+  text-align: center;
+}
+
 @media (hover: hover) {
   .auth-footer__link:hover {
     text-decoration: underline;
