@@ -1,9 +1,11 @@
 import { GUARDIAN_RELATION_OPTIONS } from '../constants';
+import { GUARDIAN_CONSENT_TERM } from '../terms/content';
 import { useJoinForm } from '../JoinFormProvider';
 import GuardianSmsVerification from './GuardianSmsVerification';
 import JoinCheckboxField from './JoinCheckboxField';
 import JoinField from './JoinField';
 import JoinSection from './JoinSection';
+import TermsTextbox from './TermsTextbox';
 
 export default function GuardianSection() {
   const { state, fieldErrors, computed, actions } = useJoinForm();
@@ -58,15 +60,7 @@ export default function GuardianSection() {
         </select>
       </JoinField>
 
-      <div className="join-terms-item">
-        <details>
-          <summary>법정대리인 동의 안내</summary>
-          <div className="join-terms-item__body">
-            만 14세 미만 학생의 개인정보·민감정보(상담 내용) 수집·이용 및 법정대리인 본인 확인을
-            위해 보호자 SMS 인증과 필수 약관 동의가 필요합니다.
-          </div>
-        </details>
-      </div>
+      <TermsTextbox id="guardian-consent" label={GUARDIAN_CONSENT_TERM.label} text={GUARDIAN_CONSENT_TERM.text} />
 
       <JoinCheckboxField
         id="agreeGuardianChildPrivacy"

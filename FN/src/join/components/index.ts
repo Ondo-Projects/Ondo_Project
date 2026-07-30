@@ -12,7 +12,8 @@ export { default as SchoolSearchSection } from './SchoolSearchSection';
 export { default as StudentInfoSection } from './StudentInfoSection';
 export { default as TeacherEmailSection } from './TeacherEmailSection';
 export { default as TermsSection } from './TermsSection';
-export { default as VerificationFeedback } from './VerificationFeedback';
+export { default as TermsTextbox } from './TermsTextbox';
+export { STUDENT_TERMS, TEACHER_TERMS, GUARDIAN_CONSENT_TERM } from '../terms/content';
 
 /** 이슈 #17-4 명칭 alias */
 export { default as RoleSelector } from './RoleSection';
