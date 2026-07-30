@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react';
 import { useAuth } from '../auth/AuthProvider';
 import AuthLoading from '../auth/AuthLoading';
 import AppLayout from '../components/layout/AppLayout';
-import BrandMark from '../components/BrandMark';
+import PageHeader from '../components/PageHeader';
 import { usePageTitle } from '../hooks/usePageTitle';
 import SectionAccessLogs from './components/SectionAccessLogs';
 import SectionActivityLogs from './components/SectionActivityLogs';
@@ -48,18 +48,21 @@ export default function AdminHomePage() {
   return (
     <AppLayout>
       <div className="admin-page" data-page="admin-home">
-        <header className="admin-header">
-          <BrandMark />
-          <div className="admin-header__main">
-            <h1 className="admin-title">관리자 콘솔</h1>
-            <p className="admin-subtitle">회원·학교 현황과 민감정보 접근 기록을 조회합니다.</p>
-          </div>
-          <div className="admin-header__actions">
-            <button type="button" className="admin-btn admin-btn--secondary" onClick={() => logout()}>
+        <PageHeader
+          tone="admin"
+          eyebrow={`${user.name?.trim() || user.username} · 관리자`}
+          title="관리자 콘솔"
+          subtitle="회원·학교 현황과 민감정보 접근 기록을 조회합니다."
+          actions={
+            <button
+              type="button"
+              className="page-header-action page-header-action--secondary"
+              onClick={() => logout()}
+            >
               로그아웃
             </button>
-          </div>
-        </header>
+          }
+        />
 
         {sectionError ? (
           <p className="admin-message admin-message--error" role="alert">

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { sendFindIdCode, verifyFindIdCode } from '../api/recovery.api';
 import { mapVerificationError } from '../join/joinErrors';
 import AppLayout from '../components/layout/AppLayout';
-import BrandMark from '../components/BrandMark';
+import AuthPageShell from '../components/AuthPageShell';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { PATHS } from '../routes/paths';
 import '../auth/auth.css';
@@ -111,14 +111,11 @@ export default function FindIdPage() {
 
   return (
     <AppLayout>
-      <div className="auth-shell">
-        <BrandMark size="auth" />
+      <AuthPageShell
+        title="아이디 찾기"
+        subtitle="가입 시 등록한 성명, 이메일, 생년월일로 본인 확인 후 아이디를 확인할 수 있어요."
+      >
         <div className="auth-card">
-          <h1 className="auth-card__title">아이디 찾기</h1>
-          <p className="auth-card__subtitle">
-            가입 시 등록한 성명, 이메일, 생년월일로 본인 확인 후 아이디를 확인할 수 있어요.
-          </p>
-
           {statusMessage ? (
             <p className="auth-message auth-message--success" role="status">
               <span className="auth-message__icon" aria-hidden="true">
@@ -241,7 +238,7 @@ export default function FindIdPage() {
             </Link>
           </div>
         </div>
-      </div>
+      </AuthPageShell>
     </AppLayout>
   );
 }

@@ -26,6 +26,17 @@
   max-width: 16rem;
 }
 
+.brand-mark-wrap--compact {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+}
+
+.brand-mark-wrap--compact .brand-mark {
+  height: 4.5rem;
+  max-width: 8rem;
+}
+
 @media (max-width: 640px) {
   .brand-mark-wrap {
     align-self: flex-start;
@@ -44,5 +55,10 @@
   .brand-mark-wrap--auth .brand-mark {
     height: 7.5rem;
     max-width: 13.5rem;
+  }
+
+  .brand-mark-wrap--compact .brand-mark {
+    height: 3.75rem;
+    max-width: 6.75rem;
   }
 }

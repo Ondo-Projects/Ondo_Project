@@ -1,8 +1,9 @@
 .teacher-page {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-6);
   min-width: 0;
+  padding-bottom: var(--space-6);
 }
 
 .teacher-header {
@@ -57,16 +58,19 @@
   border-radius: var(--radius-md);
   font-size: var(--font-size-body);
   line-height: var(--line-height-body);
+  border-left: 3px solid transparent;
 }
 
 .teacher-message--error {
   background: var(--color-error-bg);
   color: var(--color-error);
+  border-left-color: var(--color-error);
 }
 
 .teacher-message--success {
   background: var(--color-success-bg, #ecfdf5);
   color: var(--color-success, #047857);
+  border-left-color: var(--color-success, #047857);
 }
 
 .teacher-form-actions {

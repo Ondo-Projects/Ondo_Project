@@ -4,7 +4,7 @@ import { resetPassword, sendPasswordResetCode } from '../api/recovery.api';
 import { mapVerificationError } from '../join/joinErrors';
 import { validatePassword } from '../join/joinValidation';
 import AppLayout from '../components/layout/AppLayout';
-import BrandMark from '../components/BrandMark';
+import AuthPageShell from '../components/AuthPageShell';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { PATHS } from '../routes/paths';
 import '../auth/auth.css';
@@ -163,14 +163,11 @@ export default function ResetPasswordPage() {
 
   return (
     <AppLayout>
-      <div className="auth-shell">
-        <BrandMark size="auth" />
+      <AuthPageShell
+        title="비밀번호 재설정"
+        subtitle="가입 시 등록한 아이디와 이메일로 본인 확인 후 새 비밀번호를 설정할 수 있어요."
+      >
         <div className="auth-card">
-          <h1 className="auth-card__title">비밀번호 재설정</h1>
-          <p className="auth-card__subtitle">
-            가입 시 등록한 아이디와 이메일로 본인 확인 후 새 비밀번호를 설정할 수 있어요.
-          </p>
-
           {statusMessage ? (
             <p className="auth-message auth-message--success" role="status">
               <span className="auth-message__icon" aria-hidden="true">
@@ -317,7 +314,7 @@ export default function ResetPasswordPage() {
             </Link>
           </div>
         </div>
-      </div>
+      </AuthPageShell>
     </AppLayout>
   );
 }

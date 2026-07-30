@@ -7,6 +7,7 @@ import { useAuth } from '../auth/AuthProvider';
 import AuthLoading from '../auth/AuthLoading';
 import { getSignupSuccessMessage } from '../auth/loginNavigation';
 import AppLayout from '../components/layout/AppLayout';
+import PageHeader from '../components/PageHeader';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { PATHS } from '../routes/paths';
 import { getWithdrawReasonOptions } from '../withdraw/withdrawReasons';
@@ -105,19 +106,8 @@ export default function WithdrawPage() {
   return (
     <AppLayout>
       <div className="auth-shell auth-shell--wide">
+        <PageHeader variant="toolbar" title="회원 탈퇴" onBack={handleBack} />
         <div className="auth-card auth-card--withdraw">
-          <div className="auth-withdraw-top">
-            <button
-              type="button"
-              className="auth-withdraw-back"
-              onClick={handleBack}
-              disabled={isSubmitting}
-            >
-              ← 뒤로가기
-            </button>
-            <h1 className="auth-card__title auth-card__title--center">회원 탈퇴</h1>
-          </div>
-
           <section className="auth-withdraw-intro" aria-labelledby="withdraw-intro-title">
             <h2 id="withdraw-intro-title" className="auth-withdraw-intro__title">
               {greetingName}님, 정말 떠나시겠어요?
