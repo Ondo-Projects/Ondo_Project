@@ -7,6 +7,7 @@ import { useAuth } from '../auth/AuthProvider';
 import AuthLoading from '../auth/AuthLoading';
 
 import AppLayout from '../components/layout/AppLayout';
+import BrandMark from '../components/BrandMark';
 
 import { usePageTitle } from '../hooks/usePageTitle';
 
@@ -118,6 +119,8 @@ export default function TeacherHomePage() {
       <div className="teacher-page" data-page="teacher-home">
 
         <header className="teacher-header">
+
+          <BrandMark />
 
           <div className="teacher-header__main">
 

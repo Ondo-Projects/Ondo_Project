@@ -4,6 +4,7 @@ import type { StudentAssignment } from '../api/types/student';
 import { useAuth } from '../auth/AuthProvider';
 import AuthLoading from '../auth/AuthLoading';
 import AppLayout from '../components/layout/AppLayout';
+import BrandMark from '../components/BrandMark';
 import { PATHS } from '../routes/paths';
 import QuickActionBar from './components/QuickActionBar';
 import SectionAssignment from './components/SectionAssignment';
@@ -135,6 +136,7 @@ export default function StudentHomePage() {
     <AppLayout>
       <div className="student-page">
         <header className="student-header">
+          <BrandMark />
           <div className="student-header__main">
             <p className="student-greeting">
               {schoolLife.isLoading ? '불러오는 중…' : `${greetingName} · ${schoolLabel}`}
