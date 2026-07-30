@@ -50,10 +50,17 @@ FN/
 
 | Issue | 내용 |
 |-------|------|
-| #17-2 | 로그인, JWT, AuthProvider, 역할 라우팅 |
+| ~~#17-2~~ | ~~로그인, JWT, AuthProvider, 역할 라우팅~~ ✅ |
 | #17-3 | BN 가입 REST API |
 | #17-4 | React 회원가입 UI |
 | #17-5~6 | 학생·교사 화면 이전 |
+
+## 인증 (#17-2)
+
+- `AuthProvider` + `useAuth()` — 세션 복구 (`/api/auth/me`), 로그인·로그아웃
+- `RequireAuth` / `GuestRoute` — 역할별 보호 라우트
+- 401 시 `/api/auth/refresh` 자동 재시도 (`api/client.ts`)
+- 로그인 후 리다이렉트: STUDENT/TEACHER → `/home`, ADMIN → `/admin` (Thymeleaf와 동일)
 
 ## 배포 (예정)
 
