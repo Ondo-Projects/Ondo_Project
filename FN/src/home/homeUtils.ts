@@ -21,6 +21,13 @@ export function formatTodayDate(): string {
   return new Intl.DateTimeFormat('ko-KR', { dateStyle: 'full' }).format(new Date());
 }
 
+export function formatDateTime(value: string | null | undefined): string {
+  if (!value) {
+    return '-';
+  }
+  return value.replace('T', ' ').slice(0, 16);
+}
+
 export function formatScheduleDate(value: string | null | undefined): string {
   if (!value) {
     return '-';

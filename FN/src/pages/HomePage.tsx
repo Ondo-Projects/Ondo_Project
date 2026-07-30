@@ -6,6 +6,7 @@ import AppLayout from '../components/layout/AppLayout';
 import PageHeader from '../components/PageHeader';
 import { usePageTitle } from '../hooks/usePageTitle';
 import SchoolTodayStrip from '../home/components/SchoolTodayStrip';
+import PlatformAnnouncementStrip from '../home/components/PlatformAnnouncementStrip';
 import StudentHomeBlock from '../home/components/StudentHomeBlock';
 import TeacherHomeBlock from '../home/components/TeacherHomeBlock';
 import '../home/home.css';
@@ -72,6 +73,12 @@ export default function HomePage() {
             {homeData.schoolProfileError}
           </p>
         ) : null}
+
+        <PlatformAnnouncementStrip
+          isLoading={homeData.isLoading}
+          announcements={homeData.announcements}
+          error={homeData.announcementsError}
+        />
 
         <SchoolTodayStrip
           todayLabel={formatTodayDate()}

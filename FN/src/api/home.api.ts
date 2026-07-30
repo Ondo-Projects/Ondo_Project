@@ -1,4 +1,5 @@
 import { apiClient } from './client';
+import type { Announcement } from './types/announcement';
 import type {
   CounselingPostSummary,
   MealDayResponse,
@@ -13,6 +14,10 @@ import type { UserRole } from './types/auth';
 
 export function getTodayWeather() {
   return apiClient<WeatherTodayResponse>('/api/common/weather/today');
+}
+
+export function getCommonAnnouncements() {
+  return apiClient<Announcement[]>('/api/common/announcements');
 }
 
 export function getUpcomingSchoolSchedule(days = 14) {
