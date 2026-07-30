@@ -1,5 +1,6 @@
 package com.ondo.domain.user.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ondo.domain.user.entity.GuardianRelation;
 import com.ondo.domain.user.entity.Role;
 import jakarta.validation.constraints.AssertTrue;
@@ -31,6 +32,7 @@ public class SignUpRequestDTO {
 
     @Past(message = "올바른 생년월일을 입력해 주세요.")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
 
     @NotBlank
