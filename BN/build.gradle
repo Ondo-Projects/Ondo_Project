@@ -56,9 +56,13 @@ dependencies {
 	// Solapi SMS
 	implementation 'com.solapi:sdk:1.0.3'
 
+	implementation "org.springframework.boot:spring-boot-starter-mail:3.5.4"
+
+
 
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
+

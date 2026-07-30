@@ -1,0 +1,93 @@
+.placeholder-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.placeholder-page__eyebrow {
+  margin: 0;
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+  color: var(--color-neutral-400);
+}
+
+.placeholder-page__title {
+  margin: 0;
+  font-size: var(--font-size-h1);
+  line-height: var(--line-height-h1);
+  font-weight: var(--font-weight-h1);
+  color: var(--color-neutral-900);
+}
+
+.placeholder-page__description {
+  margin: 0;
+  font-size: var(--font-size-body-lg);
+  line-height: var(--line-height-body-lg);
+  color: var(--color-neutral-600);
+}
+
+.placeholder-page__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.placeholder-page__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--btn-min-height);
+  padding: var(--btn-padding-y) var(--btn-padding-x);
+  border-radius: var(--btn-radius);
+  background: var(--color-primary-600);
+  color: #ffffff;
+  font-size: var(--btn-font-size);
+  font-weight: var(--btn-font-weight);
+  text-decoration: none;
+}
+
+.placeholder-page__link--ghost {
+  background: transparent;
+  color: var(--color-primary-600);
+  border: 1.5px solid var(--color-neutral-200);
+}
+
+@media (hover: hover) {
+  .placeholder-page__link:hover {
+    background: var(--color-primary-700);
+    color: #ffffff;
+  }
+
+  .placeholder-page__link--ghost:hover {
+    background: var(--color-primary-50);
+    color: var(--color-primary-700);
+  }
+}
+
+.placeholder-page__status {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-info-bg);
+  color: var(--color-info);
+  font-size: var(--font-size-caption);
+}
+
+.placeholder-page__status--error {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+}
+
+.placeholder-page__tiles {
+  display: grid;
+  gap: var(--bento-gap-mobile);
+  margin-top: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .placeholder-page__tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--bento-gap-desktop);
+  }
+}
