@@ -7,6 +7,7 @@ import { usePageTitle } from '../hooks/usePageTitle';
 import { ScheduleSummary, WeatherWidget } from '../home/components/CommonStripWidgets';
 import StudentHomeBlock from '../home/components/StudentHomeBlock';
 import TeacherHomeBlock from '../home/components/TeacherHomeBlock';
+import BrandMark from '../components/BrandMark';
 import '../home/home.css';
 import { buildSchoolMeta, buildUserGreeting, formatTodayDate } from '../home/homeUtils';
 import { useHomeData } from '../home/useHomeData';
@@ -33,25 +34,26 @@ export default function HomePage() {
     <AppLayout>
       <div className="home-page" data-page="school-home">
         <header className="home-header">
+          <BrandMark />
           <div className="home-header__main">
             <p className="home-greeting">{homeData.isLoading ? '불러오는 중…' : greeting}</p>
             <h1 className="home-title">학교 홈</h1>
             <p className="home-subtitle">오늘의 학교 생활을 한곳에서 시작하세요.</p>
           </div>
           <div className="home-header__actions">
-            {user.role === 'TEACHER' ? (
-              <Link className="home-btn home-btn--ghost" to={PATHS.TEACHER}>
-                교사 홈
-              </Link>
-            ) : null}
-            {user.role === 'STUDENT' ? (
-              <Link className="home-btn home-btn--ghost" to={PATHS.STUDENT}>
-                학생 홈
-              </Link>
-            ) : null}
-            <button type="button" className="home-btn home-btn--secondary" onClick={handleLogout}>
-              로그아웃
-            </button>
+              {user.role === 'TEACHER' ? (
+                <Link className="home-btn home-btn--ghost" to={PATHS.TEACHER}>
+                  교사 홈
+                </Link>
+              ) : null}
+              {user.role === 'STUDENT' ? (
+                <Link className="home-btn home-btn--ghost" to={PATHS.STUDENT}>
+                  학생 홈
+                </Link>
+              ) : null}
+              <button type="button" className="home-btn home-btn--secondary" onClick={handleLogout}>
+                로그아웃
+              </button>
           </div>
         </header>
 
