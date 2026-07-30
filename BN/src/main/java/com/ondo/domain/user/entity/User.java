@@ -53,6 +53,12 @@ public class User {
     @Column(length = 20)
     private String guardianPhone;
 
+    @Column(length = 20)
+    private String phone;
+
+    @Column(nullable = false, columnDefinition = "bit(1) not null default b'0'")
+    private boolean smsNotifyEnabled = false;
+
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private GuardianRelation guardianRelation;
@@ -101,6 +107,8 @@ public class User {
             String email,
             String guardianName,
             String guardianPhone,
+            String phone,
+            Boolean smsNotifyEnabled,
             GuardianRelation guardianRelation,
             boolean agreeGuardianChildPrivacy,
             boolean agreeGuardianChildSensitive,
@@ -123,6 +131,8 @@ public class User {
         this.email = email;
         this.guardianName = guardianName;
         this.guardianPhone = guardianPhone;
+        this.phone = phone;
+        this.smsNotifyEnabled = smsNotifyEnabled != null && smsNotifyEnabled;
         this.guardianRelation = guardianRelation;
         this.agreeGuardianChildPrivacy = agreeGuardianChildPrivacy;
         this.agreeGuardianChildSensitive = agreeGuardianChildSensitive;
@@ -151,5 +161,10 @@ public class User {
     public void updateClassProfile(Integer grade, Integer classNumber) {
         this.grade = grade;
         this.classNumber = classNumber;
+    }
+
+    public void updateNotificationSettings(String phone, boolean smsNotifyEnabled) {
+        this.phone = phone;
+        this.smsNotifyEnabled = smsNotifyEnabled;
     }
 }
