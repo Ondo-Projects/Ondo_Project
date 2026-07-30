@@ -1,9 +1,26 @@
+import type { AnnouncementAudience } from '../api/types/announcement';
 import type { UserRole } from '../api/types/auth';
 import type { SuggestionCategory, SuggestionStatus } from '../api/types/suggestion';
 
 export const ADMIN_SECTIONS = {
+  ANNOUNCEMENT: 'section-announcement',
   SUGGESTION: 'section-suggestion',
 } as const;
+
+export const ANNOUNCEMENT_AUDIENCE_OPTIONS: Array<{
+  value: AnnouncementAudience;
+  label: string;
+}> = [
+  { value: 'ALL', label: '전체 (학생·교사)' },
+  { value: 'STUDENT', label: '학생' },
+  { value: 'TEACHER', label: '교사' },
+];
+
+export const ANNOUNCEMENT_AUDIENCE_LABELS: Record<AnnouncementAudience, string> = {
+  ALL: '전체',
+  STUDENT: '학생',
+  TEACHER: '교사',
+};
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   STUDENT: '학생',

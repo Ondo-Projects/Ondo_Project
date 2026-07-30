@@ -508,8 +508,64 @@
   margin-bottom: var(--space-2);
 }
 
-#section-suggestion {
+#section-suggestion,
+#section-announcement {
   scroll-margin-top: var(--space-4);
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.admin-announcement-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.admin-announcement-item {
+  padding: var(--space-4);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-md);
+  background: var(--color-neutral-50);
+}
+
+.admin-announcement-item__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.admin-announcement-item__heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.admin-announcement-item__title {
+  margin: 0;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  font-weight: var(--font-weight-label);
+  color: var(--color-neutral-900);
+}
+
+.admin-announcement-item__content {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+  color: var(--color-neutral-800);
+}
+
+.admin-badge--audience {
+  background: #eff6ff;
+  color: #1d4ed8;
 }
 
 .admin-filter-chip:focus-visible,

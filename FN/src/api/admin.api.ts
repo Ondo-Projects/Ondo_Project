@@ -20,6 +20,7 @@ import type {
   AdminUserStatusRequest,
   AdminUserSummary,
 } from './types/admin';
+import type { Announcement, AnnouncementCreateRequest } from './types/announcement';
 import type { SuggestionPost } from './types/suggestion';
 
 function buildQuery(params: Record<string, string | number | boolean | undefined>): string {
@@ -143,5 +144,22 @@ export function replyAdminSuggestion(id: number, body: AdminSuggestionReplyReque
   return apiClient<SuggestionPost>(`/api/admin/suggestions/${id}/reply`, {
     method: 'POST',
     body,
+  });
+}
+
+export function getAdminAnnouncements() {
+  return apiClient<Announcement[]>('/api/admin/announcements');
+}
+
+export function createAdminAnnouncement(body: AnnouncementCreateRequest) {
+  return apiClient<Announcement>('/api/admin/announcements', {
+    method: 'POST',
+    body,
+  });
+}
+
+export function deleteAdminAnnouncement(id: number) {
+  return apiClient<{ message: string }>(`/api/admin/announcements/${id}`, {
+    method: 'DELETE',
   });
 }
