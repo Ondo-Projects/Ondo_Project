@@ -4,7 +4,8 @@ import type { StudentAssignment } from '../api/types/student';
 import { useAuth } from '../auth/AuthProvider';
 import AuthLoading from '../auth/AuthLoading';
 import AppLayout from '../components/layout/AppLayout';
-import BrandMark from '../components/BrandMark';
+import PageHeader from '../components/PageHeader';
+import RoleHomeZone from '../components/RoleHomeZone';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { PATHS } from '../routes/paths';
 import QuickActionBar from './components/QuickActionBar';
@@ -137,27 +138,29 @@ export default function StudentHomePage() {
   return (
     <AppLayout>
       <div className="student-page">
-        <header className="student-header">
-          <BrandMark />
-          <div className="student-header__main">
-            <p className="student-greeting">
-              {schoolLife.isLoading ? '불러오는 중…' : `${greetingName} · ${schoolLabel}`}
-            </p>
-            <h1 className="student-title">학생 홈</h1>
-            <p className="student-subtitle">오늘 할 일부터 확인하고 상담까지 이어서 진행하세요.</p>
-          </div>
-          <div className="student-header__actions">
-            <Link className="student-btn student-btn--ghost" to={PATHS.HOME}>
-              공통 홈
-            </Link>
-            <Link className="student-btn student-btn--ghost" to={PATHS.WITHDRAW}>
-              회원 탈퇴
-            </Link>
-            <button type="button" className="student-btn student-btn--secondary" onClick={() => logout()}>
-              로그아웃
-            </button>
-          </div>
-        </header>
+        <PageHeader
+          tone="student"
+          eyebrow={schoolLife.isLoading ? '불러오는 중…' : `${greetingName} · ${schoolLabel}`}
+          title="학생 홈"
+          subtitle="오늘 할 일부터 확인하고 상담까지 이어서 진행하세요."
+          actions={
+            <>
+              <Link className="page-header-action page-header-action--ghost" to={PATHS.HOME}>
+                공통 홈
+              </Link>
+              <Link className="page-header-action page-header-action--danger-ghost" to={PATHS.WITHDRAW}>
+                회원 탈퇴
+              </Link>
+              <button
+                type="button"
+                className="page-header-action page-header-action--secondary"
+                onClick={() => logout()}
+              >
+                로그아웃
+              </button>
+            </>
+          }
+        />
 
         {schoolLife.pageError ? (
           <p className="student-message student-message--error" role="alert">
@@ -177,75 +180,105 @@ export default function StudentHomePage() {
           </p>
         ) : null}
 
-        <div className="student-hero">
-          <QuickActionBar onNavigate={navigateToSection} />
-          <SectionTodayTodo items={todayTodoItems} onNavigate={navigateToSection} />
-          <SectionToday
-            mealHint={mealHint}
-            meals={schoolLife.meals}
-            mealsError={schoolLife.mealsError}
-            weather={schoolLife.weather}
-            weatherError={schoolLife.weatherError}
-          />
-        </div>
-
-        <div className="student-daily-grid">
-          <SectionMood onSuccess={handleSuccess} onError={handleError} />
-          <SectionNotice
-            hasAssignment={schoolLife.hasAssignment}
-            notices={schoolLife.notices}
-            error={schoolLife.noticesError}
-          />
-          <SectionSchoolCalendar data={schoolLife.schedule} error={schoolLife.scheduleError} />
-          <SectionTimetable data={schoolLife.timetable} error={schoolLife.timetableError} />
-        </div>
-
-        <div className="student-setup-grid">
-          <SectionClassProfile
-            onSuccess={handleSuccess}
-            onError={handleError}
-            onProfileChanged={handleProfileChanged}
-          />
-          <SectionAssignment
-            assignment={schoolLife.assignment}
-            openRequest={assignmentOpenRequest}
-            onSuccess={handleSuccess}
-            onError={handleError}
-            onAssignmentChanged={handleAssignmentChanged}
-          />
-        </div>
-
-        <div className="student-workspace">
-          <StudentWorkspaceTabs activeTab={workspaceTab} onChange={handleWorkspaceTabChange} />
-
-          <div className={workspaceTab === 'pre-counsel' ? undefined : 'student-tab-hidden'}>
-            <SectionPreCounsel
-              navFocusToken={preCounselNavRequest}
-              onSuccess={handleSuccess}
-              onError={handleError}
+        <RoleHomeZone
+          badge="TODAY"
+          title="오늘 시작하기"
+          description="할 일, 날씨, 급식을 먼저 확인하고 하루를 준비하세요."
+          tone="student"
+        >
+          <div className="student-hero">
+            <QuickActionBar onNavigate={navigateToSection} />
+            <SectionTodayTodo items={todayTodoItems} onNavigate={navigateToSection} />
+            <SectionToday
+              mealHint={mealHint}
+              meals={schoolLife.meals}
+              mealsError={schoolLife.mealsError}
+              weather={schoolLife.weather}
+              weatherError={schoolLife.weatherError}
             />
           </div>
+        </RoleHomeZone>
 
-          <div className={workspaceTab === 'counsel-create' ? undefined : 'student-tab-hidden'}>
-            <SectionCounselCreate
+        <RoleHomeZone
+          badge="SCHOOL LIFE"
+          title="학교 생활"
+          description="마음 날씨, 공지, 학사 일정, 시간표를 한눈에 살펴보세요."
+          tone="student"
+        >
+          <div className="student-daily-grid">
+            <SectionMood onSuccess={handleSuccess} onError={handleError} />
+            <SectionNotice
               hasAssignment={schoolLife.hasAssignment}
+              notices={schoolLife.notices}
+              error={schoolLife.noticesError}
+            />
+            <SectionSchoolCalendar data={schoolLife.schedule} error={schoolLife.scheduleError} />
+            <SectionTimetable data={schoolLife.timetable} error={schoolLife.timetableError} />
+          </div>
+        </RoleHomeZone>
+
+        <RoleHomeZone
+          badge="SETUP"
+          title="내 정보 설정"
+          description="학급 프로필과 담임 선생님 등록을 관리하세요."
+          tone="student"
+        >
+          <div className="student-setup-grid">
+            <SectionClassProfile
               onSuccess={handleSuccess}
               onError={handleError}
-              onCreated={handleCounselingCreated}
+              onProfileChanged={handleProfileChanged}
             />
-          </div>
-
-          <div className={workspaceTab === 'counsel-list' ? undefined : 'student-tab-hidden'}>
-            <SectionCounselList
-              isActive={workspaceTab === 'counsel-list'}
-              refreshToken={counselRefreshKey}
+            <SectionAssignment
+              assignment={schoolLife.assignment}
+              openRequest={assignmentOpenRequest}
               onSuccess={handleSuccess}
               onError={handleError}
+              onAssignmentChanged={handleAssignmentChanged}
             />
           </div>
-        </div>
+        </RoleHomeZone>
 
-        <SectionSuggestion onSuccess={handleSuccess} onError={handleError} />
+        <RoleHomeZone
+          badge="COUNSEL"
+          title="상담"
+          description="사전 상담, 상담 신청, 내역을 이어서 진행하세요."
+          tone="student"
+        >
+          <div className="student-workspace">
+            <StudentWorkspaceTabs activeTab={workspaceTab} onChange={handleWorkspaceTabChange} />
+
+            <div className={workspaceTab === 'pre-counsel' ? undefined : 'student-tab-hidden'}>
+              <SectionPreCounsel
+                navFocusToken={preCounselNavRequest}
+                onSuccess={handleSuccess}
+                onError={handleError}
+              />
+            </div>
+
+            <div className={workspaceTab === 'counsel-create' ? undefined : 'student-tab-hidden'}>
+              <SectionCounselCreate
+                hasAssignment={schoolLife.hasAssignment}
+                onSuccess={handleSuccess}
+                onError={handleError}
+                onCreated={handleCounselingCreated}
+              />
+            </div>
+
+            <div className={workspaceTab === 'counsel-list' ? undefined : 'student-tab-hidden'}>
+              <SectionCounselList
+                isActive={workspaceTab === 'counsel-list'}
+                refreshToken={counselRefreshKey}
+                onSuccess={handleSuccess}
+                onError={handleError}
+              />
+            </div>
+          </div>
+        </RoleHomeZone>
+
+        <RoleHomeZone badge="FEEDBACK" title="의견 보내기" tone="student">
+          <SectionSuggestion onSuccess={handleSuccess} onError={handleError} />
+        </RoleHomeZone>
       </div>
     </AppLayout>
   );

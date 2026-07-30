@@ -22,6 +22,7 @@ export default function TeacherSectionCard({
       aria-labelledby={id ? `${id}-title` : undefined}
     >
       <h2 id={id ? `${id}-title` : undefined} className="teacher-card__title">
+        <span className="teacher-card__title-mark" aria-hidden="true" />
         {title}
       </h2>
       {helper ? <p className="teacher-card__helper">{helper}</p> : null}

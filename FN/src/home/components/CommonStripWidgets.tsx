@@ -14,7 +14,7 @@ interface WeatherWidgetProps {
 
 export function WeatherWidget({ data, error }: WeatherWidgetProps) {
   if (error) {
-    return <div className="home-status">{error}</div>;
+    return <div className="home-status home-status--warn">{error}</div>;
   }
 
   if (!data) {
@@ -23,24 +23,28 @@ export function WeatherWidget({ data, error }: WeatherWidgetProps) {
 
   const minMax =
     data.minTemperature && data.maxTemperature
-      ? `최저 ${data.minTemperature} / 최고 ${data.maxTemperature}`
+      ? `최저 ${data.minTemperature} · 최고 ${data.maxTemperature}`
       : null;
 
   return (
-    <>
-      {data.region ? <p className="home-helper">{data.region} 날씨입니다.</p> : null}
-      <div className="home-weather">
-        <div className="home-weather__icon" aria-hidden="true">
-          {data.icon || '🌡️'}
-        </div>
-        <div className="home-weather__main">
-          <div className="home-weather__temp">{data.temperature || '-'}</div>
-          <div className="home-weather__condition">{data.condition || '정보 없음'}</div>
-          {minMax ? <div className="home-weather__range">{minMax}</div> : null}
-          {data.message ? <p className="home-helper">{data.message}</p> : null}
-        </div>
+    <div className="home-weather">
+      <div className="home-weather__icon-wrap" aria-hidden="true">
+        <span className="home-weather__icon">{data.icon || '🌡️'}</span>
       </div>
-    </>
+      <div className="home-weather__main">
+        {data.region ? (
+          <p className="home-weather__region">{data.region} 날씨</p>
+        ) : null}
+        <div className="home-weather__temp-row">
+          <div className="home-weather__temp">{data.temperature || '-'}</div>
+          {data.condition ? (
+            <span className="home-weather__chip">{data.condition}</span>
+          ) : null}
+        </div>
+        {minMax ? <div className="home-weather__range">{minMax}</div> : null}
+        {data.message ? <p className="home-weather__message">{data.message}</p> : null}
+      </div>
+    </div>
   );
 }
 

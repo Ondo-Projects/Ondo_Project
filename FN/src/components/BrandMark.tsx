@@ -2,7 +2,7 @@ import './brand.css';
 
 const ONDO_LOGO_SRC = '/ondo-logo.png';
 
-type BrandMarkSize = 'default' | 'auth';
+type BrandMarkSize = 'default' | 'auth' | 'compact';
 
 interface BrandMarkProps {
   size?: BrandMarkSize;
@@ -10,7 +10,11 @@ interface BrandMarkProps {
 
 export default function BrandMark({ size = 'default' }: BrandMarkProps) {
   const wrapClassName =
-    size === 'auth' ? 'brand-mark-wrap brand-mark-wrap--auth' : 'brand-mark-wrap';
+    size === 'auth'
+      ? 'brand-mark-wrap brand-mark-wrap--auth'
+      : size === 'compact'
+        ? 'brand-mark-wrap brand-mark-wrap--compact'
+        : 'brand-mark-wrap';
 
   return (
     <span className={wrapClassName} aria-hidden="true">

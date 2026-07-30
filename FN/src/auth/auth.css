@@ -265,6 +265,10 @@
   max-width: 560px;
 }
 
+.auth-shell--join {
+  max-width: 640px;
+}
+
 .auth-card--withdraw {
   display: flex;
   flex-direction: column;

@@ -3,11 +3,11 @@ import { useAuth } from '../auth/AuthProvider';
 import { getPostLoginPath } from '../auth/redirects';
 import AuthLoading from '../auth/AuthLoading';
 import AppLayout from '../components/layout/AppLayout';
+import PageHeader from '../components/PageHeader';
 import { usePageTitle } from '../hooks/usePageTitle';
-import { ScheduleSummary, WeatherWidget } from '../home/components/CommonStripWidgets';
+import SchoolTodayStrip from '../home/components/SchoolTodayStrip';
 import StudentHomeBlock from '../home/components/StudentHomeBlock';
 import TeacherHomeBlock from '../home/components/TeacherHomeBlock';
-import BrandMark from '../components/BrandMark';
 import '../home/home.css';
 import { buildSchoolMeta, buildUserGreeting, formatTodayDate } from '../home/homeUtils';
 import { useHomeData } from '../home/useHomeData';
@@ -33,29 +33,33 @@ export default function HomePage() {
   return (
     <AppLayout>
       <div className="home-page" data-page="school-home">
-        <header className="home-header">
-          <BrandMark />
-          <div className="home-header__main">
-            <p className="home-greeting">{homeData.isLoading ? '불러오는 중…' : greeting}</p>
-            <h1 className="home-title">학교 홈</h1>
-            <p className="home-subtitle">오늘의 학교 생활을 한곳에서 시작하세요.</p>
-          </div>
-          <div className="home-header__actions">
+        <PageHeader
+          tone="home"
+          eyebrow={homeData.isLoading ? '불러오는 중…' : greeting}
+          title="학교 홈"
+          subtitle="오늘의 학교 생활을 한곳에서 시작하세요."
+          actions={
+            <>
               {user.role === 'TEACHER' ? (
-                <Link className="home-btn home-btn--ghost" to={PATHS.TEACHER}>
+                <Link className="page-header-action page-header-action--ghost" to={PATHS.TEACHER}>
                   교사 홈
                 </Link>
               ) : null}
               {user.role === 'STUDENT' ? (
-                <Link className="home-btn home-btn--ghost" to={PATHS.STUDENT}>
+                <Link className="page-header-action page-header-action--ghost" to={PATHS.STUDENT}>
                   학생 홈
                 </Link>
               ) : null}
-              <button type="button" className="home-btn home-btn--secondary" onClick={handleLogout}>
+              <button
+                type="button"
+                className="page-header-action page-header-action--secondary"
+                onClick={handleLogout}
+              >
                 로그아웃
               </button>
-          </div>
-        </header>
+            </>
+          }
+        />
 
         {homeData.pageError ? (
           <p className="home-message" role="alert">
@@ -69,15 +73,15 @@ export default function HomePage() {
           </p>
         ) : null}
 
-        <section className="home-card home-common-strip" aria-label="오늘의 학교 정보">
-          <p className="home-today-date">{formatTodayDate()}</p>
-          <p className="home-school-meta">{homeData.isLoading ? '불러오는 중…' : schoolMeta}</p>
-          <WeatherWidget data={homeData.weather} error={homeData.weatherError} />
-          <div className="home-schedule-summary">
-            <p className="home-schedule-summary__title">다가오는 학사일정</p>
-            <ScheduleSummary data={homeData.schedule} error={homeData.scheduleError} />
-          </div>
-        </section>
+        <SchoolTodayStrip
+          todayLabel={formatTodayDate()}
+          schoolMeta={schoolMeta}
+          isLoading={homeData.isLoading}
+          weather={homeData.weather}
+          weatherError={homeData.weatherError}
+          schedule={homeData.schedule}
+          scheduleError={homeData.scheduleError}
+        />
 
         {user.role === 'STUDENT' ? (
           <StudentHomeBlock

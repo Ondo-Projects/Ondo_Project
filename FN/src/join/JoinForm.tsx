@@ -1,7 +1,7 @@
 import { type FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AppLayout from '../components/layout/AppLayout';
-import BrandMark from '../components/BrandMark';
+import AuthPageShell from '../components/AuthPageShell';
 import { getSignupSuccessMessage } from '../auth/loginNavigation';
 import { PATHS } from '../routes/paths';
 import { scrollToFirstJoinError } from './joinA11y';
@@ -50,14 +50,12 @@ export default function JoinForm() {
       <a className="join-skip-link" href="#join-form-main">
         회원가입 양식으로 바로가기
       </a>
-      <div className="join-shell">
-        <BrandMark size="auth" />
+      <AuthPageShell
+        title="회원가입"
+        subtitle="학교 선택, 계정 정보, 약관 동의 후 가입을 완료해 주세요."
+        join
+      >
         <div className="join-card">
-          <h1 className="join-card__title">회원가입</h1>
-          <p className="join-card__subtitle">
-            학교 선택, 계정 정보, 약관 동의 후 가입을 완료해 주세요.
-          </p>
-
           <JoinErrorSummary errors={fieldErrors} visible={showValidationSummary} />
 
           {submitError ? (
@@ -104,7 +102,7 @@ export default function JoinForm() {
             </Link>
           </div>
         </div>
-      </div>
+      </AuthPageShell>
     </AppLayout>
   );
 }

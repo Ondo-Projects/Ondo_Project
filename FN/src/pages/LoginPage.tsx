@@ -8,7 +8,7 @@ import {
 import { getPostLoginPath } from '../auth/redirects';
 import { ApiError } from '../api/types/api-error';
 import AppLayout from '../components/layout/AppLayout';
-import BrandMark from '../components/BrandMark';
+import AuthPageShell from '../components/AuthPageShell';
 import { PATHS } from '../routes/paths';
 import '../auth/auth.css';
 
@@ -59,14 +59,8 @@ export default function LoginPage() {
 
   return (
     <AppLayout>
-      <div className="auth-shell">
-        <BrandMark size="auth" />
+      <AuthPageShell title="로그인" subtitle="학생·교사 계정으로 온도에 접속해요.">
         <div className="auth-card">
-          <h1 className="auth-card__title">로그인</h1>
-          <p className="auth-card__subtitle">
-            학생·교사 계정으로 온도에 접속해요.
-          </p>
-
           {successMessage ? (
             <p className="auth-message auth-message--success" role="status">
               <span className="auth-message__icon" aria-hidden="true">
@@ -138,7 +132,7 @@ export default function LoginPage() {
             </Link>
           </div>
         </div>
-      </div>
+      </AuthPageShell>
     </AppLayout>
   );
 }

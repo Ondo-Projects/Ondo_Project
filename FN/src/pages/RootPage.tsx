@@ -1,19 +1,20 @@
 import { Link } from 'react-router-dom';
 import ProductTile from '../components/ProductTile.jsx';
 import AppLayout from '../components/layout/AppLayout';
+import PageHeader from '../components/PageHeader';
 import { PATHS } from '../routes/paths';
 import './placeholder.css';
 
 export default function RootPage() {
   return (
     <AppLayout>
+      <PageHeader
+        variant="landing"
+        eyebrow="온도(Ondo)"
+        title="학교 상담 플랫폼"
+        subtitle="로그인하면 역할에 맞는 홈으로 이동해요. UI는 2026 디자인 가이드를 따릅니다."
+      />
       <section className="placeholder-page">
-        <p className="placeholder-page__eyebrow">온도(Ondo)</p>
-        <h1 className="placeholder-page__title">학교 상담 플랫폼</h1>
-        <p className="placeholder-page__description">
-          로그인하면 역할에 맞는 홈으로 이동해요. UI는 2026 디자인 가이드를 따릅니다.
-        </p>
-
         <div className="placeholder-page__tiles">
           <ProductTile
             title="학생"
