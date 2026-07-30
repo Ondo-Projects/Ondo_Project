@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
+  getCommonAnnouncements,
   getProfileSchool,
   getTeacherCounselingPosts,
   getTeacherPreCounselingProfiles,
@@ -10,6 +11,7 @@ import {
   getUpcomingSchoolSchedule,
 } from '../api/home.api';
 import type { AuthUser } from '../api/types/auth';
+import type { Announcement } from '../api/types/announcement';
 import type {
   MealDayResponse,
   PreCounselingProfileSummary,
@@ -39,6 +41,8 @@ export interface HomeDataState {
   mealsError: string | null;
   timetable: TimetableDayResponse | null;
   timetableError: string | null;
+  announcements: Announcement[] | null;
+  announcementsError: string | null;
   teacherSummary: TeacherSummaryState;
   isLoading: boolean;
 }
@@ -62,6 +66,8 @@ const initialState: HomeDataState = {
   mealsError: null,
   timetable: null,
   timetableError: null,
+  announcements: null,
+  announcementsError: null,
   teacherSummary: initialTeacherSummary,
   isLoading: true,
 };
@@ -108,6 +114,10 @@ export function useHomeData(user: AuthUser | null): HomeDataState {
           error: resolveErrorMessage(error, '학사일정을 불러올 수 없습니다.'),
         }));
 
+        const announcementsPromise = getCommonAnnouncements().catch((error) => ({
+          error: resolveErrorMessage(error, '플랫폼 공지를 불러올 수 없습니다.'),
+        }));
+
         const studentMealsPromise =
           currentUser.role === 'STUDENT'
             ? getTodayMeals().catch((error) => ({
@@ -133,10 +143,11 @@ export function useHomeData(user: AuthUser | null): HomeDataState {
               }))
             : Promise.resolve(null);
 
-        const [weatherResult, scheduleResult, mealsResult, timetableResult, teacherResult] =
+        const [weatherResult, scheduleResult, announcementsResult, mealsResult, timetableResult, teacherResult] =
           await Promise.all([
             weatherPromise,
             schedulePromise,
+            announcementsPromise,
             studentMealsPromise,
             studentTimetablePromise,
             teacherSummaryPromise,
@@ -158,6 +169,8 @@ export function useHomeData(user: AuthUser | null): HomeDataState {
           mealsError: null,
           timetable: null,
           timetableError: null,
+          announcements: null,
+          announcementsError: null,
           teacherSummary: initialTeacherSummary,
           isLoading: false,
         };
@@ -172,6 +185,12 @@ export function useHomeData(user: AuthUser | null): HomeDataState {
           nextState.scheduleError = scheduleResult.error;
         } else {
           nextState.schedule = scheduleResult;
+        }
+
+        if ('error' in announcementsResult) {
+          nextState.announcementsError = announcementsResult.error;
+        } else {
+          nextState.announcements = announcementsResult;
         }
 
         if (mealsResult) {
