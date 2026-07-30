@@ -1,14 +1,19 @@
-import { Link, Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
-import { getPostLoginPath, getRoleHomePath } from '../auth/redirects';
-import AppLayout from '../components/layout/AppLayout';
+import { getPostLoginPath } from '../auth/redirects';
 import AuthLoading from '../auth/AuthLoading';
+import AppLayout from '../components/layout/AppLayout';
+import { ScheduleSummary, WeatherWidget } from '../home/components/CommonStripWidgets';
+import StudentHomeBlock from '../home/components/StudentHomeBlock';
+import TeacherHomeBlock from '../home/components/TeacherHomeBlock';
+import '../home/home.css';
+import { buildSchoolMeta, buildUserGreeting, formatTodayDate } from '../home/homeUtils';
+import { useHomeData } from '../home/useHomeData';
 import { PATHS } from '../routes/paths';
-import '../auth/auth.css';
-import './placeholder.css';
 
 export default function HomePage() {
   const { user, logout } = useAuth();
+  const homeData = useHomeData(user);
 
   if (!user) {
     return <AuthLoading message="홈을 준비하고 있어요" />;
@@ -18,45 +23,58 @@ export default function HomePage() {
     await logout();
   }
 
-  const roleHomePath = getRoleHomePath(user.role);
-  const greetingName = user.name?.trim() || user.username;
+  const greeting = buildUserGreeting(user, homeData.schoolProfile);
+  const schoolMeta = buildSchoolMeta(user, homeData.schoolProfile);
 
   return (
     <AppLayout>
-      <section className="placeholder-page">
-        <p className="placeholder-page__eyebrow">공통 홈 · {user.role}</p>
-        <h1 className="placeholder-page__title">안녕하세요, {greetingName}님</h1>
-        <p className="placeholder-page__description">
-          Thymeleaf `/home`에 대응하는 React 허브예요. 역할별 앱으로 이동할 수 있어요.
-        </p>
+      <div className="home-page">
+        <header className="home-header">
+          <div className="home-header__main">
+            <p className="home-greeting">{homeData.isLoading ? '불러오는 중…' : greeting}</p>
+            <h1 className="home-title">학교 홈</h1>
+            <p className="home-subtitle">오늘의 학교 생활을 한곳에서 시작하세요.</p>
+          </div>
+          <div className="home-header__actions">
+            <button type="button" className="home-btn home-btn--secondary" onClick={handleLogout}>
+              로그아웃
+            </button>
+          </div>
+        </header>
 
-        <div className="auth-profile">
-          <p className="auth-profile__name">{greetingName}</p>
-          <p className="auth-profile__meta">아이디 · {user.username}</p>
-          {user.schoolName ? (
-            <p className="auth-profile__meta">학교 · {user.schoolName}</p>
-          ) : null}
-        </div>
+        {homeData.pageError ? (
+          <p className="home-message" role="alert">
+            {homeData.pageError}
+          </p>
+        ) : null}
 
-        <div className="auth-actions">
-          {user.role !== 'ADMIN' ? (
-            <Link className="auth-actions__button auth-actions__button--primary" to={roleHomePath}>
-              {user.role === 'STUDENT' ? '학생 홈 열기' : '교사 홈 열기'}
-            </Link>
-          ) : (
-            <Link className="auth-actions__button auth-actions__button--primary" to={PATHS.ADMIN}>
-              관리자 콘솔 열기
-            </Link>
-          )}
-          <button
-            type="button"
-            className="auth-actions__button auth-actions__button--ghost"
-            onClick={handleLogout}
-          >
-            로그아웃
-          </button>
-        </div>
-      </section>
+        {homeData.schoolProfileError ? (
+          <p className="home-message" role="alert">
+            {homeData.schoolProfileError}
+          </p>
+        ) : null}
+
+        <section className="home-card home-common-strip" aria-label="오늘의 학교 정보">
+          <p className="home-today-date">{formatTodayDate()}</p>
+          <p className="home-school-meta">{homeData.isLoading ? '불러오는 중…' : schoolMeta}</p>
+          <WeatherWidget data={homeData.weather} error={homeData.weatherError} />
+          <div className="home-schedule-summary">
+            <p className="home-schedule-summary__title">다가오는 학사일정</p>
+            <ScheduleSummary data={homeData.schedule} error={homeData.scheduleError} />
+          </div>
+        </section>
+
+        {user.role === 'STUDENT' ? (
+          <StudentHomeBlock
+            meals={homeData.meals}
+            mealsError={homeData.mealsError}
+            timetable={homeData.timetable}
+            timetableError={homeData.timetableError}
+          />
+        ) : null}
+
+        {user.role === 'TEACHER' ? <TeacherHomeBlock summary={homeData.teacherSummary} /> : null}
+      </div>
     </AppLayout>
   );
 }
