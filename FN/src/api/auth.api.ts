@@ -1,5 +1,10 @@
 import { apiClient } from './client';
-import type { LoginRequest, LoginResponse, MeResponse } from './types/auth';
+import type {
+  LoginRequest,
+  LoginResponse,
+  MeResponse,
+  TokenRefreshResponse,
+} from './types/auth';
 
 export function login(request: LoginRequest) {
   return apiClient<LoginResponse>('/api/auth/login', {
@@ -13,18 +18,20 @@ export function getMe() {
   return apiClient<MeResponse>('/api/auth/me');
 }
 
-export function refreshToken(refreshToken: string) {
-  return apiClient<LoginResponse>('/api/auth/refresh', {
+export function refreshToken(refreshTokenValue: string) {
+  return apiClient<TokenRefreshResponse>('/api/auth/refresh', {
     method: 'POST',
-    body: { refreshToken },
+    body: { refreshToken: refreshTokenValue },
     auth: false,
+    skipAuthRetry: true,
   });
 }
 
-export function logout(refreshToken: string) {
-  return apiClient<void>('/api/auth/logout', {
+export function logout(refreshTokenValue: string | null) {
+  return apiClient<{ message: string }>('/api/auth/logout', {
     method: 'POST',
-    body: { refreshToken },
+    body: refreshTokenValue ? { refreshToken: refreshTokenValue } : undefined,
     auth: false,
+    skipAuthRetry: true,
   });
 }
