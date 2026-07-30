@@ -346,7 +346,8 @@
             font-size: 11px;
             padding: 3px 8px;
         }
-        input[type="text"] {
+        input[type="text"],
+        input[type="tel"] {
             width: 100%;
             padding: 12px 14px;
             border: 1px solid #d1d5db;
@@ -355,6 +356,35 @@
             font-family: inherit;
         }
         .field { margin-bottom: 14px; }
+        .checkbox-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .checkbox-row input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+        .notification-status {
+            margin: 0 0 14px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .notification-status.ready {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .notification-status.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
         .notice-item {
             border: 1px solid #e5e7eb;
             border-radius: 12px;
@@ -903,6 +933,26 @@
         </section>
     </div>
 
+    <div class="card" id="notificationSettingsCard" style="margin-bottom: 20px;">
+        <section>
+            <h2>상담 SMS 알림</h2>
+            <p class="helper">학생이 상담을 신청하면 휴대전화로 알림을 받을 수 있습니다. 상담 내용은 문자에 포함되지 않습니다.</p>
+            <p class="notification-status pending" id="notificationSettingsStatus">설정을 불러오는 중...</p>
+            <div class="field">
+                <label for="notificationPhone">휴대전화 번호</label>
+                <input type="tel" id="notificationPhone" placeholder="01012345678" autocomplete="tel" inputmode="tel">
+            </div>
+            <label class="checkbox-row" for="notificationSmsEnabled">
+                <input type="checkbox" id="notificationSmsEnabled">
+                <span>상담 신청 SMS 수신에 동의합니다.</span>
+            </label>
+            <p class="helper">번호와 수신 동의를 모두 설정해야 SMS 알림이 발송됩니다.</p>
+            <div class="inline-actions" style="margin-top: 12px;">
+                <button type="button" class="btn-primary" id="saveNotificationSettingsBtn">저장</button>
+            </div>
+        </section>
+    </div>
+
     <div class="card" style="margin-bottom: 20px;">
         <section>
             <h2>오늘 확인할 것</h2>
@@ -1201,6 +1251,10 @@
     const profileSchoolResults = document.getElementById('profileSchoolResults');
     const profileSelectedSchoolCode = document.getElementById('profileSelectedSchoolCode');
     const confirmSchoolChangeBtn = document.getElementById('confirmSchoolChangeBtn');
+    const notificationSettingsStatus = document.getElementById('notificationSettingsStatus');
+    const notificationPhone = document.getElementById('notificationPhone');
+    const notificationSmsEnabled = document.getElementById('notificationSmsEnabled');
+    const saveNotificationSettingsBtn = document.getElementById('saveNotificationSettingsBtn');
     const suggestionForm = document.getElementById('suggestionForm');
     const suggestionList = document.getElementById('suggestionList');
     const suggestionDetail = document.getElementById('suggestionDetail');
@@ -1654,6 +1708,36 @@
     async function loadProfileSchool() {
         const data = await api('/api/teacher/profile/school');
         renderProfileSchool(data);
+    }
+
+    function renderNotificationSettings(data) {
+        notificationPhone.value = data.phone || '';
+        notificationSmsEnabled.checked = Boolean(data.smsNotifyEnabled);
+        if (data.ready) {
+            notificationSettingsStatus.textContent = 'SMS 알림이 설정되었습니다. 학생 상담 신청 시 문자를 받습니다.';
+            notificationSettingsStatus.className = 'notification-status ready';
+            return;
+        }
+        notificationSettingsStatus.textContent = 'SMS 알림을 받으려면 휴대전화 번호와 수신 동의를 설정해 주세요.';
+        notificationSettingsStatus.className = 'notification-status pending';
+    }
+
+    async function loadNotificationSettings() {
+        const data = await api('/api/teacher/profile/notification-settings');
+        renderNotificationSettings(data);
+    }
+
+    async function saveNotificationSettings() {
+        clearMessages();
+        const data = await api('/api/teacher/profile/notification-settings', {
+            method: 'PUT',
+            body: JSON.stringify({
+                phone: notificationPhone.value.trim(),
+                smsNotifyEnabled: notificationSmsEnabled.checked
+            })
+        });
+        renderNotificationSettings(data);
+        showSuccess(data.message || '상담 알림 설정이 저장되었습니다.');
     }
 
     function resetProfileSchoolChange() {
@@ -2140,6 +2224,7 @@
 
     Promise.all([
         loadProfileSchool(),
+        loadNotificationSettings(),
         loadInviteCode(),
         loadNotices(),
         loadMoodSection(),
@@ -2207,6 +2292,9 @@
     });
     confirmSchoolChangeBtn.addEventListener('click', () => {
         changeProfileSchool().catch(error => showError(error.message));
+    });
+    saveNotificationSettingsBtn.addEventListener('click', () => {
+        saveNotificationSettings().catch(error => showError(error.message));
     });
 </script>
 </body>
