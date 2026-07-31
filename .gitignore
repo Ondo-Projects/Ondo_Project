@@ -1,7 +1,10 @@
 FN/node_modules/
 FN/dist/
 
-# BN local secrets (never commit)
+# BN local / prod secrets (never commit)
 BN/config/application-local.properties
+BN/config/application-prod.properties
 **/application-local.properties
+**/application-prod.properties
 !**/application-local.properties.example
+!**/application-prod.properties.example
