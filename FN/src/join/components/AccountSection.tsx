@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { Alert, Btn, Input } from '../../components/ui';
 import { useJoinForm } from '../JoinFormProvider';
 import JoinField from './JoinField';
 import JoinSection from './JoinSection';
@@ -54,7 +55,7 @@ export default function AccountSection() {
   return (
     <JoinSection title={`${sectionNumber}. 계정 정보`}>
       <JoinField id="username" label="아이디" error={fieldErrors.username} required>
-        <input
+        <Input
           type="text"
           name="username"
           minLength={4}
@@ -66,27 +67,22 @@ export default function AccountSection() {
       </JoinField>
 
       <div className="join-inline-actions">
-        <button
+        <Btn
           type="button"
-          className="join-btn join-btn--secondary"
+          variant="secondary"
           disabled={isCheckingUsername}
           onClick={() => void actions.runUsernameCheck()}
         >
           {isCheckingUsername ? '확인 중…' : '중복 확인'}
-        </button>
+        </Btn>
       </div>
 
       {state.usernameChecked && state.usernameAvailable ? (
-        <p className="join-message join-message--success" role="status">
-          <span className="join-message__icon" aria-hidden="true">
-            ✓
-          </span>
-          <span>사용 가능한 아이디예요.</span>
-        </p>
+        <Alert variant="success">사용 가능한 아이디예요.</Alert>
       ) : null}
 
       <JoinField id="password" label="비밀번호" error={fieldErrors.password} required>
-        <input
+        <Input
           type="password"
           name="password"
           minLength={8}
@@ -113,7 +109,7 @@ export default function AccountSection() {
         error={fieldErrors.passwordConfirm}
         required
       >
-        <input
+        <Input
           type="password"
           name="passwordConfirm"
           minLength={8}

@@ -1,7 +1,8 @@
 import { type FormEvent, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import AppLayout from '../components/layout/AppLayout';
 import AuthPageShell from '../components/AuthPageShell';
+import { Alert, Btn, Card } from '../components/ui';
 import { getSignupSuccessMessage } from '../auth/loginNavigation';
 import { PATHS } from '../routes/paths';
 import { scrollToFirstJoinError } from './joinA11y';
@@ -55,16 +56,13 @@ export default function JoinForm() {
         subtitle="학교 선택, 계정 정보, 약관 동의 후 가입을 완료해 주세요."
         join
       >
-        <div className="join-card">
+        <Card compact className="join-card">
           <JoinErrorSummary errors={fieldErrors} visible={showValidationSummary} />
 
           {submitError ? (
-            <p className="join-message join-message--error" id="join-submit-error" role="alert">
-              <span className="join-message__icon" aria-hidden="true">
-                !
-              </span>
-              <span>{submitError}</span>
-            </p>
+            <Alert variant="error" id="join-submit-error">
+              {submitError}
+            </Alert>
           ) : null}
 
           <form
@@ -83,25 +81,28 @@ export default function JoinForm() {
             <AccountSection />
             <TermsSection />
 
-            <button
-              className="join-btn join-btn--primary join-submit"
+            <Btn
               type="submit"
+              variant="primary"
+              size="student"
+              fullWidth
+              className="join-submit"
               disabled={isSubmitting}
               aria-describedby={submitError ? 'join-submit-error' : undefined}
             >
               {isSubmitting ? '가입 처리 중…' : '가입하기'}
-            </button>
+            </Btn>
           </form>
 
-          <div className="join-footer">
-            <Link className="join-footer__link" to={PATHS.LOGIN}>
+          <nav className="join-footer" aria-label="회원가입 관련 링크">
+            <Btn variant="ghost" to={PATHS.LOGIN}>
               로그인
-            </Link>
-            <Link className="join-footer__link" to={PATHS.ROOT}>
+            </Btn>
+            <Btn variant="ghost" to={PATHS.ROOT}>
               처음으로
-            </Link>
-          </div>
-        </div>
+            </Btn>
+          </nav>
+        </Card>
       </AuthPageShell>
     </AppLayout>
   );

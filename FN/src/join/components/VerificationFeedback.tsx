@@ -1,3 +1,5 @@
+import { Alert } from '../../components/ui';
+
 interface VerificationFeedbackProps {
   successMessage?: string | null;
   errorMessage?: string | null;
@@ -10,25 +12,11 @@ export default function VerificationFeedback({
   showSuccess = false,
 }: VerificationFeedbackProps) {
   if (showSuccess && successMessage) {
-    return (
-      <p className="join-message join-message--success" role="status">
-        <span className="join-message__icon" aria-hidden="true">
-          ✓
-        </span>
-        <span>{successMessage}</span>
-      </p>
-    );
+    return <Alert variant="success">{successMessage}</Alert>;
   }
 
   if (errorMessage) {
-    return (
-      <p className="join-message join-message--error" role="alert">
-        <span className="join-message__icon" aria-hidden="true">
-          !
-        </span>
-        <span>{errorMessage}</span>
-      </p>
-    );
+    return <Alert variant="error">{errorMessage}</Alert>;
   }
 
   return null;

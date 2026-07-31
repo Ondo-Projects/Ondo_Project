@@ -1,3 +1,4 @@
+import { CardHelper, Input, Select } from '../../components/ui';
 import { GUARDIAN_RELATION_OPTIONS } from '../constants';
 import { GUARDIAN_CONSENT_TERM } from '../terms/content';
 import { useJoinForm } from '../JoinFormProvider';
@@ -16,12 +17,10 @@ export default function GuardianSection() {
 
   return (
     <JoinSection title="5. 법정대리인(보호자) 동의">
-      <p className="join-field__helper">
-        만 14세 미만 학생은 보호자 SMS 인증 후 가입할 수 있습니다.
-      </p>
+      <CardHelper>만 14세 미만 학생은 보호자 SMS 인증 후 가입할 수 있습니다.</CardHelper>
 
       <JoinField id="guardianName" label="보호자 성명" error={fieldErrors.guardianName} required>
-        <input
+        <Input
           type="text"
           name="guardianName"
           maxLength={50}
@@ -32,7 +31,7 @@ export default function GuardianSection() {
       </JoinField>
 
       <JoinField id="guardianPhone" label="보호자 휴대전화" error={fieldErrors.guardianPhone} required>
-        <input
+        <Input
           type="tel"
           name="guardianPhone"
           maxLength={20}
@@ -44,7 +43,7 @@ export default function GuardianSection() {
       </JoinField>
 
       <JoinField id="guardianRelation" label="학생과의 관계" error={fieldErrors.guardianRelation} required>
-        <select
+        <Select
           name="guardianRelation"
           value={state.guardianRelation}
           onChange={(event) =>
@@ -57,7 +56,7 @@ export default function GuardianSection() {
               {option.label}
             </option>
           ))}
-        </select>
+        </Select>
       </JoinField>
 
       <TermsTextbox id="guardian-consent" label={GUARDIAN_CONSENT_TERM.label} text={GUARDIAN_CONSENT_TERM.text} />

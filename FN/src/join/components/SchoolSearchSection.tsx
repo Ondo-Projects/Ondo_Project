@@ -1,6 +1,7 @@
 import { type KeyboardEvent, useEffect, useId, useState } from 'react';
 import { searchSchools } from '../../api/school.api';
 import type { School, SchoolTypeFilter } from '../../api/types/signup';
+import { Btn, CardHelper, Field, Input } from '../../components/ui';
 import { getSchoolResultId } from '../joinA11y';
 import { mapVerificationError } from '../joinErrors';
 import { SCHOOL_TYPE_FILTERS } from '../constants';
@@ -30,8 +31,6 @@ export default function SchoolSearchSection() {
 
   const schoolError = fieldErrors.school;
   const helperId = 'schoolKeyword-helper';
-  const errorId = schoolError ? 'schoolKeyword-error' : undefined;
-  const describedBy = [helperId, errorId].filter(Boolean).join(' ') || undefined;
 
   useEffect(() => {
     if (state.selectedSchool) {
@@ -134,33 +133,30 @@ export default function SchoolSearchSection() {
 
   return (
     <JoinSection title="2. 학교 검색">
-      <p className="join-field__helper" id={helperId}>
+      <CardHelper id={helperId}>
         전국 중·고등학교를 검색해 선택해 주세요.
-      </p>
+      </CardHelper>
 
       {!state.selectedSchool ? (
-        <div className="join-field">
-          <label className="join-field__label" htmlFor="schoolKeyword">
-            학교명 (필수)
-          </label>
+        <Field id="schoolKeyword" label="학교명" error={schoolError} required>
           <div className="join-search-box">
             <div className="join-search-input-wrap">
               <span className="join-search-icon" aria-hidden="true">
                 🔍
               </span>
-              <input
+              <Input
                 id="schoolKeyword"
-                className={`join-field__input${schoolError ? ' join-field__input--error' : ''}`}
                 type="text"
                 role="combobox"
                 value={keyword}
                 placeholder="예: 개포중, 경기고, 부산중..."
                 autoComplete="off"
+                error={Boolean(schoolError)}
+                aria-invalid={schoolError ? true : undefined}
                 aria-expanded={isOpen}
                 aria-controls={isOpen ? listboxId : undefined}
                 aria-autocomplete="list"
-                aria-invalid={schoolError ? true : undefined}
-                aria-describedby={describedBy}
+                aria-describedby={helperId}
                 aria-activedescendant={
                   activeResultIndex >= 0 ? getSchoolResultId(activeResultIndex) : undefined
                 }
@@ -241,15 +237,7 @@ export default function SchoolSearchSection() {
               </div>
             ) : null}
           </div>
-          {schoolError ? (
-            <p className="join-field__error" id={errorId} role="alert">
-              <span className="join-field__error-icon" aria-hidden="true">
-                !
-              </span>
-              <span>{schoolError}</span>
-            </p>
-          ) : null}
-        </div>
+        </Field>
       ) : (
         <div className="join-selected-school" role="status" aria-live="polite">
           <div className="join-selected-school__header">
@@ -259,9 +247,9 @@ export default function SchoolSearchSection() {
                 {state.selectedSchool.schoolType} · {state.selectedSchool.region}
               </p>
             </div>
-            <button type="button" className="join-btn join-btn--ghost" onClick={handleChangeSchool}>
+            <Btn type="button" variant="ghost" onClick={handleChangeSchool}>
               다시 선택
-            </button>
+            </Btn>
           </div>
         </div>
       )}

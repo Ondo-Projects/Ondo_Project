@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { sendGuardianSms, verifyGuardianSms } from '../../api/sms.api';
+import { Btn, Input } from '../../components/ui';
 import { mapVerificationError } from '../joinErrors';
 import JoinField from './JoinField';
 import VerificationFeedback from './VerificationFeedback';
@@ -85,26 +86,26 @@ export default function GuardianSmsVerification({
   return (
     <>
       <div className="join-inline-actions">
-        <button
+        <Btn
           type="button"
-          className="join-btn join-btn--secondary"
+          variant="secondary"
           disabled={isSending}
           onClick={() => void handleSendSms()}
         >
           {isSending ? '발송 중…' : '인증번호 발송'}
-        </button>
-        <button
+        </Btn>
+        <Btn
           type="button"
-          className="join-btn join-btn--primary"
+          variant="primary"
           disabled={isVerifying}
           onClick={() => void handleVerifySms()}
         >
           {isVerifying ? '확인 중…' : '인증 확인'}
-        </button>
+        </Btn>
       </div>
 
       <JoinField id="smsVerificationCode" label="인증번호 6자리" error={smsError}>
-        <input
+        <Input
           type="text"
           inputMode="numeric"
           maxLength={6}

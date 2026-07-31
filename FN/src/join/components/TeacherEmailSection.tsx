@@ -1,3 +1,4 @@
+import { CardHelper } from '../../components/ui';
 import { validateTeacherEmail } from '../joinValidation';
 import { useJoinForm } from '../JoinFormProvider';
 import EmailVerificationBlock from './EmailVerificationBlock';
@@ -12,7 +13,7 @@ export default function TeacherEmailSection() {
 
   return (
     <JoinSection title="4. 교사 이메일 인증">
-      <p className="join-field__helper">교사 가입은 공직 메일(@korea.kr) 인증이 필요합니다.</p>
+      <CardHelper>교사 가입은 공직 메일(@korea.kr) 인증이 필요합니다.</CardHelper>
 
       <EmailVerificationBlock
         id="teacherEmail"

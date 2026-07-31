@@ -7,193 +7,39 @@
   color: var(--color-neutral-600);
 }
 
-.auth-card {
-  background: var(--color-bg-card);
-  border: var(--card-border);
-  border-radius: var(--card-radius);
-  box-shadow: var(--shadow-card);
-  padding: var(--card-padding);
-}
-
-.auth-card__title {
-  margin: 0 0 var(--space-2);
-  font-size: var(--font-size-h1);
-  line-height: var(--line-height-h1);
-  font-weight: var(--font-weight-h1);
-  color: var(--color-neutral-900);
-}
-
-.auth-card__subtitle {
-  margin: 0 0 var(--space-6);
-  font-size: var(--font-size-body);
-  line-height: var(--line-height-body);
-  color: var(--color-neutral-600);
-}
-
 .auth-form {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
 }
 
-.auth-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.auth-field__label {
-  font-size: var(--font-size-label);
-  line-height: var(--line-height-label);
-  font-weight: var(--font-weight-label);
-  color: var(--color-neutral-800);
-}
-
-.auth-field__input {
-  min-height: var(--input-min-height);
-  padding: var(--input-padding-y) var(--input-padding-x);
-  border: var(--input-border-width) solid var(--input-border-color);
-  border-radius: var(--input-radius);
-  font-size: var(--input-font-size);
-  color: var(--color-neutral-900);
-  background: var(--color-bg-card);
-}
-
-.auth-field__input:focus-visible {
-  border-color: var(--input-focus-border);
-  box-shadow: var(--input-focus-ring);
-  outline: 3px solid var(--color-primary-100);
-  outline-offset: 2px;
-}
-
-.auth-message {
-  display: flex;
-  gap: var(--space-2);
-  align-items: flex-start;
-  margin: 0;
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-body);
-  line-height: var(--line-height-body);
-}
-
-.auth-message__icon {
-  flex-shrink: 0;
-  font-weight: 700;
-}
-
-.auth-message--error {
-  background: var(--color-error-bg);
-  color: var(--color-error);
-}
-
-.auth-message--success {
-  background: var(--color-success-bg);
-  color: var(--color-success);
-}
-
-.auth-submit:focus-visible,
-.auth-footer__link:focus-visible {
-  outline: 3px solid var(--color-primary-100);
-  outline-offset: 2px;
-}
-
-.auth-submit {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  min-height: var(--btn-min-height-student);
-  margin-top: var(--space-2);
-  padding: var(--btn-padding-y) var(--btn-padding-x);
-  border: none;
-  border-radius: var(--btn-radius);
-  background: var(--color-primary-600);
-  color: #ffffff;
-  font-size: var(--btn-font-size);
-  font-weight: var(--btn-font-weight);
-  cursor: pointer;
-  transition:
-    background var(--duration-fast) ease,
-    transform 0.1s ease;
-}
-
-.auth-submit:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.auth-submit:active:not(:disabled) {
-  transform: scale(var(--btn-active-scale));
-}
-
-@media (hover: hover) {
-  .auth-submit:hover:not(:disabled) {
-    background: var(--color-primary-700);
-  }
-}
-
 .auth-footer {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
   margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-neutral-200);
   font-size: var(--font-size-caption);
   color: var(--color-neutral-600);
 }
 
-/* Legacy auth pages (FindId, ResetPassword, Withdraw) — migrate to ui components in Phase 1 */
+.ui-card .auth-footer {
+  margin-top: 0;
+}
 
-.auth-footer__link {
-  display: inline-flex;
-  align-items: center;
+.ui-card .auth-footer .ui-btn {
   min-height: var(--touch-target-min);
-  padding: 0 var(--space-1);
-  color: var(--color-primary-600);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-caption);
   font-weight: var(--font-weight-label);
-  text-decoration: none;
 }
 
 .auth-inline-actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
-}
-
-.auth-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: var(--btn-min-height-student);
-  padding: var(--btn-padding-y) var(--btn-padding-x);
-  border-radius: var(--btn-radius);
-  border: none;
-  font-size: var(--btn-font-size);
-  font-weight: var(--btn-font-weight);
-  cursor: pointer;
-}
-
-.auth-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.auth-btn--secondary {
-  background: var(--color-neutral-100);
-  color: var(--color-neutral-800);
-  border: 1px solid var(--color-neutral-200);
-}
-
-.auth-btn:focus-visible {
-  outline: 3px solid var(--color-primary-100);
-  outline-offset: 2px;
-}
-
-@media (hover: hover) {
-  .auth-btn--secondary:hover:not(:disabled) {
-    background: var(--color-neutral-200);
-  }
 }
 
 .auth-result {
@@ -219,11 +65,6 @@
   font-weight: var(--font-weight-h2);
   color: var(--color-neutral-900);
   word-break: break-all;
-}
-
-.auth-result__link {
-  margin-top: var(--space-2);
-  text-decoration: none;
 }
 
 .auth-password-rules {
@@ -252,12 +93,6 @@
   text-align: center;
 }
 
-@media (hover: hover) {
-  .auth-footer__link:hover {
-    text-decoration: underline;
-  }
-}
-
 .auth-shell {
   max-width: 480px;
   margin: 0 auto;
@@ -275,20 +110,7 @@
 }
 
 .auth-login-card .auth-footer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-2);
   margin: 0;
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--color-neutral-200);
-}
-
-.auth-login-card .auth-footer .ui-btn {
-  min-height: var(--touch-target-min);
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-label);
 }
 
 .auth-shell--wide {
@@ -431,26 +253,6 @@
   flex-direction: column;
   gap: var(--space-3);
   margin-top: var(--space-2);
-}
-
-.auth-withdraw-actions__continue {
-  text-decoration: none;
-  text-align: center;
-}
-
-.auth-submit--muted {
-  background: var(--color-neutral-200);
-  color: var(--color-neutral-800);
-}
-
-@media (hover: hover) {
-  .auth-submit--muted:hover:not(:disabled) {
-    background: var(--color-neutral-300);
-  }
-
-  .auth-withdraw-back:hover:not(:disabled) {
-    color: var(--color-neutral-900);
-  }
 }
 
 .auth-profile {

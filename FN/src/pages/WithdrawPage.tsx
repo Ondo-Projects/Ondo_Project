@@ -1,5 +1,5 @@
 import { type FormEvent, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { withdrawAccount } from '../api/withdraw.api';
 import { ApiError } from '../api/types/api-error';
 import type { WithdrawReason } from '../api/types/withdraw';
@@ -8,6 +8,7 @@ import AuthLoading from '../auth/AuthLoading';
 import { getSignupSuccessMessage } from '../auth/loginNavigation';
 import AppLayout from '../components/layout/AppLayout';
 import PageHeader from '../components/PageHeader';
+import { Alert, Btn, Card, Field, Input } from '../components/ui';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { PATHS } from '../routes/paths';
 import { getWithdrawReasonOptions } from '../withdraw/withdrawReasons';
@@ -107,7 +108,7 @@ export default function WithdrawPage() {
     <AppLayout>
       <div className="auth-shell auth-shell--wide">
         <PageHeader variant="toolbar" title="회원 탈퇴" onBack={handleBack} />
-        <div className="auth-card auth-card--withdraw">
+        <Card compact className="auth-card--withdraw">
           <section className="auth-withdraw-intro" aria-labelledby="withdraw-intro-title">
             <h2 id="withdraw-intro-title" className="auth-withdraw-intro__title">
               {greetingName}님, 정말 떠나시겠어요?
@@ -132,14 +133,7 @@ export default function WithdrawPage() {
             </ul>
           </section>
 
-          {errorMessage ? (
-            <p className="auth-message auth-message--error" role="alert">
-              <span className="auth-message__icon" aria-hidden="true">
-                !
-              </span>
-              <span>{errorMessage}</span>
-            </p>
-          ) : null}
+          {errorMessage ? <Alert variant="error">{errorMessage}</Alert> : null}
 
           <form className="auth-form" onSubmit={(event) => void handleWithdraw(event)} noValidate>
             <fieldset className="auth-withdraw-reasons">
@@ -162,13 +156,8 @@ export default function WithdrawPage() {
             </fieldset>
 
             {reason === 'OTHER' ? (
-              <div className="auth-field">
-                <label className="auth-field__label" htmlFor="withdraw-reason-detail">
-                  기타 사유
-                </label>
-                <input
-                  id="withdraw-reason-detail"
-                  className="auth-field__input"
+              <Field id="withdraw-reason-detail" label="기타 사유">
+                <Input
                   type="text"
                   name="reasonDetail"
                   maxLength={500}
@@ -177,7 +166,7 @@ export default function WithdrawPage() {
                   disabled={isSubmitting}
                   placeholder="탈퇴 사유를 입력해 주세요."
                 />
-              </div>
+              </Field>
             ) : null}
 
             <label className="auth-checkbox-field">
@@ -191,13 +180,8 @@ export default function WithdrawPage() {
               <span>안내 사항을 모두 확인하였으며, 탈퇴에 동의합니다. (필수)</span>
             </label>
 
-            <div className="auth-field">
-              <label className="auth-field__label" htmlFor="withdraw-password">
-                비밀번호 (필수)
-              </label>
-              <input
-                id="withdraw-password"
-                className="auth-field__input"
+            <Field id="withdraw-password" label="비밀번호" required>
+              <Input
                 type="password"
                 name="password"
                 autoComplete="current-password"
@@ -205,12 +189,14 @@ export default function WithdrawPage() {
                 onChange={(event) => setPassword(event.target.value)}
                 disabled={isSubmitting}
               />
-            </div>
+            </Field>
 
             <div className="auth-withdraw-actions">
-              <Link
-                className="auth-submit auth-withdraw-actions__continue"
+              <Btn
+                variant="secondary"
+                fullWidth
                 to={continuePath}
+                className="auth-withdraw-actions__continue"
                 onClick={(event) => {
                   if (isSubmitting) {
                     event.preventDefault();
@@ -218,17 +204,18 @@ export default function WithdrawPage() {
                 }}
               >
                 계속 이용하기
-              </Link>
-              <button
-                className="auth-submit auth-submit--muted"
+              </Btn>
+              <Btn
                 type="submit"
+                variant="danger"
+                fullWidth
                 disabled={isSubmitting}
               >
                 {isSubmitting ? '탈퇴 처리 중…' : '탈퇴하기'}
-              </button>
+              </Btn>
             </div>
           </form>
-        </div>
+        </Card>
       </div>
     </AppLayout>
   );
