@@ -56,6 +56,6 @@ ondo.weather.api-key=your-weather-api-key
 # Admin 최초 계정 (username 없을 때 1회 생성 — 이후 enabled=false 권장)
 # ----------------------------------------------------------------
 ondo.admin.bootstrap.enabled=true
-ondo.admin.bootstrap.username=admin
-ondo.admin.bootstrap.password=qudtjs123.
-ondo.admin.bootstrap.name=시스템관리자
+ondo.admin.bootstrap.username=
+ondo.admin.bootstrap.password=
+ondo.admin.bootstrap.name=
