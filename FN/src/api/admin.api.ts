@@ -20,7 +20,12 @@ import type {
   AdminUserStatusRequest,
   AdminUserSummary,
 } from './types/admin';
-import type { Announcement, AnnouncementCreateRequest } from './types/announcement';
+import type {
+  AnnouncementCreateRequest,
+  AnnouncementDetail,
+  AnnouncementPageResponse,
+  AnnouncementUpdateRequest,
+} from './types/announcement';
 import type { SuggestionPost } from './types/suggestion';
 
 function buildQuery(params: Record<string, string | number | boolean | undefined>): string {
@@ -147,13 +152,22 @@ export function replyAdminSuggestion(id: number, body: AdminSuggestionReplyReque
   });
 }
 
-export function getAdminAnnouncements() {
-  return apiClient<Announcement[]>('/api/admin/announcements');
+export function getAdminAnnouncements(page = 0, size = 20) {
+  return apiClient<AnnouncementPageResponse>(
+    `/api/admin/announcements?page=${page}&size=${size}`,
+  );
 }
 
 export function createAdminAnnouncement(body: AnnouncementCreateRequest) {
-  return apiClient<Announcement>('/api/admin/announcements', {
+  return apiClient<AnnouncementDetail>('/api/admin/announcements', {
     method: 'POST',
+    body,
+  });
+}
+
+export function updateAdminAnnouncement(id: number, body: AnnouncementUpdateRequest) {
+  return apiClient<AnnouncementDetail>(`/api/admin/announcements/${id}`, {
+    method: 'PATCH',
     body,
   });
 }
