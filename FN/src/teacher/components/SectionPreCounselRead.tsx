@@ -13,6 +13,7 @@ import {
   formatTeacherDisplay,
   scrollToTeacherSection,
 } from '../teacherUtils';
+import { Badge, Btn, CardHelper } from '../../components/ui';
 import TeacherSectionCard from './TeacherSectionCard';
 
 interface SectionPreCounselReadProps {
@@ -141,13 +142,9 @@ export default function SectionPreCounselRead({
               >
                 <div className="teacher-pre-counsel-item__header">
                   <strong>{studentName}</strong>
-                  <span
-                    className={`teacher-pre-counsel-badge${
-                      item.completed ? ' is-done' : ' is-pending'
-                    }`}
-                  >
+                  <Badge variant={item.completed ? 'completed' : 'pending'}>
                     {item.completed ? '작성완료' : '미작성'}
-                  </span>
+                  </Badge>
                 </div>
                 <p className="teacher-pre-counsel-item__meta">{meta}</p>
               </button>
@@ -165,14 +162,9 @@ export default function SectionPreCounselRead({
             <h3 className="teacher-pre-counsel-detail-header__title">
               사전 상담 · {selectedStudentName || selectedUsername}
             </h3>
-            <button
-              type="button"
-              className="teacher-btn teacher-btn--secondary"
-              aria-label="사전 상담 닫기"
-              onClick={closeDetail}
-            >
+            <Btn type="button" variant="secondary" size="student" aria-label="사전 상담 닫기" onClick={closeDetail}>
               닫기
-            </button>
+            </Btn>
           </div>
 
           {isDetailLoading ? (
@@ -182,9 +174,7 @@ export default function SectionPreCounselRead({
           ) : detailProfile ? (
             <>
               <PreCounselDetailBody profile={detailProfile} />
-              <p className="teacher-card__helper">
-                최종 수정: {formatDateTime(detailProfile.updatedAt)}
-              </p>
+              <CardHelper>최종 수정: {formatDateTime(detailProfile.updatedAt)}</CardHelper>
             </>
           ) : null}
         </div>
