@@ -52,27 +52,6 @@
   align-self: center;
 }
 
-.teacher-message {
-  margin: 0;
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-body);
-  line-height: var(--line-height-body);
-  border-left: 3px solid transparent;
-}
-
-.teacher-message--error {
-  background: var(--color-error-bg);
-  color: var(--color-error);
-  border-left-color: var(--color-error);
-}
-
-.teacher-message--success {
-  background: var(--color-success-bg, #ecfdf5);
-  color: var(--color-success, #047857);
-  border-left-color: var(--color-success, #047857);
-}
-
 .teacher-form-actions {
   display: flex;
   flex-wrap: wrap;
@@ -287,25 +266,24 @@
   cursor: pointer;
 }
 
-.teacher-card {
-  background: #ffffff;
-  border-radius: var(--radius-lg);
-  padding: var(--space-6);
-  box-shadow: var(--shadow-card);
-  min-width: 0;
+.ui-card {
   scroll-margin-top: var(--space-4);
 }
 
-.teacher-card--compact {
-  padding: var(--space-5);
+.teacher-page .ui-card > .ui-card__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-neutral-200) 80%, transparent);
 }
 
-.teacher-card__title {
-  margin: 0 0 var(--space-3);
-  font-size: var(--font-size-h3);
-  line-height: var(--line-height-h3);
-  font-weight: var(--font-weight-h3);
-  color: var(--color-neutral-900);
+.teacher-page .ui-card .ui-card__title-mark {
+  width: 0.35rem;
+  height: 1.125rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, var(--color-primary-500), var(--color-primary-300));
 }
 
 .teacher-card__helper {
@@ -967,7 +945,7 @@
     justify-content: flex-end;
   }
 
-  .teacher-card {
+  .ui-card {
     padding: var(--space-5);
   }
 
