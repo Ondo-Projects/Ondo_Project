@@ -1,0 +1,161 @@
+/**
+ * Shared UI components (§5.1 Button, §5.2 Card)
+ * Source: FN/DOCS/DESIGN/2026_UIUX_디자인가이드.md
+ */
+
+/* ─── Button (§5.1) ─── */
+
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--btn-min-height);
+  padding: var(--btn-padding-y) var(--btn-padding-x);
+  border-radius: var(--btn-radius);
+  border: none;
+  font-family: inherit;
+  font-size: var(--btn-font-size);
+  font-weight: var(--btn-font-weight);
+  line-height: var(--line-height-body);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background var(--duration-fast) var(--ease-default),
+    border-color var(--duration-fast) var(--ease-default),
+    color var(--duration-fast) var(--ease-default),
+    transform 0.1s var(--ease-default);
+}
+
+.ui-btn--student {
+  min-height: var(--btn-min-height-student);
+}
+
+.ui-btn--full {
+  width: 100%;
+}
+
+.ui-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.ui-btn:active:not(:disabled) {
+  transform: scale(var(--btn-active-scale));
+}
+
+.ui-btn:focus-visible {
+  outline: var(--btn-focus-ring);
+  outline-offset: var(--btn-focus-offset);
+}
+
+.ui-btn--primary {
+  background: var(--color-primary-600);
+  color: var(--color-neutral-50);
+}
+
+.ui-btn--secondary {
+  background: var(--color-neutral-100);
+  color: var(--color-neutral-900);
+  border: 1px solid var(--color-neutral-200);
+}
+
+.ui-btn--ghost {
+  background: transparent;
+  color: var(--color-primary-600);
+  border: 1.5px solid var(--color-neutral-200);
+}
+
+.ui-btn--danger {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+}
+
+@media (hover: hover) {
+  .ui-btn--primary:hover:not(:disabled) {
+    background: var(--color-primary-700);
+  }
+
+  .ui-btn--secondary:hover:not(:disabled) {
+    background: var(--color-neutral-200);
+  }
+
+  .ui-btn--ghost:hover:not(:disabled) {
+    background: var(--color-primary-50);
+  }
+
+  .ui-btn--danger:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--color-error-bg) 70%, var(--color-error));
+  }
+}
+
+/* ─── Card (§5.2) ─── */
+
+.ui-card {
+  background: var(--color-bg-card);
+  border-radius: var(--card-radius);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-card);
+  border: var(--card-border);
+  min-width: 0;
+}
+
+.ui-card--compact {
+  padding: var(--space-5);
+}
+
+.ui-card--interactive {
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .ui-card--interactive:hover {
+    transform: translateY(var(--card-hover-translate-y));
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.ui-card__title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-h3);
+  font-weight: var(--font-weight-h3);
+  color: var(--color-neutral-900);
+}
+
+.ui-card__title--marked {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-neutral-200) 80%, transparent);
+}
+
+.ui-card__title-mark {
+  flex-shrink: 0;
+  width: 0.35rem;
+  height: 1.125rem;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-600);
+}
+
+.ui-card__helper {
+  margin: calc(var(--space-3) * -1) 0 var(--space-4);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+  color: var(--color-neutral-600);
+}
+
+.ui-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+@media (max-width: 640px) {
+  .ui-card {
+    padding: var(--space-5);
+  }
+}
