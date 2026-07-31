@@ -2,7 +2,9 @@ package com.ondo.domain.announcement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ondo.domain.announcement.dto.AnnouncementCreateDTO;
+import com.ondo.domain.announcement.dto.AnnouncementUpdateDTO;
 import com.ondo.domain.announcement.entity.AnnouncementAudience;
+import com.ondo.domain.announcement.entity.AnnouncementStatus;
 import com.ondo.domain.announcement.entity.PlatformAnnouncement;
 import com.ondo.domain.announcement.repository.PlatformAnnouncementRepository;
 import com.ondo.domain.school.entity.School;
@@ -26,6 +28,7 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -91,45 +94,128 @@ class AnnouncementIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.title").value("점검 안내"))
                 .andExpect(jsonPath("$.audience").value("ALL"))
+                .andExpect(jsonPath("$.status").value("PUBLISHED"))
+                .andExpect(jsonPath("$.pinned").value(false))
                 .andExpect(jsonPath("$.adminUsername").value(ADMIN_USERNAME));
 
         mockMvc.perform(get("/api/common/announcements")
                         .header("Authorization", "Bearer " + bearerToken(STUDENT_USERNAME, Role.STUDENT)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].title").value("점검 안내"));
+                .andExpect(jsonPath("$.items[0].title").value("점검 안내"))
+                .andExpect(jsonPath("$.items[0].contentPreview").value("오늘 밤 점검합니다."))
+                .andExpect(jsonPath("$.totalElements").value(1));
 
         mockMvc.perform(get("/api/common/announcements")
                         .header("Authorization", "Bearer " + bearerToken(TEACHER_USERNAME, Role.TEACHER)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].title").value("점검 안내"));
+                .andExpect(jsonPath("$.items[0].title").value("점검 안내"));
     }
 
     @Test
     void commonAnnouncements_filtersByAudience() throws Exception {
-        saveAnnouncement("학생 공지", AnnouncementAudience.STUDENT);
-        saveAnnouncement("교사 공지", AnnouncementAudience.TEACHER);
-        saveAnnouncement("전체 공지", AnnouncementAudience.ALL);
+        saveAnnouncement("학생 공지", AnnouncementAudience.STUDENT, false, AnnouncementStatus.PUBLISHED);
+        saveAnnouncement("교사 공지", AnnouncementAudience.TEACHER, false, AnnouncementStatus.PUBLISHED);
+        saveAnnouncement("전체 공지", AnnouncementAudience.ALL, false, AnnouncementStatus.PUBLISHED);
 
         mockMvc.perform(get("/api/common/announcements")
                         .header("Authorization", "Bearer " + bearerToken(STUDENT_USERNAME, Role.STUDENT)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[?(@.title == '학생 공지')]").exists())
-                .andExpect(jsonPath("$[?(@.title == '전체 공지')]").exists())
-                .andExpect(jsonPath("$[?(@.title == '교사 공지')]").doesNotExist());
+                .andExpect(jsonPath("$.totalElements").value(2))
+                .andExpect(jsonPath("$.items[?(@.title == '학생 공지')]").exists())
+                .andExpect(jsonPath("$.items[?(@.title == '전체 공지')]").exists())
+                .andExpect(jsonPath("$.items[?(@.title == '교사 공지')]").doesNotExist());
 
         mockMvc.perform(get("/api/common/announcements")
                         .header("Authorization", "Bearer " + bearerToken(TEACHER_USERNAME, Role.TEACHER)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[?(@.title == '교사 공지')]").exists())
-                .andExpect(jsonPath("$[?(@.title == '전체 공지')]").exists())
-                .andExpect(jsonPath("$[?(@.title == '학생 공지')]").doesNotExist());
+                .andExpect(jsonPath("$.totalElements").value(2))
+                .andExpect(jsonPath("$.items[?(@.title == '교사 공지')]").exists())
+                .andExpect(jsonPath("$.items[?(@.title == '전체 공지')]").exists())
+                .andExpect(jsonPath("$.items[?(@.title == '학생 공지')]").doesNotExist());
+    }
+
+    @Test
+    void commonAnnouncements_pinnedFirst() throws Exception {
+        saveAnnouncement("일반 공지", AnnouncementAudience.ALL, false, AnnouncementStatus.PUBLISHED);
+        saveAnnouncement("중요 공지", AnnouncementAudience.ALL, true, AnnouncementStatus.PUBLISHED);
+
+        mockMvc.perform(get("/api/common/announcements")
+                        .header("Authorization", "Bearer " + bearerToken(STUDENT_USERNAME, Role.STUDENT)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].title").value("중요 공지"))
+                .andExpect(jsonPath("$.items[0].pinned").value(true))
+                .andExpect(jsonPath("$.items[1].title").value("일반 공지"));
+    }
+
+    @Test
+    void getCommonAnnouncement_returnsDetail() throws Exception {
+        PlatformAnnouncement announcement = saveAnnouncement(
+                "상세 공지",
+                AnnouncementAudience.ALL,
+                false,
+                AnnouncementStatus.PUBLISHED
+        );
+
+        mockMvc.perform(get("/api/common/announcements/{id}", announcement.getId())
+                        .header("Authorization", "Bearer " + bearerToken(STUDENT_USERNAME, Role.STUDENT)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("상세 공지"))
+                .andExpect(jsonPath("$.content").value("상세 공지 내용"))
+                .andExpect(jsonPath("$.contentPreview").doesNotExist());
+    }
+
+    @Test
+    void archivedAnnouncement_hiddenFromCommonListAndDetail() throws Exception {
+        PlatformAnnouncement archived = saveAnnouncement(
+                "보관 공지",
+                AnnouncementAudience.ALL,
+                false,
+                AnnouncementStatus.ARCHIVED
+        );
+
+        mockMvc.perform(get("/api/common/announcements")
+                        .header("Authorization", "Bearer " + bearerToken(STUDENT_USERNAME, Role.STUDENT)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(0));
+
+        mockMvc.perform(get("/api/common/announcements/{id}", archived.getId())
+                        .header("Authorization", "Bearer " + bearerToken(STUDENT_USERNAME, Role.STUDENT)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("공지를 찾을 수 없습니다."));
+    }
+
+    @Test
+    void updateAnnouncement_changesFields() throws Exception {
+        PlatformAnnouncement announcement = saveAnnouncement(
+                "수정 전",
+                AnnouncementAudience.STUDENT,
+                false,
+                AnnouncementStatus.PUBLISHED
+        );
+
+        AnnouncementUpdateDTO request = new AnnouncementUpdateDTO();
+        request.setTitle("수정 후");
+        request.setPinned(true);
+        request.setAudience(AnnouncementAudience.ALL);
+
+        mockMvc.perform(patch("/api/admin/announcements/{id}", announcement.getId())
+                        .header("Authorization", "Bearer " + bearerToken(ADMIN_USERNAME, Role.ADMIN))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("수정 후"))
+                .andExpect(jsonPath("$.pinned").value(true))
+                .andExpect(jsonPath("$.audience").value("ALL"));
     }
 
     @Test
     void deleteAnnouncement_removesRecord() throws Exception {
-        PlatformAnnouncement announcement = saveAnnouncement("삭제 대상", AnnouncementAudience.ALL);
+        PlatformAnnouncement announcement = saveAnnouncement(
+                "삭제 대상",
+                AnnouncementAudience.ALL,
+                false,
+                AnnouncementStatus.PUBLISHED
+        );
 
         mockMvc.perform(delete("/api/admin/announcements/{id}", announcement.getId())
                         .header("Authorization", "Bearer " + bearerToken(ADMIN_USERNAME, Role.ADMIN)))
@@ -158,13 +244,22 @@ class AnnouncementIntegrationTest {
         return request;
     }
 
-    private PlatformAnnouncement saveAnnouncement(String title, AnnouncementAudience audience) {
+    private PlatformAnnouncement saveAnnouncement(
+            String title,
+            AnnouncementAudience audience,
+            boolean pinned,
+            AnnouncementStatus status
+    ) {
+        LocalDateTime now = LocalDateTime.now();
         return announcementRepository.save(PlatformAnnouncement.builder()
                 .title(title)
                 .content(title + " 내용")
                 .audience(audience)
                 .admin(admin)
-                .createdAt(LocalDateTime.now())
+                .pinned(pinned)
+                .status(status)
+                .createdAt(now)
+                .updatedAt(now)
                 .build());
     }
 

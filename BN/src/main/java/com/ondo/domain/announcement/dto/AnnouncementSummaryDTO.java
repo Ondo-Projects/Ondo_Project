@@ -8,11 +8,13 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public class AnnouncementResponseDTO {
+public class AnnouncementSummaryDTO {
+
+    private static final int PREVIEW_MAX_LENGTH = 120;
 
     private final Long id;
     private final String title;
-    private final String content;
+    private final String contentPreview;
     private final AnnouncementAudience audience;
     private final String adminUsername;
     private final String adminName;
@@ -21,10 +23,10 @@ public class AnnouncementResponseDTO {
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
-    public AnnouncementResponseDTO(PlatformAnnouncement announcement) {
+    public AnnouncementSummaryDTO(PlatformAnnouncement announcement) {
         this.id = announcement.getId();
         this.title = announcement.getTitle();
-        this.content = announcement.getContent();
+        this.contentPreview = toPreview(announcement.getContent());
         this.audience = announcement.getAudience();
         this.adminUsername = announcement.getAdmin().getUsername();
         this.adminName = announcement.getAdmin().getName();
@@ -32,5 +34,16 @@ public class AnnouncementResponseDTO {
         this.status = announcement.getStatus();
         this.createdAt = announcement.getCreatedAt();
         this.updatedAt = announcement.getUpdatedAt();
+    }
+
+    public static String toPreview(String content) {
+        if (content == null || content.isBlank()) {
+            return "";
+        }
+        String normalized = content.replaceAll("\\s+", " ").trim();
+        if (normalized.length() <= PREVIEW_MAX_LENGTH) {
+            return normalized;
+        }
+        return normalized.substring(0, PREVIEW_MAX_LENGTH) + "…";
     }
 }
