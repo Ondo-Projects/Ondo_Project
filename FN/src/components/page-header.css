@@ -5,7 +5,7 @@
   border-radius: var(--radius-lg);
   background:
     radial-gradient(circle at top right, color-mix(in srgb, var(--color-primary-100) 80%, transparent), transparent 55%),
-    linear-gradient(135deg, var(--color-primary-50) 0%, #ffffff 58%, var(--color-neutral-50) 100%);
+    linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-bg-card) 58%, var(--color-neutral-50) 100%);
   box-shadow: var(--shadow-card);
 }
 
@@ -27,20 +27,20 @@
 .page-header--tone-teacher {
   background:
     radial-gradient(circle at top right, color-mix(in srgb, #dbeafe 80%, transparent), transparent 55%),
-    linear-gradient(135deg, #eff6ff 0%, #ffffff 58%, var(--color-neutral-50) 100%);
+    linear-gradient(135deg, #eff6ff 0%, var(--color-bg-card) 58%, var(--color-neutral-50) 100%);
 }
 
 .page-header--tone-admin {
   background:
     radial-gradient(circle at top right, color-mix(in srgb, #fef3c7 70%, transparent), transparent 55%),
-    linear-gradient(135deg, #fffbeb 0%, #ffffff 58%, var(--color-neutral-50) 100%);
+    linear-gradient(135deg, #fffbeb 0%, var(--color-bg-card) 58%, var(--color-neutral-50) 100%);
   border-color: color-mix(in srgb, #fcd34d 35%, var(--color-neutral-200));
 }
 
 .page-header--tone-home {
   background:
     radial-gradient(circle at top right, color-mix(in srgb, var(--color-primary-100) 70%, transparent), transparent 55%),
-    linear-gradient(135deg, #f0fdf4 0%, #ffffff 58%, var(--color-neutral-50) 100%);
+    linear-gradient(135deg, #f0fdf4 0%, var(--color-bg-card) 58%, var(--color-neutral-50) 100%);
   border-color: color-mix(in srgb, #86efac 35%, var(--color-neutral-200));
 }
 
@@ -78,7 +78,7 @@
   justify-content: center;
   padding: var(--space-2);
   border-radius: var(--radius-md);
-  background: color-mix(in srgb, #ffffff 82%, transparent);
+  background: color-mix(in srgb, var(--color-bg-card) 82%, transparent);
   box-shadow: 0 1px 2px rgb(15 23 42 / 6%);
 }
 
@@ -194,14 +194,14 @@
 }
 
 .page-header-action--ghost {
-  background: color-mix(in srgb, #ffffff 72%, transparent);
+  background: color-mix(in srgb, var(--color-bg-card) 72%, transparent);
   color: var(--color-neutral-800);
   border-color: color-mix(in srgb, var(--color-neutral-300) 80%, transparent);
 }
 
 .page-header-action--secondary {
   background: var(--color-neutral-800);
-  color: #ffffff;
+  color: var(--color-on-primary);
 }
 
 .page-header-action--danger-ghost {
@@ -212,7 +212,7 @@
 
 @media (hover: hover) {
   .page-header-action--ghost:hover {
-    background: #ffffff;
+    background: var(--color-bg-card);
     color: var(--color-primary-700);
     border-color: var(--color-primary-200);
   }
@@ -260,5 +260,26 @@
   .page-header--landing,
   .page-header--toolbar {
     padding: var(--space-4);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .page-header,
+  .page-header--tone-teacher,
+  .page-header--tone-admin,
+  .page-header--tone-home {
+    border-color: var(--color-neutral-200);
+    background:
+      radial-gradient(circle at top right, color-mix(in srgb, var(--color-primary-900) 35%, transparent), transparent 55%),
+      linear-gradient(135deg, var(--color-bg-elevated) 0%, var(--color-bg-card) 58%, var(--color-bg-page) 100%);
+  }
+
+  .page-header__title {
+    color: var(--color-neutral-800);
+  }
+
+  .page-header__eyebrow,
+  .page-header__eyebrow--center {
+    color: var(--color-primary-300);
   }
 }

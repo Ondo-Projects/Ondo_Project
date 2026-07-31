@@ -1,6 +1,6 @@
 import type { AnnouncementDetail } from '../../api/types/announcement';
 import { ANNOUNCEMENT_AUDIENCE_LABELS } from '../../api/types/announcement';
-import { Drawer, DrawerBody, DrawerClose, DrawerHeader, DrawerTitle } from '../../components/ui';
+import { Drawer, DrawerBody, DrawerClose, DrawerHeader, DrawerTitle, Skeleton, SkeletonText } from '../../components/ui';
 import { formatDateTime } from '../homeUtils';
 
 interface AnnouncementDetailDrawerProps {
@@ -27,7 +27,10 @@ export default function AnnouncementDetailDrawer({
 
       <DrawerBody>
         {isLoading ? (
-          <p className="home-announcement-drawer__status">불러오는 중…</p>
+          <div aria-hidden="true">
+            <Skeleton height="1.25rem" width="40%" rounded="sm" />
+            <SkeletonText lines={4} className="home-announcement-drawer__skeleton" />
+          </div>
         ) : error ? (
           <p
             className="home-announcement-drawer__status home-announcement-drawer__status--error"

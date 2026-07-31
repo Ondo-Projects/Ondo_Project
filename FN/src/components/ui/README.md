@@ -17,6 +17,8 @@
 | `Badge` | 역할·상태 뱃지 (§2.3, §5.5) |
 | `Alert` | success / error / warning / info 피드백 |
 | `Drawer` | backdrop, ESC, focus trap, safe area shell |
+| `Skeleton` | 로딩 placeholder (§5.7), `SkeletonText` |
+| `ToastProvider` / `useToast` | 3초 auto-dismiss 피드백 (§6.4) |
 
 ## 사용 예
 
@@ -50,6 +52,19 @@ import { Alert, Btn, Card, Field, Input } from '../components/ui';
 | `student-badge--*`, `admin-badge--*` | `<Badge variant="…">` |
 | `home-announcement-drawer`, `admin-announcement-drawer` | `<Drawer>` compound API |
 
+## Phase 5 (feature/design-a11y-polish)
+
+- **Dark mode** — `tokens.css` dark 토큰 보강 (surface, semantic, badge, skeleton)
+- **Skeleton** — `Skeleton`, `SkeletonText` + `AuthLoading` 카드형 스켈레톤
+- **Toast** — `ToastProvider`, `useToast` (App 루트 연결), 관리자 성공 피드백 파일럿
+
+```tsx
+const { showToast } = useToast();
+showToast('저장했습니다.', 'success');
+```
+
+- **CSS** — `#ffffff` → 토큰 치환, home/admin/teacher/page-header dark 보정
+
 ## Phase 1 (feature/design-auth-layout)
 
 - **Auth** — `FindIdPage`, `ResetPasswordPage`, `WithdrawPage` + `LoginPage` ui 정리
@@ -79,13 +94,7 @@ import { Alert, Btn, Card, Field, Input } from '../components/ui';
 - **Alert:** `StudentHomePage` — 페이지 success/error 메시지
 - **Drawer:** `AnnouncementDetailDrawer` — 공지 상세 shell
 
-## 이후 Phase (예고)
-
-| Phase | 브랜치 (예) | 범위 |
-|-------|-------------|------|
-| 5 | `feature/design-a11y-polish` | 다크모드 QA, 스켈레톤·토스트(선택) |
-
-(Phase 1~4 완료)
+(Phase 0~5 완료)
 
 ## 규칙
 

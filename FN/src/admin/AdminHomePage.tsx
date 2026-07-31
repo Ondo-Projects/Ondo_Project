@@ -14,13 +14,13 @@ import SectionStatistics from './components/SectionStatistics';
 import SectionSuggestionAdmin from './components/SectionSuggestionAdmin';
 import SectionSystemStatus from './components/SectionSystemStatus';
 import SectionUserSearch from './components/SectionUserSearch';
-import { Alert } from '../components/ui';
+import { Alert, useToast } from '../components/ui';
 import './admin.css';
 
 export default function AdminHomePage() {
   const { user, logout } = useAuth();
+  const { showToast } = useToast();
   const [refreshToken, setRefreshToken] = useState(0);
-  const [pageSuccess, setPageSuccess] = useState<string | null>(null);
   const [sectionError, setSectionError] = useState<string | null>(null);
 
   usePageTitle('관리자 | 온도');
@@ -32,14 +32,13 @@ export default function AdminHomePage() {
   const handleSuccess = useCallback(
     (message: string) => {
       setSectionError(null);
-      setPageSuccess(message);
+      showToast(message, 'success');
       refreshData();
     },
-    [refreshData],
+    [refreshData, showToast],
   );
 
   const handleError = useCallback((message: string) => {
-    setPageSuccess(null);
     setSectionError(message);
   }, []);
 
@@ -67,8 +66,6 @@ export default function AdminHomePage() {
         />
 
         {sectionError ? <Alert variant="error">{sectionError}</Alert> : null}
-
-        {pageSuccess ? <Alert variant="success">{pageSuccess}</Alert> : null}
 
         <SectionDashboard refreshToken={refreshToken} onError={handleError} />
         <SectionUserSearch

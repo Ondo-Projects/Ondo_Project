@@ -31,6 +31,9 @@
   --color-bg-card: #ffffff;
   --color-bg-elevated: #ffffff;
   --color-border-subtle: rgba(226, 232, 240, 0.8);
+  --color-on-primary: #ffffff;
+  --color-skeleton-base: var(--color-neutral-100);
+  --color-skeleton-shine: var(--color-neutral-200);
 
   /* ─── Semantic ─── */
   --color-success: #059669;
@@ -203,19 +206,48 @@
 /* ─── Dark mode (§2.4) ─── */
 @media (prefers-color-scheme: dark) {
   :root {
+    --color-primary-50: #1e3a5f;
+    --color-primary-100: #1e40af;
     --color-primary-500: #60a5fa;
     --color-primary-600: #60a5fa;
     --color-primary-700: #3b82f6;
+
+    --color-neutral-50: #0f172a;
+    --color-neutral-100: #1e293b;
+    --color-neutral-200: #334155;
+    --color-neutral-800: #f1f5f9;
+    --color-neutral-600: #cbd5e1;
+    --color-neutral-400: #94a3b8;
 
     --color-bg-page: #0f172a;
     --color-bg-page-solid: #0f172a;
     --color-bg-card: #1e293b;
     --color-bg-elevated: #334155;
     --color-border-subtle: rgba(51, 65, 85, 0.8);
+    --color-on-primary: #f8fafc;
+    --color-skeleton-base: #334155;
+    --color-skeleton-shine: #475569;
 
-    --color-neutral-800: #f1f5f9;
-    --color-neutral-600: #cbd5e1;
-    --color-neutral-400: #94a3b8;
+    --color-success-bg: #064e3b;
+    --color-warning-bg: #78350f;
+    --color-error-bg: #7f1d1d;
+    --color-info-bg: #0c4a6e;
+
+    --badge-student-bg: #1e3a8a;
+    --badge-student-text: #bfdbfe;
+    --badge-teacher-bg: #14532d;
+    --badge-teacher-text: #bbf7d0;
+    --badge-admin-bg: #78350f;
+    --badge-admin-text: #fde68a;
+    --badge-pending-bg: #78350f;
+    --badge-pending-text: #fde68a;
+    --badge-in-progress-bg: #1e3a8a;
+    --badge-in-progress-text: #bfdbfe;
+    --badge-completed-bg: #14532d;
+    --badge-completed-text: #bbf7d0;
+
+    --btn-focus-ring: 3px solid color-mix(in srgb, var(--color-primary-500) 45%, transparent);
+    --input-focus-ring: 0 0 0 4px color-mix(in srgb, var(--color-primary-500) 25%, transparent);
 
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
     --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.25);
