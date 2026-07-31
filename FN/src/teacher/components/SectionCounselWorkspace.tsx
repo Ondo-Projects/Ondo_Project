@@ -7,7 +7,9 @@ import {
 } from '../../api/counseling.api';
 import { ApiError } from '../../api/types/api-error';
 import type { CounselingPost, CounselingStatus } from '../../api/types/counseling';
+import { Badge, Btn, Field, Textarea } from '../../components/ui';
 import {
+  getCounselingStatusBadgeVariant,
   getCounselingStatusLabel,
   getCounselingTypeLabel,
 } from '../../student/counselingLabels';
@@ -16,7 +18,6 @@ import { TEACHER_SECTIONS } from '../constants';
 import {
   COUNSEL_STATUS_FILTERS,
   getAllowedStatusTransitions,
-  getCounselStatusBadgeClass,
   getStatusTransitionLabel,
 } from '../teacherCounselingUtils';
 import { formatDateTime, formatTeacherDisplay, scrollToTeacherSection } from '../teacherUtils';
@@ -193,9 +194,9 @@ export default function SectionCounselWorkspace({
               >
                 <div className="teacher-post-item__header">
                   <h3 className="teacher-post-item__title">{post.title}</h3>
-                  <span className={getCounselStatusBadgeClass(post.status)}>
+                  <Badge variant={getCounselingStatusBadgeVariant(post.status)}>
                     {getCounselingStatusLabel(post.status)}
-                  </span>
+                  </Badge>
                 </div>
                 <p className="teacher-post-item__meta">
                   {formatTeacherDisplay(post.studentName, post.studentUsername)} ·{' '}
@@ -211,14 +212,16 @@ export default function SectionCounselWorkspace({
       {showDetail ? (
         <TeacherSectionCard id={TEACHER_SECTIONS.DETAIL_CARD} title="상담 상세" compact>
           <div className="teacher-detail-header">
-            <button
+            <Btn
               type="button"
-              className="teacher-btn teacher-btn--secondary teacher-detail-header__close"
+              variant="secondary"
+              size="student"
+              className="teacher-detail-header__close"
               aria-label="상담 상세 닫기"
               onClick={closeDetail}
             >
               닫기
-            </button>
+            </Btn>
           </div>
 
           {isDetailLoading || !detailPost ? (
@@ -227,9 +230,9 @@ export default function SectionCounselWorkspace({
             <>
               <div className="teacher-post-item__header teacher-detail-header-row">
                 <h3 className="teacher-post-item__title">{detailPost.title}</h3>
-                <span className={getCounselStatusBadgeClass(detailPost.status)}>
+                <Badge variant={getCounselingStatusBadgeVariant(detailPost.status)}>
                   {getCounselingStatusLabel(detailPost.status)}
-                </span>
+                </Badge>
               </div>
 
               <p className="teacher-post-meta">
@@ -259,42 +262,41 @@ export default function SectionCounselWorkspace({
               {allowedStatuses.length > 0 ? (
                 <div className="teacher-form-actions teacher-detail-actions">
                   {allowedStatuses.map((status) => (
-                    <button
+                    <Btn
                       key={status}
                       type="button"
-                      className="teacher-btn teacher-btn--muted"
+                      variant="secondary"
+                      size="student"
                       disabled={updatingStatus !== null}
                       onClick={() => handleStatusUpdate(detailPost.id, status)}
                     >
                       {updatingStatus === status
                         ? '변경 중…'
                         : getStatusTransitionLabel(status)}
-                    </button>
+                    </Btn>
                   ))}
                 </div>
               ) : null}
 
               <div className="teacher-reply-box">
-                <label className="teacher-field__label" htmlFor="teacherReplyContent">
-                  교사 답변
-                </label>
-                <textarea
-                  id="teacherReplyContent"
-                  className="teacher-field__textarea"
-                  placeholder="학생에게 전달할 답변을 작성해 주세요."
-                  disabled={isReplyDisabled || isSubmittingReply}
-                  value={replyContent}
-                  onChange={(event) => setReplyContent(event.target.value)}
-                />
+                <Field id="teacherReplyContent" label="교사 답변">
+                  <Textarea
+                    placeholder="학생에게 전달할 답변을 작성해 주세요."
+                    disabled={isReplyDisabled || isSubmittingReply}
+                    value={replyContent}
+                    onChange={(event) => setReplyContent(event.target.value)}
+                  />
+                </Field>
                 <div className="teacher-form-actions">
-                  <button
+                  <Btn
                     type="button"
-                    className="teacher-btn teacher-btn--primary"
+                    variant="primary"
+                    size="student"
                     disabled={isReplyDisabled || isSubmittingReply}
                     onClick={handleReplySubmit}
                   >
                     {isSubmittingReply ? '등록 중…' : '답변 등록'}
-                  </button>
+                  </Btn>
                 </div>
               </div>
             </>
