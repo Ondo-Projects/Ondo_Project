@@ -38,26 +38,21 @@ export default function StudentHomePage() {
   usePageTitle('학생 홈 | 온도');
   const {
     reloadTimetable,
+    reloadWorkspace,
     applyAssignment,
     ...schoolLife
   } = useStudentSchoolLife(Boolean(user));
   const [workspaceTab, setWorkspaceTab] = useState<StudentWorkspaceTab>('pre-counsel');
-  const [counselRefreshKey, setCounselRefreshKey] = useState(0);
-  const [todoRefreshKey, setTodoRefreshKey] = useState(0);
   const [assignmentOpenRequest, setAssignmentOpenRequest] = useState(0);
   const [preCounselNavRequest, setPreCounselNavRequest] = useState(0);
   const [pageSuccess, setPageSuccess] = useState<string | null>(null);
   const [sectionError, setSectionError] = useState<string | null>(null);
 
-  const refreshTodo = useCallback(() => {
-    setTodoRefreshKey((key) => key + 1);
-  }, []);
+  const refreshWorkspace = useCallback(() => {
+    void reloadWorkspace();
+  }, [reloadWorkspace]);
 
-  const { items: todayTodoItems } = useStudentTodayTodo(
-    schoolLife,
-    Boolean(user),
-    todoRefreshKey,
-  );
+  const { items: todayTodoItems } = useStudentTodayTodo(schoolLife);
 
   const navigateToSection = useCallback((sectionId: string) => {
     const tab = resolveWorkspaceTabForSection(sectionId);
@@ -79,9 +74,9 @@ export default function StudentHomePage() {
     (message: string) => {
       setSectionError(null);
       setPageSuccess(message);
-      refreshTodo();
+      refreshWorkspace();
     },
-    [refreshTodo],
+    [refreshWorkspace],
   );
 
   const handleError = useCallback((message: string) => {
@@ -91,25 +86,24 @@ export default function StudentHomePage() {
 
   const handleProfileChanged = useCallback(async () => {
     await reloadTimetable();
-    refreshTodo();
-  }, [reloadTimetable, refreshTodo]);
+    refreshWorkspace();
+  }, [reloadTimetable, refreshWorkspace]);
 
   const handleAssignmentChanged = useCallback(
     async (assignment: StudentAssignment) => {
       await applyAssignment(assignment);
-      refreshTodo();
+      refreshWorkspace();
     },
-    [applyAssignment, refreshTodo],
+    [applyAssignment, refreshWorkspace],
   );
 
   const handleCounselingCreated = useCallback(() => {
-    setCounselRefreshKey((key) => key + 1);
-    refreshTodo();
+    refreshWorkspace();
     setWorkspaceTab('counsel-list');
     window.setTimeout(() => {
       scrollToStudentSection(STUDENT_SECTIONS.COUNSEL_LIST);
     }, 0);
-  }, [refreshTodo]);
+  }, [refreshWorkspace]);
 
   const handleWorkspaceTabChange = useCallback((tab: StudentWorkspaceTab) => {
     setWorkspaceTab(tab);
@@ -184,7 +178,12 @@ export default function StudentHomePage() {
             weatherError={schoolLife.weatherError}
           />
           <div className="student-daily-grid">
-            <SectionMood onSuccess={handleSuccess} onError={handleError} />
+            <SectionMood
+              prefetchedMood={schoolLife.todayMood}
+              moodLoaded={schoolLife.workspaceLoaded}
+              onSuccess={handleSuccess}
+              onError={handleError}
+            />
             <SectionNotice
               hasAssignment={schoolLife.hasAssignment}
               notices={schoolLife.notices}
@@ -228,6 +227,8 @@ export default function StudentHomePage() {
 
             <div className={workspaceTab === 'pre-counsel' ? undefined : 'student-tab-hidden'}>
               <SectionPreCounsel
+                prefetchedProfile={schoolLife.preCounselProfile}
+                profileLoaded={schoolLife.workspaceLoaded}
                 navFocusToken={preCounselNavRequest}
                 onSuccess={handleSuccess}
                 onError={handleError}
@@ -246,7 +247,8 @@ export default function StudentHomePage() {
             <div className={workspaceTab === 'counsel-list' ? undefined : 'student-tab-hidden'}>
               <SectionCounselList
                 isActive={workspaceTab === 'counsel-list'}
-                refreshToken={counselRefreshKey}
+                prefetchedPosts={schoolLife.counselingPosts}
+                postsLoaded={schoolLife.workspaceLoaded}
                 onSuccess={handleSuccess}
                 onError={handleError}
               />
@@ -255,7 +257,12 @@ export default function StudentHomePage() {
         </RoleHomeZone>
 
         <RoleHomeZone badge="FEEDBACK" title="의견 보내기" tone="student">
-          <SectionSuggestion onSuccess={handleSuccess} onError={handleError} />
+          <SectionSuggestion
+            prefetchedSuggestions={schoolLife.suggestions}
+            suggestionsLoaded={schoolLife.workspaceLoaded}
+            onSuccess={handleSuccess}
+            onError={handleError}
+          />
         </RoleHomeZone>
       </div>
     </AppLayout>

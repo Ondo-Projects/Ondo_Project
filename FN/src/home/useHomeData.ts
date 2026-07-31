@@ -1,18 +1,8 @@
 import { useEffect, useState } from 'react';
-import {
-  getProfileSchool,
-  getTeacherCounselingPosts,
-  getTeacherPreCounselingProfiles,
-  getTeacherUnreadCount,
-  getTodayMeals,
-  getTodayTimetable,
-  getTodayWeather,
-  getUpcomingSchoolSchedule,
-} from '../api/home.api';
+import { getCommonHomeAggregate } from '../api/home.api';
 import type { AuthUser } from '../api/types/auth';
 import type {
   MealDayResponse,
-  PreCounselingProfileSummary,
   ProfileSchoolResponse,
   SchoolScheduleUpcomingResponse,
   TimetableDayResponse,
@@ -84,6 +74,10 @@ export function useHomeData(user: AuthUser | null): HomeDataState {
       return;
     }
 
+    if (user.role !== 'STUDENT' && user.role !== 'TEACHER') {
+      return;
+    }
+
     const currentUser = user;
     let cancelled = false;
 
@@ -91,124 +85,35 @@ export function useHomeData(user: AuthUser | null): HomeDataState {
       setState({ ...initialState, isLoading: true });
 
       try {
-        let schoolProfile: ProfileSchoolResponse | null = null;
-        let schoolProfileError: string | null = null;
-
-        try {
-          schoolProfile = await getProfileSchool(currentUser.role);
-        } catch (error) {
-          schoolProfileError = resolveErrorMessage(error, '학교 정보를 불러오지 못했습니다.');
-        }
-
-        const weatherPromise = getTodayWeather().catch((error) => ({
-          error: resolveErrorMessage(error, '날씨 정보를 불러올 수 없습니다.'),
-        }));
-
-        const schedulePromise = getUpcomingSchoolSchedule(14).catch((error) => ({
-          error: resolveErrorMessage(error, '학사일정을 불러올 수 없습니다.'),
-        }));
-
-        const studentMealsPromise =
-          currentUser.role === 'STUDENT'
-            ? getTodayMeals().catch((error) => ({
-                error: resolveErrorMessage(error, '급식 정보를 불러올 수 없습니다.'),
-              }))
-            : Promise.resolve(null);
-
-        const studentTimetablePromise =
-          currentUser.role === 'STUDENT'
-            ? getTodayTimetable().catch((error) => ({
-                error: resolveErrorMessage(error, '시간표를 불러올 수 없습니다.'),
-              }))
-            : Promise.resolve(null);
-
-        const teacherSummaryPromise =
-          currentUser.role === 'TEACHER'
-            ? Promise.all([
-                getTeacherUnreadCount(),
-                getTeacherCounselingPosts(),
-                getTeacherPreCounselingProfiles(),
-              ]).catch((error) => ({
-                error: resolveErrorMessage(error, '교사 요약 정보를 불러올 수 없습니다.'),
-              }))
-            : Promise.resolve(null);
-
-        const [weatherResult, scheduleResult, mealsResult, timetableResult, teacherResult] =
-          await Promise.all([
-            weatherPromise,
-            schedulePromise,
-            studentMealsPromise,
-            studentTimetablePromise,
-            teacherSummaryPromise,
-          ]);
+        const data = await getCommonHomeAggregate(14);
 
         if (cancelled) {
           return;
         }
 
         const nextState: HomeDataState = {
-          pageError: null,
-          schoolProfile,
-          schoolProfileError,
-          weather: null,
-          weatherError: null,
-          schedule: null,
-          scheduleError: null,
-          meals: null,
-          mealsError: null,
-          timetable: null,
-          timetableError: null,
+          pageError: data.schoolProfileError ?? null,
+          schoolProfile: data.schoolProfile ?? null,
+          schoolProfileError: data.schoolProfileError ?? null,
+          weather: data.weather ?? null,
+          weatherError: data.weatherError ?? null,
+          schedule: data.schedule ?? null,
+          scheduleError: data.scheduleError ?? null,
+          meals: data.meals ?? null,
+          mealsError: data.mealsError ?? null,
+          timetable: data.timetable ?? null,
+          timetableError: data.timetableError ?? null,
           teacherSummary: initialTeacherSummary,
           isLoading: false,
         };
 
-        if ('error' in weatherResult) {
-          nextState.weatherError = weatherResult.error;
-        } else {
-          nextState.weather = weatherResult;
-        }
-
-        if ('error' in scheduleResult) {
-          nextState.scheduleError = scheduleResult.error;
-        } else {
-          nextState.schedule = scheduleResult;
-        }
-
-        if (mealsResult) {
-          if ('error' in mealsResult) {
-            nextState.mealsError = mealsResult.error;
-          } else {
-            nextState.meals = mealsResult;
-          }
-        }
-
-        if (timetableResult) {
-          if ('error' in timetableResult) {
-            nextState.timetableError = timetableResult.error;
-          } else {
-            nextState.timetable = timetableResult;
-          }
-        }
-
-        if (teacherResult) {
-          if ('error' in teacherResult) {
-            nextState.teacherSummary = {
-              ...initialTeacherSummary,
-              error: teacherResult.error,
-            };
-          } else {
-            const [unreadData, posts, preCounselSummaries] = teacherResult as [
-              { count: number },
-              { status: string }[],
-              PreCounselingProfileSummary[],
-            ];
-            nextState.teacherSummary = {
-              unreadCount: unreadData.count,
-              waitingCount: posts.filter((post) => post.status === 'WAITING').length,
-              preCounselPendingCount: preCounselSummaries.filter((item) => !item.completed).length,
-              error: null,
-            };
-          }
+        if (currentUser.role === 'TEACHER') {
+          nextState.teacherSummary = {
+            unreadCount: data.teacherUnreadCount ?? 0,
+            waitingCount: data.teacherWaitingCount ?? 0,
+            preCounselPendingCount: data.teacherPreCounselPendingCount ?? 0,
+            error: data.teacherSummaryError ?? null,
+          };
         }
 
         setState(nextState);

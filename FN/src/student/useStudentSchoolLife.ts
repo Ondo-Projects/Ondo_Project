@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
+import type { StudentHomeAggregateResponse } from '../api/types/home';
+import type { CounselingPost } from '../api/types/counseling';
 import type { ProfileSchoolResponse } from '../api/types/home';
 import type {
   MealDayResponse,
@@ -6,16 +8,18 @@ import type {
   TimetableDayResponse,
   WeatherTodayResponse,
 } from '../api/types/home';
-import type { StudentAssignment, StudentNotice } from '../api/types/student';
+import type {
+  MoodTodayResponse,
+  PreCounselingProfile,
+  StudentAssignment,
+  StudentNotice,
+} from '../api/types/student';
+import type { SuggestionPost } from '../api/types/suggestion';
 import { ApiError } from '../api/types/api-error';
 import {
-  getStudentAssignmentOptional,
+  getStudentHomeAggregate,
   getStudentNotices,
-  getStudentProfileSchool,
-  getStudentTodayMeals,
   getStudentTodayTimetable,
-  getStudentTodayWeather,
-  getStudentUpcomingSchoolSchedule,
 } from '../api/student.api';
 
 export interface StudentSchoolLifeState {
@@ -34,6 +38,11 @@ export interface StudentSchoolLifeState {
   timetableError: string | null;
   notices: StudentNotice[] | null;
   noticesError: string | null;
+  todayMood: MoodTodayResponse | null;
+  preCounselProfile: PreCounselingProfile | null;
+  counselingPosts: CounselingPost[] | null;
+  suggestions: SuggestionPost[] | null;
+  workspaceLoaded: boolean;
 }
 
 const initialState: StudentSchoolLifeState = {
@@ -52,6 +61,11 @@ const initialState: StudentSchoolLifeState = {
   timetableError: null,
   notices: null,
   noticesError: null,
+  todayMood: null,
+  preCounselProfile: null,
+  counselingPosts: null,
+  suggestions: null,
+  workspaceLoaded: false,
 };
 
 function resolveErrorMessage(error: unknown, fallback: string): string {
@@ -64,15 +78,6 @@ function resolveErrorMessage(error: unknown, fallback: string): string {
   return fallback;
 }
 
-async function loadNoticesSafe(): Promise<{ notices: StudentNotice[] } | { error: string }> {
-  try {
-    const notices = await getStudentNotices();
-    return { notices };
-  } catch (error) {
-    return { error: resolveErrorMessage(error, '알림을 불러올 수 없습니다.') };
-  }
-}
-
 async function loadTimetableSafe(): Promise<
   { timetable: TimetableDayResponse } | { error: string }
 > {
@@ -82,6 +87,53 @@ async function loadTimetableSafe(): Promise<
   } catch (error) {
     return { error: resolveErrorMessage(error, '시간표를 불러올 수 없습니다.') };
   }
+}
+
+async function loadNoticesSafe(): Promise<{ notices: StudentNotice[] } | { error: string }> {
+  try {
+    const notices = await getStudentNotices();
+    return { notices };
+  } catch (error) {
+    return { error: resolveErrorMessage(error, '알림을 불러올 수 없습니다.') };
+  }
+}
+
+function normalizeTodayMood(value: StudentHomeAggregateResponse['todayMood']): MoodTodayResponse | null {
+  if (!value) {
+    return null;
+  }
+  if ('recorded' in value && value.recorded === false) {
+    return { recorded: false };
+  }
+  return value;
+}
+
+function mapStudentHomeAggregate(data: StudentHomeAggregateResponse): StudentSchoolLifeState {
+  const assignment = data.assignment ?? null;
+  const hasAssignment = assignment !== null;
+
+  return {
+    isLoading: false,
+    pageError: data.schoolProfileError ?? null,
+    schoolProfile: data.schoolProfile ?? null,
+    assignment,
+    hasAssignment,
+    meals: data.meals ?? null,
+    mealsError: data.mealsError ?? null,
+    weather: data.weather ?? null,
+    weatherError: data.weatherError ?? null,
+    schedule: data.schedule ?? null,
+    scheduleError: data.scheduleError ?? null,
+    timetable: data.timetable ?? null,
+    timetableError: data.timetableError ?? null,
+    notices: hasAssignment ? (data.notices ?? []) : null,
+    noticesError: data.noticesError ?? null,
+    todayMood: normalizeTodayMood(data.todayMood),
+    preCounselProfile: data.preCounselProfile ?? null,
+    counselingPosts: data.counselingPosts ?? null,
+    suggestions: data.suggestions ?? null,
+    workspaceLoaded: true,
+  };
 }
 
 export function useStudentSchoolLife(enabled: boolean) {
@@ -100,6 +152,27 @@ export function useStudentSchoolLife(enabled: boolean) {
       }
       return { ...prev, timetable: result.timetable, timetableError: null };
     });
+  }, []);
+
+  const reloadWorkspace = useCallback(async () => {
+    try {
+      const data = await getStudentHomeAggregate();
+      setState((prev) => {
+        const mapped = mapStudentHomeAggregate(data);
+        return {
+          ...prev,
+          todayMood: mapped.todayMood,
+          preCounselProfile: mapped.preCounselProfile,
+          counselingPosts: mapped.counselingPosts,
+          suggestions: mapped.suggestions,
+          notices: mapped.notices,
+          noticesError: mapped.noticesError,
+          workspaceLoaded: true,
+        };
+      });
+    } catch {
+      // keep previous workspace data on refresh failure
+    }
   }, []);
 
   const applyAssignment = useCallback(async (assignment: StudentAssignment | null) => {
@@ -135,83 +208,11 @@ export function useStudentSchoolLife(enabled: boolean) {
       setState({ ...initialState, isLoading: true });
 
       try {
-        const [schoolProfile, assignment] = await Promise.all([
-          getStudentProfileSchool(),
-          getStudentAssignmentOptional(),
-        ]);
-
-        const hasAssignment = assignment !== null;
-
-        const [mealsResult, weatherResult, scheduleResult, timetableResult, noticesResult] =
-          await Promise.all([
-            getStudentTodayMeals().catch((error) => ({
-              error: resolveErrorMessage(error, '급식 정보를 불러올 수 없습니다.'),
-            })),
-            getStudentTodayWeather().catch((error) => ({
-              error: resolveErrorMessage(error, '날씨 정보를 불러올 수 없습니다.'),
-            })),
-            getStudentUpcomingSchoolSchedule(14).catch((error) => ({
-              error: resolveErrorMessage(error, '학사일정을 불러올 수 없습니다.'),
-            })),
-            loadTimetableSafe(),
-            hasAssignment ? loadNoticesSafe() : Promise.resolve(null),
-          ]);
-
+        const data = await getStudentHomeAggregate();
         if (cancelled) {
           return;
         }
-
-        const nextState: StudentSchoolLifeState = {
-          isLoading: false,
-          pageError: null,
-          schoolProfile,
-          assignment,
-          hasAssignment,
-          meals: null,
-          mealsError: null,
-          weather: null,
-          weatherError: null,
-          schedule: null,
-          scheduleError: null,
-          timetable: null,
-          timetableError: null,
-          notices: hasAssignment ? [] : null,
-          noticesError: null,
-        };
-
-        if ('error' in mealsResult) {
-          nextState.mealsError = mealsResult.error;
-        } else {
-          nextState.meals = mealsResult;
-        }
-
-        if ('error' in weatherResult) {
-          nextState.weatherError = weatherResult.error;
-        } else {
-          nextState.weather = weatherResult;
-        }
-
-        if ('error' in scheduleResult) {
-          nextState.scheduleError = scheduleResult.error;
-        } else {
-          nextState.schedule = scheduleResult;
-        }
-
-        if ('error' in timetableResult) {
-          nextState.timetableError = timetableResult.error;
-        } else {
-          nextState.timetable = timetableResult.timetable;
-        }
-
-        if (noticesResult) {
-          if ('error' in noticesResult) {
-            nextState.noticesError = noticesResult.error;
-          } else {
-            nextState.notices = noticesResult.notices;
-          }
-        }
-
-        setState(nextState);
+        setState(mapStudentHomeAggregate(data));
       } catch (error) {
         if (!cancelled) {
           setState({
@@ -234,6 +235,7 @@ export function useStudentSchoolLife(enabled: boolean) {
     ...state,
     reload,
     reloadTimetable,
+    reloadWorkspace,
     applyAssignment,
   };
 }

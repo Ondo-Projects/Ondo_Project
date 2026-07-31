@@ -27,7 +27,8 @@ export default function TeacherHomePage() {
   const [summaryRefreshKey, setSummaryRefreshKey] = useState(0);
   const [pageSuccess, setPageSuccess] = useState<string | null>(null);
   const [sectionError, setSectionError] = useState<string | null>(null);
-  const { summary } = useTeacherDashboard(Boolean(user), summaryRefreshKey);
+  const { summary, counselingPosts, preCounselSummaries, suggestions, listsLoaded } =
+    useTeacherDashboard(Boolean(user), summaryRefreshKey);
 
   usePageTitle('교사 홈 | 온도');
 
@@ -112,7 +113,8 @@ export default function TeacherHomePage() {
         >
           <SectionInviteCode onSuccess={handleSuccess} onError={handleError} />
           <SectionCounselWorkspace
-            refreshToken={summaryRefreshKey}
+            prefetchedPosts={counselingPosts}
+            postsLoaded={listsLoaded}
             onSuccess={handleSuccess}
             onError={handleError}
             onDataChange={refreshSummary}
@@ -126,10 +128,15 @@ export default function TeacherHomePage() {
           tone="teacher"
         >
           <SectionMoodSummary onError={handleError} />
-          <SectionPreCounselRead refreshToken={summaryRefreshKey} onError={handleError} />
+          <SectionPreCounselRead
+            prefetchedSummaries={preCounselSummaries}
+            summariesLoaded={listsLoaded}
+            onError={handleError}
+          />
           <SectionNoticeBoard onSuccess={handleSuccess} onError={handleError} />
           <SectionSuggestion
-            refreshToken={summaryRefreshKey}
+            prefetchedSuggestions={suggestions}
+            suggestionsLoaded={listsLoaded}
             onSuccess={handleSuccess}
             onError={handleError}
           />

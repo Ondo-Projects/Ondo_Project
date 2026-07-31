@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ondo.domain.weather.dto.WeatherGridCoordinate;
 import com.ondo.domain.weather.dto.WeatherTodayResponseDTO;
+import com.ondo.global.cache.CacheNames;
 import com.ondo.global.config.WeatherProperties;
 import com.ondo.global.error.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
@@ -22,6 +24,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Component
 @RequiredArgsConstructor
@@ -36,10 +39,19 @@ public class WeatherApiClient {
     private final ObjectMapper objectMapper;
     private final RestClient restClient = RestClient.create();
 
+    @Cacheable(
+            cacheNames = CacheNames.WEATHER_TODAY,
+            key = "#region + ':' + #grid.nx + ':' + #grid.ny + ':' + T(java.time.LocalDate).now()"
+    )
     public WeatherTodayResponseDTO fetchTodayWeather(String region, WeatherGridCoordinate grid) {
         LocalDateTime now = LocalDateTime.now();
-        Map<String, String> current = fetchUltraShortNowcastSafely(grid, now);
-        Map<String, List<ForecastValue>> vilageForecasts = fetchVilageForecast(grid, now);
+        CompletableFuture<Map<String, String>> currentFuture = CompletableFuture.supplyAsync(
+                () -> fetchUltraShortNowcastSafely(grid, now));
+        CompletableFuture<Map<String, List<ForecastValue>>> vilageFuture = CompletableFuture.supplyAsync(
+                () -> fetchVilageForecast(grid, now));
+
+        Map<String, String> current = currentFuture.join();
+        Map<String, List<ForecastValue>> vilageForecasts = vilageFuture.join();
 
         String temperature = formatTemperature(current.get("T1H"));
         ForecastSnapshot snapshot = buildSnapshot(vilageForecasts, now.toLocalDate(), current);

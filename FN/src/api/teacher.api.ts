@@ -80,6 +80,10 @@ export function getTeacherSuggestions() {
   return apiClient<TeacherSuggestionPost[]>('/api/teacher/suggestions');
 }
 
+export function getTeacherHomeAggregate() {
+  return apiClient<import('./types/home').TeacherHomeAggregateResponse>('/api/teacher/home');
+}
+
 export function getTeacherSuggestion(id: number) {
   return apiClient<TeacherSuggestionPost>(`/api/teacher/suggestions/${id}`);
 }

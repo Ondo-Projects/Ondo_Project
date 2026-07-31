@@ -7,9 +7,11 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.ondo.domain.meal.dto.MealItemResponseDTO;
 import com.ondo.domain.schoollife.dto.SchoolScheduleItemResponseDTO;
 import com.ondo.domain.schoollife.dto.TimetablePeriodResponseDTO;
+import com.ondo.global.cache.CacheNames;
 import com.ondo.global.config.NeisProperties;
 import com.ondo.global.error.BusinessException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -156,6 +158,10 @@ public class NeisApiClient {
         }
     }
 
+    @Cacheable(
+            cacheNames = CacheNames.NEIS_MEALS,
+            key = "#officeCode + ':' + #standardSchoolCode + ':' + #date"
+    )
     public List<MealItemResponseDTO> fetchMeals(String officeCode, String standardSchoolCode, LocalDate date) {
         URI uri = buildEncodedUri(UriComponentsBuilder
                 .fromUriString(neisProperties.getBaseUrl() + "/mealServiceDietInfo")
@@ -186,6 +192,10 @@ public class NeisApiClient {
         return meals;
     }
 
+    @Cacheable(
+            cacheNames = CacheNames.NEIS_SCHEDULE,
+            key = "#officeCode + ':' + #standardSchoolCode + ':' + #fromDate + ':' + #toDate"
+    )
     public List<SchoolScheduleItemResponseDTO> fetchSchoolSchedule(
             String officeCode,
             String standardSchoolCode,
@@ -229,6 +239,10 @@ public class NeisApiClient {
                 .toList();
     }
 
+    @Cacheable(
+            cacheNames = CacheNames.NEIS_TIMETABLE,
+            key = "#officeCode + ':' + #standardSchoolCode + ':' + #schoolType + ':' + #date + ':' + #grade + ':' + #classNumber"
+    )
     public List<TimetablePeriodResponseDTO> fetchTimetable(
             String officeCode,
             String standardSchoolCode,

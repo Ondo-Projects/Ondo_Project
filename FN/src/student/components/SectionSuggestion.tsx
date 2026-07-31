@@ -21,6 +21,8 @@ import { formatDateTime } from '../studentUtils';
 import StudentSectionCard from './StudentSectionCard';
 
 interface SectionSuggestionProps {
+  prefetchedSuggestions: SuggestionPost[] | null;
+  suggestionsLoaded: boolean;
   onSuccess: (message: string) => void;
   onError: (message: string) => void;
 }
@@ -44,7 +46,12 @@ const EMPTY_CREATE_FORM: CreateFormState = {
   content: '',
 };
 
-export default function SectionSuggestion({ onSuccess, onError }: SectionSuggestionProps) {
+export default function SectionSuggestion({
+  prefetchedSuggestions,
+  suggestionsLoaded,
+  onSuccess,
+  onError,
+}: SectionSuggestionProps) {
   const [createForm, setCreateForm] = useState<CreateFormState>(EMPTY_CREATE_FORM);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [suggestions, setSuggestions] = useState<SuggestionPost[]>([]);
@@ -71,8 +78,11 @@ export default function SectionSuggestion({ onSuccess, onError }: SectionSuggest
   }, [onError]);
 
   useEffect(() => {
-    loadSuggestions();
-  }, [loadSuggestions]);
+    if (suggestionsLoaded) {
+      setSuggestions(prefetchedSuggestions ?? []);
+      setIsLoading(false);
+    }
+  }, [suggestionsLoaded, prefetchedSuggestions]);
 
   useEffect(() => {
     if (!selectedId || !suggestions.some((item) => item.id === selectedId)) {
