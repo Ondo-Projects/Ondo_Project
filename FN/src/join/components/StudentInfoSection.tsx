@@ -1,3 +1,4 @@
+import { Input } from '../../components/ui';
 import { validateStudentEmail } from '../joinValidation';
 import { useJoinForm } from '../JoinFormProvider';
 import EmailVerificationBlock from './EmailVerificationBlock';
@@ -20,7 +21,7 @@ export default function StudentInfoSection() {
         error={fieldErrors.birthDate}
         required
       >
-        <input
+        <Input
           type="date"
           name="birthDate"
           value={state.birthDate}

@@ -1,3 +1,4 @@
+import { Input } from '../../components/ui';
 import { useJoinForm } from '../JoinFormProvider';
 import JoinField from './JoinField';
 import JoinSection from './JoinSection';
@@ -15,7 +16,7 @@ export default function ProfileNameSection() {
         error={fieldErrors.name}
         required
       >
-        <input
+        <Input
           type="text"
           name="name"
           maxLength={50}

@@ -50,6 +50,12 @@ import { Alert, Btn, Card, Field, Input } from '../components/ui';
 | `student-badge--*`, `admin-badge--*` | `<Badge variant="…">` |
 | `home-announcement-drawer`, `admin-announcement-drawer` | `<Drawer>` compound API |
 
+## Phase 1 (feature/design-auth-layout)
+
+- **Auth** — `FindIdPage`, `ResetPasswordPage`, `WithdrawPage` + `LoginPage` ui 정리
+- **Join** — `JoinField` → `Field`, 섹션별 `Input`/`Select`/`Btn`/`Alert`, `JoinForm` → `Card`
+- **`auth.css` / `join.css`** — 레거시 field/submit/message/btn 규칙 제거
+
 ## Phase 4 (feature/design-home-admin)
 
 - **Admin 전체** — `AdminSectionCard` → `Card`, 섹션별 `Btn` / `Field` / `Input` / `Select` / `Textarea` / `Badge` / `Alert`
@@ -77,10 +83,9 @@ import { Alert, Btn, Card, Field, Input } from '../components/ui';
 
 | Phase | 브랜치 (예) | 범위 |
 |-------|-------------|------|
-| 1 | `feature/design-auth-layout` | Auth 전 페이지, AppLayout |
 | 5 | `feature/design-a11y-polish` | 다크모드 QA, 스켈레톤·토스트(선택) |
 
-(Phase 2~4 완료)
+(Phase 1~4 완료)
 
 ## 규칙
 

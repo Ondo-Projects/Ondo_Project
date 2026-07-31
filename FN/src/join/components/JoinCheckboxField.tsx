@@ -1,3 +1,5 @@
+import { Input } from '../../components/ui';
+
 interface JoinCheckboxFieldProps {
   id: string;
   label: string;
@@ -16,12 +18,12 @@ export default function JoinCheckboxField({
   return (
     <>
       <label className="join-checkbox-row" htmlFor={id}>
-        <input id={id} type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} />
+        <Input id={id} type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} />
         <span>{label}</span>
       </label>
       {error ? (
-        <p className="join-field__error" role="alert">
-          <span className="join-field__error-icon" aria-hidden="true">
+        <p className="ui-field__error" role="alert">
+          <span className="ui-field__error-icon" aria-hidden="true">
             !
           </span>
           <span>{error}</span>

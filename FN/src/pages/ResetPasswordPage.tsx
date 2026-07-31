@@ -1,10 +1,11 @@
 import { type FormEvent, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { resetPassword, sendPasswordResetCode } from '../api/recovery.api';
 import { mapVerificationError } from '../join/joinErrors';
 import { validatePassword } from '../join/joinValidation';
 import AppLayout from '../components/layout/AppLayout';
 import AuthPageShell from '../components/AuthPageShell';
+import { Alert, Btn, Card, Field, Input } from '../components/ui';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { PATHS } from '../routes/paths';
 import '../auth/auth.css';
@@ -167,33 +168,14 @@ export default function ResetPasswordPage() {
         title="비밀번호 재설정"
         subtitle="가입 시 등록한 아이디와 이메일로 본인 확인 후 새 비밀번호를 설정할 수 있어요."
       >
-        <div className="auth-card">
-          {statusMessage ? (
-            <p className="auth-message auth-message--success" role="status">
-              <span className="auth-message__icon" aria-hidden="true">
-                ✓
-              </span>
-              <span>{statusMessage}</span>
-            </p>
-          ) : null}
+        <Card compact>
+          {statusMessage ? <Alert variant="success">{statusMessage}</Alert> : null}
 
-          {errorMessage ? (
-            <p className="auth-message auth-message--error" role="alert">
-              <span className="auth-message__icon" aria-hidden="true">
-                !
-              </span>
-              <span>{errorMessage}</span>
-            </p>
-          ) : null}
+          {errorMessage ? <Alert variant="error">{errorMessage}</Alert> : null}
 
           <form className="auth-form" onSubmit={(event) => void handleSubmit(event)} noValidate>
-            <div className="auth-field">
-              <label className="auth-field__label" htmlFor="reset-username">
-                아이디 (필수)
-              </label>
-              <input
-                id="reset-username"
-                className="auth-field__input"
+            <Field id="reset-username" label="아이디" required>
+              <Input
                 type="text"
                 name="username"
                 minLength={4}
@@ -203,15 +185,10 @@ export default function ResetPasswordPage() {
                 onChange={(event) => setUsername(event.target.value)}
                 disabled={isSending || isSubmitting}
               />
-            </div>
+            </Field>
 
-            <div className="auth-field">
-              <label className="auth-field__label" htmlFor="reset-email">
-                이메일 (필수)
-              </label>
-              <input
-                id="reset-email"
-                className="auth-field__input"
+            <Field id="reset-email" label="이메일" required>
+              <Input
                 type="email"
                 name="email"
                 autoComplete="email"
@@ -219,26 +196,22 @@ export default function ResetPasswordPage() {
                 onChange={(event) => setEmail(event.target.value)}
                 disabled={isSending || isSubmitting}
               />
-            </div>
+            </Field>
 
             <div className="auth-inline-actions">
-              <button
+              <Btn
                 type="button"
-                className="auth-btn auth-btn--secondary"
+                variant="secondary"
+                size="student"
                 disabled={isSending || isSubmitting}
                 onClick={() => void handleSendCode()}
               >
                 {isSending ? '발송 중…' : '인증번호 발송'}
-              </button>
+              </Btn>
             </div>
 
-            <div className="auth-field">
-              <label className="auth-field__label" htmlFor="reset-code">
-                인증번호 6자리
-              </label>
-              <input
-                id="reset-code"
-                className="auth-field__input"
+            <Field id="reset-code" label="인증번호 6자리">
+              <Input
                 type="text"
                 inputMode="numeric"
                 maxLength={6}
@@ -248,15 +221,10 @@ export default function ResetPasswordPage() {
                 onChange={(event) => setCode(event.target.value.replace(/\D/g, ''))}
                 disabled={isSubmitting}
               />
-            </div>
+            </Field>
 
-            <div className="auth-field">
-              <label className="auth-field__label" htmlFor="reset-password">
-                새 비밀번호 (필수)
-              </label>
-              <input
-                id="reset-password"
-                className="auth-field__input"
+            <Field id="reset-password" label="새 비밀번호" required>
+              <Input
                 type="password"
                 name="password"
                 minLength={8}
@@ -266,7 +234,7 @@ export default function ResetPasswordPage() {
                 onChange={(event) => setPassword(event.target.value)}
                 disabled={isSubmitting}
               />
-            </div>
+            </Field>
 
             <ul className="auth-password-rules" aria-label="비밀번호 규칙">
               {passwordRules.map((rule) => (
@@ -279,13 +247,8 @@ export default function ResetPasswordPage() {
               ))}
             </ul>
 
-            <div className="auth-field">
-              <label className="auth-field__label" htmlFor="reset-password-confirm">
-                새 비밀번호 확인 (필수)
-              </label>
-              <input
-                id="reset-password-confirm"
-                className="auth-field__input"
+            <Field id="reset-password-confirm" label="새 비밀번호 확인" required>
+              <Input
                 type="password"
                 name="passwordConfirm"
                 minLength={8}
@@ -295,25 +258,25 @@ export default function ResetPasswordPage() {
                 onChange={(event) => setPasswordConfirm(event.target.value)}
                 disabled={isSubmitting}
               />
-            </div>
+            </Field>
 
-            <button className="auth-submit" type="submit" disabled={isSubmitting}>
+            <Btn type="submit" variant="primary" size="student" fullWidth disabled={isSubmitting}>
               {isSubmitting ? '변경 중…' : '비밀번호 변경'}
-            </button>
+            </Btn>
           </form>
 
-          <div className="auth-footer">
-            <Link className="auth-footer__link" to={PATHS.LOGIN}>
+          <nav className="auth-footer" aria-label="인증 관련 링크">
+            <Btn variant="ghost" size="student" to={PATHS.LOGIN}>
               로그인
-            </Link>
-            <Link className="auth-footer__link" to={PATHS.FIND_ID}>
+            </Btn>
+            <Btn variant="ghost" size="student" to={PATHS.FIND_ID}>
               아이디 찾기
-            </Link>
-            <Link className="auth-footer__link" to={PATHS.JOIN}>
+            </Btn>
+            <Btn variant="ghost" size="student" to={PATHS.JOIN}>
               회원가입
-            </Link>
-          </div>
-        </div>
+            </Btn>
+          </nav>
+        </Card>
       </AuthPageShell>
     </AppLayout>
   );

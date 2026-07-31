@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { getEmailStatus, sendEmailCode, verifyEmailCode } from '../../api/email.api';
 import type { SignUpRole } from '../../api/types/signup';
+import { Btn, Input } from '../../components/ui';
 import { mapVerificationError } from '../joinErrors';
 import JoinField from './JoinField';
 import VerificationFeedback from './VerificationFeedback';
@@ -108,7 +109,7 @@ export default function EmailVerificationBlock({
   return (
     <>
       <JoinField id={id} label={label} helper={helper} error={emailError} required={required}>
-        <input
+        <Input
           type="email"
           name="email"
           placeholder={placeholder}
@@ -122,26 +123,26 @@ export default function EmailVerificationBlock({
       </JoinField>
 
       <div className="join-inline-actions">
-        <button
+        <Btn
           type="button"
-          className="join-btn join-btn--secondary"
+          variant="secondary"
           disabled={isSending}
           onClick={() => void handleSendCode()}
         >
           {isSending ? '발송 중…' : '인증번호 발송'}
-        </button>
-        <button
+        </Btn>
+        <Btn
           type="button"
-          className="join-btn join-btn--primary"
+          variant="primary"
           disabled={isVerifying}
           onClick={() => void handleVerifyCode()}
         >
           {isVerifying ? '확인 중…' : '인증 확인'}
-        </button>
+        </Btn>
       </div>
 
       <JoinField id={codeFieldId} label="인증번호 6자리">
-        <input
+        <Input
           type="text"
           inputMode="numeric"
           maxLength={6}
