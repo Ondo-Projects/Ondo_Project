@@ -31,7 +31,3 @@ export function getStatusTransitionLabel(status: CounselingStatus): string {
       return status;
   }
 }
-
-export function getCounselStatusBadgeClass(status: CounselingStatus): string {
-  return `teacher-badge teacher-badge--${status.toLowerCase()}`;
-}

@@ -5,6 +5,7 @@ import {
 } from '../../api/teacher.api';
 import { ApiError } from '../../api/types/api-error';
 import type { StudentMoodSummary, TeacherWeeklyMoodResponse } from '../../api/types/teacher';
+import { CardHelper } from '../../components/ui';
 import { TEACHER_SECTIONS } from '../constants';
 import {
   formatShortDate,
@@ -111,7 +112,7 @@ export default function SectionMoodSummary({ onError }: SectionMoodSummaryProps)
 
       {moodView === 'today' ? (
         <div>
-          <p className="teacher-card__helper">담당 학생들의 오늘 기록입니다.</p>
+          <CardHelper>담당 학생들의 오늘 기록입니다.</CardHelper>
           {isTodayLoading ? (
             <p className="teacher-status">불러오는 중…</p>
           ) : todaySummaries.length === 0 ? (
@@ -137,7 +138,7 @@ export default function SectionMoodSummary({ onError }: SectionMoodSummaryProps)
         </div>
       ) : (
         <div>
-          <p className="teacher-card__helper">최근 7일간 담당 학생들의 기록 요약입니다.</p>
+          <CardHelper>최근 7일간 담당 학생들의 기록 요약입니다.</CardHelper>
           {isWeeklyLoading || !weeklyData ? (
             <p className="teacher-status">불러오는 중…</p>
           ) : (

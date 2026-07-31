@@ -4,6 +4,7 @@ import {
   updateTeacherNotificationSettings,
 } from '../../api/teacher.api';
 import { ApiError } from '../../api/types/api-error';
+import { Btn, CardHelper, Field, Input } from '../../components/ui';
 import { TEACHER_SECTIONS } from '../constants';
 import TeacherSectionCard from './TeacherSectionCard';
 
@@ -91,13 +92,8 @@ export default function SectionNotificationSettings({
         {statusText}
       </p>
 
-      <div className="teacher-field">
-        <label className="teacher-field__label" htmlFor="notificationPhone">
-          휴대전화 번호
-        </label>
-        <input
-          id="notificationPhone"
-          className="teacher-field__input"
+      <Field id="notificationPhone" label="휴대전화 번호">
+        <Input
           type="tel"
           inputMode="tel"
           autoComplete="tel"
@@ -106,7 +102,7 @@ export default function SectionNotificationSettings({
           value={phone}
           onChange={(event) => setPhone(event.target.value)}
         />
-      </div>
+      </Field>
 
       <label className="teacher-checkbox-row" htmlFor="notificationSmsEnabled">
         <input
@@ -119,19 +115,18 @@ export default function SectionNotificationSettings({
         <span>상담 신청 SMS 수신에 동의합니다.</span>
       </label>
 
-      <p className="teacher-card__helper">
-        번호와 수신 동의를 모두 설정해야 SMS 알림이 발송됩니다.
-      </p>
+      <CardHelper>번호와 수신 동의를 모두 설정해야 SMS 알림이 발송됩니다.</CardHelper>
 
       <div className="teacher-form-actions">
-        <button
+        <Btn
           type="button"
-          className="teacher-btn teacher-btn--primary"
+          variant="primary"
+          size="student"
           disabled={isLoading || isSaving}
           onClick={handleSave}
         >
           {isSaving ? '저장 중…' : '저장'}
-        </button>
+        </Btn>
       </div>
     </TeacherSectionCard>
   );

@@ -5,6 +5,7 @@ import AuthLoading from '../auth/AuthLoading';
 import AppLayout from '../components/layout/AppLayout';
 import PageHeader from '../components/PageHeader';
 import RoleHomeZone from '../components/RoleHomeZone';
+import { Alert } from '../components/ui';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { PATHS } from '../routes/paths';
 import SectionNoticeBoard from './components/SectionNoticeBoard';
@@ -88,17 +89,9 @@ export default function TeacherHomePage() {
           }
         />
 
-        {sectionError ? (
-          <p className="teacher-message teacher-message--error" role="alert">
-            {sectionError}
-          </p>
-        ) : null}
+        {sectionError ? <Alert variant="error">{sectionError}</Alert> : null}
 
-        {pageSuccess ? (
-          <p className="teacher-message teacher-message--success" role="status">
-            {pageSuccess}
-          </p>
-        ) : null}
+        {pageSuccess ? <Alert variant="success">{pageSuccess}</Alert> : null}
 
         <RoleHomeZone
           badge="TODAY"

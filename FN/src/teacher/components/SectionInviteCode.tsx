@@ -4,6 +4,7 @@ import {
   regenerateTeacherInviteCode,
 } from '../../api/teacher.api';
 import { ApiError } from '../../api/types/api-error';
+import { Btn, CardHelper } from '../../components/ui';
 import { TEACHER_SECTIONS } from '../constants';
 import { formatDateTime } from '../teacherUtils';
 import TeacherSectionCard from './TeacherSectionCard';
@@ -76,26 +77,28 @@ export default function SectionInviteCode({ onSuccess, onError }: SectionInviteC
           <div className="teacher-invite-code" id="inviteCode">
             {isLoading ? '불러오는 중…' : code}
           </div>
-          <p className="teacher-card__helper">발급: {createdAt}</p>
+          <CardHelper>발급: {createdAt}</CardHelper>
         </div>
 
         <div className="teacher-form-actions">
-          <button
+          <Btn
             type="button"
-            className="teacher-btn teacher-btn--secondary"
+            variant="secondary"
+            size="student"
             disabled={isLoading || isRegenerating}
             onClick={handleCopy}
           >
             복사
-          </button>
-          <button
+          </Btn>
+          <Btn
             type="button"
-            className="teacher-btn teacher-btn--primary"
+            variant="primary"
+            size="student"
             disabled={isLoading || isRegenerating}
             onClick={handleRegenerate}
           >
             {isRegenerating ? '재발급 중…' : '재발급'}
-          </button>
+          </Btn>
         </div>
       </div>
     </TeacherSectionCard>
