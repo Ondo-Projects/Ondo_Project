@@ -191,8 +191,17 @@ sequenceDiagram
 
 ---
 
-## 6. Phase 1 연결 (다음 작업)
+## 6. Phase 1 — 백엔드 외부 API 캐시 (완료)
 
-1. 백엔드 — 날씨·NEIS **캐시** (Redis/Caffeine)  
-2. 프론트 — `useHomeData` / `useStudentSchoolLife` **단일 병렬**, 섹션 **중복 제거**  
-3. 런타임 재측정 후 §3·§5 TODO 갱신
+| 항목 | 구현 |
+|------|------|
+| 캐시 엔진 | Caffeine (in-memory), `ExternalApiCacheConfig` |
+| TTL | 날씨 15분, NEIS 30분 (`ondo.cache.external.*`) |
+| 대상 | `WeatherApiClient.fetchTodayWeather`, `NeisApiClient` meals/schedule/timetable |
+| 날씨 병렬 | 초단기실황 + 단기예보 `CompletableFuture.supplyAsync` |
+| 로깅 | `[cache HIT/MISS] {cacheName} key=…` (debug, `logging-enabled`) |
+
+**다음 (Phase 2):**
+
+1. 프론트 — `useHomeData` / `useStudentSchoolLife` **단일 병렬**, 섹션 **중복 제거**  
+2. BN 기동 후 `npm run measure:api-baseline` 재측정 → §3·§5 TODO 갱신
