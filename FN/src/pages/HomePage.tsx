@@ -6,7 +6,7 @@ import AppLayout from '../components/layout/AppLayout';
 import PageHeader from '../components/PageHeader';
 import { usePageTitle } from '../hooks/usePageTitle';
 import SchoolTodayStrip from '../home/components/SchoolTodayStrip';
-import PlatformAnnouncementSection from '../home/components/PlatformAnnouncementSection';
+import PlatformAnnouncementBoard from '../home/components/PlatformAnnouncementBoard';
 import StudentHomeBlock from '../home/components/StudentHomeBlock';
 import TeacherHomeBlock from '../home/components/TeacherHomeBlock';
 import '../home/home.css';
@@ -69,8 +69,6 @@ export default function HomePage() {
           <Alert variant="error">{homeData.schoolProfileError}</Alert>
         ) : null}
 
-        <PlatformAnnouncementSection />
-
         <SchoolTodayStrip
           todayLabel={formatTodayDate()}
           schoolMeta={schoolMeta}
@@ -91,6 +89,8 @@ export default function HomePage() {
         ) : null}
 
         {user.role === 'TEACHER' ? <TeacherHomeBlock summary={homeData.teacherSummary} /> : null}
+
+        <PlatformAnnouncementBoard />
       </div>
     </AppLayout>
   );

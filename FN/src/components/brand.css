@@ -37,6 +37,17 @@
   max-width: 8rem;
 }
 
+.brand-mark-wrap--dashboard {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+}
+
+.brand-mark-wrap--dashboard .brand-mark {
+  height: 5.75rem;
+  max-width: 10.5rem;
+}
+
 @media (max-width: 640px) {
   .brand-mark-wrap {
     align-self: flex-start;
@@ -60,5 +71,10 @@
   .brand-mark-wrap--compact .brand-mark {
     height: 3.75rem;
     max-width: 6.75rem;
+  }
+
+  .brand-mark-wrap--dashboard .brand-mark {
+    height: 4.75rem;
+    max-width: 8.75rem;
   }
 }

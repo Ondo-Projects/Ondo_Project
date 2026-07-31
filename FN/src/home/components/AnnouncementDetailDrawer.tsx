@@ -1,7 +1,16 @@
 import type { AnnouncementDetail } from '../../api/types/announcement';
 import { ANNOUNCEMENT_AUDIENCE_LABELS } from '../../api/types/announcement';
-import { Drawer, DrawerBody, DrawerClose, DrawerHeader, DrawerTitle, Skeleton, SkeletonText } from '../../components/ui';
-import { formatDateTime } from '../homeUtils';
+import {
+  Drawer,
+  DrawerBody,
+  DrawerClose,
+  DrawerHeader,
+  DrawerTitle,
+  Skeleton,
+  SkeletonText,
+} from '../../components/ui';
+import { formatAnnouncementMeta } from '../announcementUtils';
+import '../platform-announcement.css';
 
 interface AnnouncementDetailDrawerProps {
   isOpen: boolean;
@@ -29,34 +38,29 @@ export default function AnnouncementDetailDrawer({
         {isLoading ? (
           <div aria-hidden="true">
             <Skeleton height="1.25rem" width="40%" rounded="sm" />
-            <SkeletonText lines={4} className="home-announcement-drawer__skeleton" />
+            <SkeletonText lines={4} className="platform-announcement-drawer__skeleton" />
           </div>
         ) : error ? (
           <p
-            className="home-announcement-drawer__status home-announcement-drawer__status--error"
+            className="platform-announcement-drawer__status platform-announcement-drawer__status--error"
             role="alert"
           >
             {error}
           </p>
         ) : announcement ? (
           <>
-            <div className="home-announcement-drawer__badges">
+            <div className="platform-announcement-drawer__badges">
               {announcement.pinned ? (
-                <span className="home-announcement-item__pin">고정</span>
+                <span className="platform-announcement-item__pin">고정</span>
               ) : null}
-              <span className="home-announcement-item__audience">
+              <span className="platform-announcement-item__audience">
                 {ANNOUNCEMENT_AUDIENCE_LABELS[announcement.audience]}
               </span>
             </div>
-            <p className="home-announcement-item__meta">
-              {formatDateTime(announcement.createdAt)}
-              {announcement.updatedAt !== announcement.createdAt
-                ? ` · 수정 ${formatDateTime(announcement.updatedAt)}`
-                : ''}
-              {' · '}
-              {announcement.adminName || announcement.adminUsername}
+            <p className="platform-announcement-item__meta">
+              {formatAnnouncementMeta(announcement.createdAt, announcement.updatedAt)}
             </p>
-            <div className="home-announcement-drawer__content">{announcement.content}</div>
+            <div className="platform-announcement-drawer__content">{announcement.content}</div>
           </>
         ) : null}
       </DrawerBody>
