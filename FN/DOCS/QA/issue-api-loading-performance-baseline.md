@@ -222,4 +222,17 @@ sequenceDiagram
 | 학생 홈 | ~16–20 | ~11–12 (+ class-profile 1) |
 | 교사 홈 | ~13–15 | ~10–11 |
 
-**다음 (Phase 3+):** BFF aggregate (`/api/student/home`), React Query, BN 기동 후 재측정
+**다음 (Phase 3+):** React Query, BN 기동 후 재측정
+
+---
+
+## 8. Phase 3 — BFF Aggregate (완료)
+
+| 엔드포인트 | 역할 | 프론트 연동 |
+|-----------|------|------------|
+| `GET /api/student/home` | 학생 홈 11건 → **1 HTTP** | `useStudentSchoolLife` |
+| `GET /api/teacher/home` | 교사 대시보드 4건 → **1 HTTP** | `useTeacherDashboard` |
+| `GET /api/common/home?days=14` | 공통 학교 홈 → **1 HTTP** | `useHomeData` |
+
+- 백엔드: `StudentHomeAggregateService` 등 — 기존 domain service 위 **병렬 orchestration**, 섹션별 `*Error` 필드로 부분 실패 허용
+- `AssignmentService.findMyAssignmentOptional()` 추가 (예외 대신 null)

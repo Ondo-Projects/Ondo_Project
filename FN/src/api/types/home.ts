@@ -88,3 +88,57 @@ export interface PreCounselingProfileSummary {
 export interface UnreadCountResponse {
   count: number;
 }
+
+export interface StudentHomeAggregateResponse {
+  schoolProfile?: ProfileSchoolResponse | null;
+  schoolProfileError?: string | null;
+  assignment?: import('./student').StudentAssignment | null;
+  meals?: MealDayResponse | null;
+  mealsError?: string | null;
+  weather?: WeatherTodayResponse | null;
+  weatherError?: string | null;
+  schedule?: SchoolScheduleUpcomingResponse | null;
+  scheduleError?: string | null;
+  timetable?: TimetableDayResponse | null;
+  timetableError?: string | null;
+  notices?: import('./student').StudentNotice[] | null;
+  noticesError?: string | null;
+  todayMood?: import('./student').MoodTodayResponse | null;
+  todayMoodError?: string | null;
+  preCounselProfile?: import('./student').PreCounselingProfile | null;
+  preCounselProfileError?: string | null;
+  counselingPosts?: import('./counseling').CounselingPost[] | null;
+  counselingPostsError?: string | null;
+  suggestions?: import('./suggestion').SuggestionPost[] | null;
+  suggestionsError?: string | null;
+}
+
+export interface TeacherHomeAggregateResponse {
+  unreadCount?: number | null;
+  unreadCountError?: string | null;
+  counselingPosts?: import('./counseling').CounselingPost[] | null;
+  counselingPostsError?: string | null;
+  preCounselSummaries?: PreCounselingProfileSummary[] | null;
+  preCounselSummariesError?: string | null;
+  suggestions?: import('./suggestion').SuggestionPost[] | null;
+  suggestionsError?: string | null;
+}
+
+export interface CommonHomeAggregateResponse {
+  schoolProfile?: ProfileSchoolResponse | null;
+  schoolProfileError?: string | null;
+  weather?: WeatherTodayResponse | null;
+  weatherError?: string | null;
+  schedule?: SchoolScheduleUpcomingResponse | null;
+  scheduleError?: string | null;
+  meals?: MealDayResponse | null;
+  mealsError?: string | null;
+  timetable?: TimetableDayResponse | null;
+  timetableError?: string | null;
+  teacherUnreadCount?: number | null;
+  teacherWaitingCount?: number | null;
+  teacherPreCounselPendingCount?: number | null;
+  teacherSummaryError?: string | null;
+  teacherCounselingPosts?: CounselingPostSummary[] | null;
+  teacherPreCounselSummaries?: PreCounselingProfileSummary[] | null;
+}

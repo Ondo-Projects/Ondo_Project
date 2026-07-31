@@ -88,6 +88,14 @@ public class AssignmentService {
                 .orElseThrow(() -> new BusinessException("등록된 담당 교사가 없습니다."));
     }
 
+    public java.util.Optional<AssignmentResponseDTO> findMyAssignmentOptional(String username) {
+        User student = getUser(username);
+        assertRole(student, Role.STUDENT);
+
+        return assignmentRepository.findByStudentWithDetails(student)
+                .map(AssignmentResponseDTO::new);
+    }
+
     private TeacherInviteCode createInviteCode(User teacher) {
         TeacherInviteCode inviteCode = TeacherInviteCode.builder()
                 .teacher(teacher)

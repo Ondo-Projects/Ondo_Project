@@ -82,6 +82,10 @@ export function getStudentPreCounselingProfile() {
   return apiClient<PreCounselingProfile>('/api/student/pre-counseling-profile');
 }
 
+export function getStudentHomeAggregate() {
+  return apiClient<import('./types/home').StudentHomeAggregateResponse>('/api/student/home');
+}
+
 export function saveStudentPreCounselingProfile(body: PreCounselingProfileSaveRequest) {
   return apiClient<PreCounselingProfileSaveResponse>('/api/student/pre-counseling-profile', {
     method: 'PUT',

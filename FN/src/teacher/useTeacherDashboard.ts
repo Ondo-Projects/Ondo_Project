@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import { getTeacherCounselingPosts, getTeacherUnreadCount } from '../api/counseling.api';
-import { getTeacherPreCounselingProfiles, getTeacherSuggestions } from '../api/teacher.api';
+import { getTeacherHomeAggregate } from '../api/teacher.api';
 import { ApiError } from '../api/types/api-error';
+import type { TeacherHomeAggregateResponse } from '../api/types/home';
 import type { CounselingPost } from '../api/types/counseling';
 import type { PreCounselingProfileSummary } from '../api/types/home';
 import type { SuggestionPost } from '../api/types/suggestion';
@@ -96,19 +96,33 @@ function buildSuggestionSummary(
   };
 }
 
-function buildSummaryFromLists(
-  unreadResult: { count: number } | null,
-  postsResult: CounselingPost[] | null,
-  preCounselResult: PreCounselingProfileSummary[] | null,
-  suggestionsResult: SuggestionPost[] | null,
-): TeacherDashboardSummary {
+function mapTeacherHomeAggregate(data: TeacherHomeAggregateResponse): TeacherDashboardData {
+  const counselingPosts = data.counselingPosts ?? null;
+  const preCounselSummaries = data.preCounselSummaries ?? null;
+  const suggestions = data.suggestions ?? null;
+  const listsLoaded = true;
+  const error =
+    data.unreadCountError ??
+    data.counselingPostsError ??
+    data.preCounselSummariesError ??
+    data.suggestionsError ??
+    null;
+
   return {
-    unreadCount: unreadResult?.count ?? 0,
-    waitingCount: postsResult?.filter((post) => post.status === 'WAITING').length ?? 0,
-    preCounselPendingCount: preCounselResult?.filter((item) => !item.completed).length ?? 0,
-    suggestion: buildSuggestionSummary(suggestionsResult, suggestionsResult !== null),
-    isLoading: false,
-    error: null,
+    summary: {
+      unreadCount: data.unreadCount ?? 0,
+      waitingCount:
+        counselingPosts?.filter((post) => post.status === 'WAITING').length ?? 0,
+      preCounselPendingCount:
+        preCounselSummaries?.filter((item) => !item.completed).length ?? 0,
+      suggestion: buildSuggestionSummary(suggestions, listsLoaded),
+      isLoading: false,
+      error,
+    },
+    counselingPosts,
+    preCounselSummaries,
+    suggestions,
+    listsLoaded,
   };
 }
 
@@ -122,25 +136,8 @@ export function useTeacherDashboard(enabled: boolean, refreshToken = 0) {
     }));
 
     try {
-      const [unreadResult, postsResult, preCounselResult, suggestionsResult] = await Promise.all([
-        getTeacherUnreadCount().catch(() => null),
-        getTeacherCounselingPosts().catch(() => null),
-        getTeacherPreCounselingProfiles().catch(() => null),
-        getTeacherSuggestions().catch(() => null),
-      ]);
-
-      setData({
-        summary: buildSummaryFromLists(
-          unreadResult,
-          postsResult,
-          preCounselResult,
-          suggestionsResult,
-        ),
-        counselingPosts: postsResult,
-        preCounselSummaries: preCounselResult,
-        suggestions: suggestionsResult,
-        listsLoaded: true,
-      });
+      const aggregate = await getTeacherHomeAggregate();
+      setData(mapTeacherHomeAggregate(aggregate));
     } catch (error) {
       setData({
         summary: {

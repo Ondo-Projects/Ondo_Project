@@ -35,6 +35,12 @@ export function getUpcomingSchoolSchedule(days = 14) {
   );
 }
 
+export function getCommonHomeAggregate(days = 14) {
+  return apiClient<import('./types/home').CommonHomeAggregateResponse>(
+    `/api/common/home?days=${days}`,
+  );
+}
+
 export function getProfileSchool(role: UserRole) {
   if (role === 'STUDENT') {
     return apiClient<ProfileSchoolResponse>('/api/student/profile/school');
