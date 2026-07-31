@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
 import type { MealDayResponse, TimetableDayResponse } from '../../api/types/home';
+import { Btn, Card } from '../../components/ui';
 import { PATHS } from '../../routes/paths';
 import {
   mealDisplayMessage,
@@ -25,47 +25,48 @@ export default function StudentHomeBlock({
   timetableError,
 }: StudentHomeBlockProps) {
   return (
-    <section className="home-card home-role-block" aria-labelledby="student-home-title">
-      <h2 id="student-home-title" className="home-role-block__title">
-        오늘 학교생활
-      </h2>
-
+    <Card
+      title="오늘 학교생활"
+      titleId="student-home-title"
+      className="home-role-block"
+      aria-labelledby="student-home-title"
+    >
       <MealSummary data={meals} error={mealsError} />
       <TimetableSummary data={timetable} error={timetableError} />
 
       <nav className="home-quick-links" aria-label="학생 빠른 이동">
-        <Link className="home-btn home-btn--quick" to={`${PATHS.STUDENT}#section-today`}>
+        <Btn variant="secondary" to={`${PATHS.STUDENT}#section-today`}>
           오늘
-        </Link>
-        <Link className="home-btn home-btn--quick" to={`${PATHS.STUDENT}#section-mood`}>
+        </Btn>
+        <Btn variant="secondary" to={`${PATHS.STUDENT}#section-mood`}>
           마음
-        </Link>
-        <Link className="home-btn home-btn--quick" to={`${PATHS.STUDENT}#section-notice`}>
+        </Btn>
+        <Btn variant="secondary" to={`${PATHS.STUDENT}#section-notice`}>
           알림
-        </Link>
-        <Link className="home-btn home-btn--quick" to={`${PATHS.STUDENT}#section-counsel-create`}>
+        </Btn>
+        <Btn variant="secondary" to={`${PATHS.STUDENT}#section-counsel-create`}>
           상담
-        </Link>
-        <Link className="home-btn home-btn--quick" to={`${PATHS.STUDENT}#section-pre-counsel`}>
+        </Btn>
+        <Btn variant="secondary" to={`${PATHS.STUDENT}#section-pre-counsel`}>
           사전카드
-        </Link>
-        <Link className="home-btn home-btn--quick" to={`${PATHS.STUDENT}#section-school-calendar`}>
+        </Btn>
+        <Btn variant="secondary" to={`${PATHS.STUDENT}#section-school-calendar`}>
           일정
-        </Link>
-        <Link className="home-btn home-btn--quick" to={`${PATHS.STUDENT}#section-timetable`}>
+        </Btn>
+        <Btn variant="secondary" to={`${PATHS.STUDENT}#section-timetable`}>
           시간표
-        </Link>
-        <Link className="home-btn home-btn--quick" to={`${PATHS.STUDENT}#section-suggestion`}>
+        </Btn>
+        <Btn variant="secondary" to={`${PATHS.STUDENT}#section-suggestion`}>
           건의
-        </Link>
+        </Btn>
       </nav>
 
       <div className="home-role-actions">
-        <Link className="home-btn home-btn--primary" to={PATHS.STUDENT}>
+        <Btn variant="primary" fullWidth to={PATHS.STUDENT}>
           학생 홈 전체 보기
-        </Link>
+        </Btn>
       </div>
-    </section>
+    </Card>
   );
 }
 

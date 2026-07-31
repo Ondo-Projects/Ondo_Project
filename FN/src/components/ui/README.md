@@ -50,7 +50,18 @@ import { Alert, Btn, Card, Field, Input } from '../components/ui';
 | `student-badge--*`, `admin-badge--*` | `<Badge variant="…">` |
 | `home-announcement-drawer`, `admin-announcement-drawer` | `<Drawer>` compound API |
 
-## Phase 2 파일럿 (feature/design-student)
+## Phase 4 (feature/design-home-admin)
+
+- **Admin 전체** — `AdminSectionCard` → `Card`, 섹션별 `Btn` / `Field` / `Input` / `Select` / `Textarea` / `Badge` / `Alert`
+- **AdminAnnouncementEditDrawer** — `Drawer` compound API
+- **Home** — `HomePage` Alert, role block Card+Btn, `PlatformAnnouncementSection` Btn/Alert
+- **`admin.css` / `home.css`** — 레거시 btn/field/card/message/badge 규칙 제거
+
+## Phase 3 (feature/design-teacher)
+
+- **교사 섹션 전체** — ui 컴포넌트 적용, `teacher.css` 레거시 규칙 제거
+
+## Phase 2 (feature/design-student)
 
 - **전체 학생 섹션** — `Card`, `Field`, `Input`, `Textarea`, `Select`, `Btn`, `Badge`, `Alert`
 - **LoginPage** — `Card`, `Field`, `Input`, `Btn`, `Alert`, footer `Btn ghost`
@@ -67,10 +78,9 @@ import { Alert, Btn, Card, Field, Input } from '../components/ui';
 | Phase | 브랜치 (예) | 범위 |
 |-------|-------------|------|
 | 1 | `feature/design-auth-layout` | Auth 전 페이지, AppLayout |
-| 2 | `feature/design-student` | `student.css` → ui |
-| 3 | `feature/design-teacher` | 교사 홈 |
-| 4 | `feature/design-home-admin` | 공통 홈·관리자 |
 | 5 | `feature/design-a11y-polish` | 다크모드 QA, 스켈레톤·토스트(선택) |
+
+(Phase 2~4 완료)
 
 ## 규칙
 

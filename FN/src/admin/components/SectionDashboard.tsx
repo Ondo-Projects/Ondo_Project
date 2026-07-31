@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { getAdminDashboard } from '../../api/admin.api';
 import type { AdminDashboardResponse } from '../../api/types/admin';
 import { ApiError } from '../../api/types/api-error';
+import { Card, CardHelper } from '../../components/ui';
 import { formatCount, resolveErrorMessage } from '../adminUtils';
 
 interface SectionDashboardProps {
@@ -58,8 +59,7 @@ export default function SectionDashboard({ refreshToken, onError }: SectionDashb
   ];
 
   return (
-    <div className="admin-card">
-      <h2 className="admin-card__title">운영 현황</h2>
+    <Card title="운영 현황" titleMark>
       {isLoading ? <p className="admin-status">불러오는 중…</p> : null}
       <div className="admin-summary-grid">
         {items.map((item) => (
@@ -72,9 +72,9 @@ export default function SectionDashboard({ refreshToken, onError }: SectionDashb
           </div>
         ))}
       </div>
-      <p className="admin-helper">
+      <CardHelper>
         상담·사전상담 본문은 표시하지 않으며, 접근 기록(감사)만 조회합니다.
-      </p>
-    </div>
+      </CardHelper>
+    </Card>
   );
 }

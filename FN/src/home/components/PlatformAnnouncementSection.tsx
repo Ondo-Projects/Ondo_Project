@@ -1,5 +1,6 @@
 import type { AnnouncementSummary } from '../../api/types/announcement';
 import { ANNOUNCEMENT_AUDIENCE_LABELS } from '../../api/types/announcement';
+import { Alert, Btn } from '../../components/ui';
 import { formatDateTime } from '../homeUtils';
 import AnnouncementDetailDrawer from './AnnouncementDetailDrawer';
 import { usePlatformAnnouncements } from '../usePlatformAnnouncements';
@@ -77,9 +78,12 @@ export default function PlatformAnnouncementSection() {
         {isLoading ? (
           <p className="home-announcement-strip__status">공지를 불러오는 중…</p>
         ) : error && items.length === 0 ? (
-          <p className="home-announcement-strip__status home-announcement-strip__status--error" role="alert">
+          <Alert
+            variant="error"
+            className="home-announcement-strip__status home-announcement-strip__status--error"
+          >
             {error}
-          </p>
+          </Alert>
         ) : (
           <>
             <div className="home-announcement-strip__list">
@@ -94,13 +98,13 @@ export default function PlatformAnnouncementSection() {
 
             {totalElements > stripItems.length ? (
               <div className="home-announcement-strip__actions">
-                <button
-                  type="button"
+                <Btn
+                  variant="ghost"
                   className="home-announcement-board__more"
                   onClick={scrollToBoard}
                 >
                   전체 공지 {totalElements}건 보기
-                </button>
+                </Btn>
               </div>
             ) : null}
           </>
@@ -119,9 +123,12 @@ export default function PlatformAnnouncementSection() {
           </div>
 
           {error && items.length > 0 ? (
-            <p className="home-announcement-strip__status home-announcement-strip__status--error" role="alert">
+            <Alert
+              variant="error"
+              className="home-announcement-strip__status home-announcement-strip__status--error"
+            >
               {error}
-            </p>
+            </Alert>
           ) : null}
 
           <div className="home-announcement-board__list">
@@ -136,14 +143,14 @@ export default function PlatformAnnouncementSection() {
 
           {hasMore ? (
             <div className="home-announcement-board__actions">
-              <button
-                type="button"
+              <Btn
+                variant="ghost"
                 className="home-announcement-board__more"
                 disabled={isLoadingMore}
                 onClick={() => void loadMore()}
               >
                 {isLoadingMore ? '불러오는 중…' : '더 보기'}
-              </button>
+              </Btn>
             </div>
           ) : null}
         </section>
