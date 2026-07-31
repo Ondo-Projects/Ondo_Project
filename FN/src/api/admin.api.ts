@@ -158,6 +158,10 @@ export function getAdminAnnouncements(page = 0, size = 20) {
   );
 }
 
+export function getAdminAnnouncement(id: number) {
+  return apiClient<AnnouncementDetail>(`/api/admin/announcements/${id}`);
+}
+
 export function createAdminAnnouncement(body: AnnouncementCreateRequest) {
   return apiClient<AnnouncementDetail>('/api/admin/announcements', {
     method: 'POST',

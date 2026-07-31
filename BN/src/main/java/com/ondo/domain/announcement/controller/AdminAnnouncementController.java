@@ -54,6 +54,17 @@ public class AdminAnnouncementController {
         ));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<AnnouncementResponseDTO> getAnnouncement(
+            Authentication authentication,
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(announcementService.getAdminAnnouncement(
+                authentication.getName(),
+                id
+        ));
+    }
+
     @PatchMapping("/{id}")
     public ResponseEntity<AnnouncementResponseDTO> updateAnnouncement(
             Authentication authentication,

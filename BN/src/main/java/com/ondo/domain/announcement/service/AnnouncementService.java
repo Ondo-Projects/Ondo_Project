@@ -65,6 +65,16 @@ public class AnnouncementService {
         return toPageResponse(result);
     }
 
+    public AnnouncementResponseDTO getAdminAnnouncement(String adminUsername, Long announcementId) {
+        User admin = getUser(adminUsername);
+        assertRole(admin, Role.ADMIN);
+
+        PlatformAnnouncement announcement = announcementRepository.findById(announcementId)
+                .orElseThrow(() -> new BusinessException("공지를 찾을 수 없습니다."));
+
+        return new AnnouncementResponseDTO(announcement);
+    }
+
     public AnnouncementPageResponseDTO getCommonAnnouncements(String username, int page, int size) {
         User user = getUser(username);
         assertRoleIn(user, Role.STUDENT, Role.TEACHER);
