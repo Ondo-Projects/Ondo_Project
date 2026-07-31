@@ -1,4 +1,5 @@
 import type { AnnouncementAudience } from '../api/types/announcement';
+import type { AnnouncementStatus } from '../api/types/announcement';
 import type { UserRole } from '../api/types/auth';
 import type { SuggestionCategory, SuggestionStatus } from '../api/types/suggestion';
 
@@ -21,6 +22,19 @@ export const ANNOUNCEMENT_AUDIENCE_LABELS: Record<AnnouncementAudience, string> 
   STUDENT: '학생',
   TEACHER: '교사',
 };
+
+export const ANNOUNCEMENT_STATUS_LABELS: Record<AnnouncementStatus, string> = {
+  PUBLISHED: '게시',
+  ARCHIVED: '보관',
+};
+
+export const ANNOUNCEMENT_STATUS_OPTIONS: Array<{
+  value: AnnouncementStatus;
+  label: string;
+}> = [
+  { value: 'PUBLISHED', label: '게시' },
+  { value: 'ARCHIVED', label: '보관' },
+];
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   STUDENT: '학생',

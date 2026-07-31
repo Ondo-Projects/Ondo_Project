@@ -568,6 +568,107 @@
   color: #1d4ed8;
 }
 
+.admin-link-button {
+  display: inline;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-primary-700);
+  font: inherit;
+  font-weight: var(--font-weight-label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-link-button:hover {
+  color: var(--color-primary-800);
+  text-decoration: underline;
+}
+
+.admin-link-button:focus-visible {
+  outline: 3px solid var(--color-primary-100);
+  outline-offset: 2px;
+}
+
+.admin-field--checkbox label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.admin-form--drawer {
+  margin-bottom: 0;
+}
+
+.admin-announcement-table__title {
+  min-width: 12rem;
+}
+
+.admin-announcement-table__title .admin-helper {
+  margin: var(--space-1) 0 0;
+}
+
+.admin-announcement-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal, 1000);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.admin-announcement-drawer__backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: rgb(15 23 42 / 45%);
+  cursor: pointer;
+}
+
+.admin-announcement-drawer__panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 36rem);
+  max-height: 100%;
+  background: #ffffff;
+  box-shadow: -8px 0 24px rgb(15 23 42 / 12%);
+}
+
+.admin-announcement-drawer__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border-bottom: 1px solid var(--color-neutral-200);
+}
+
+.admin-announcement-drawer__title {
+  margin: 0;
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-h3);
+  font-weight: var(--font-weight-h3);
+  color: var(--color-neutral-900);
+}
+
+.admin-announcement-drawer__body {
+  padding: var(--space-5);
+  overflow-y: auto;
+}
+
+@media (max-width: 639px) {
+  .admin-announcement-drawer {
+    align-items: flex-end;
+  }
+
+  .admin-announcement-drawer__panel {
+    width: 100%;
+    max-height: 92vh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+}
+
 .admin-filter-chip:focus-visible,
 .admin-btn:focus-visible,
 .admin-suggestion-row:focus-visible {

@@ -185,6 +185,22 @@ class AnnouncementIntegrationTest {
     }
 
     @Test
+    void getAdminAnnouncement_returnsDetail() throws Exception {
+        PlatformAnnouncement announcement = saveAnnouncement(
+                "관리자 상세",
+                AnnouncementAudience.ALL,
+                false,
+                AnnouncementStatus.PUBLISHED
+        );
+
+        mockMvc.perform(get("/api/admin/announcements/{id}", announcement.getId())
+                        .header("Authorization", "Bearer " + bearerToken(ADMIN_USERNAME, Role.ADMIN)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("관리자 상세"))
+                .andExpect(jsonPath("$.content").value("관리자 상세 내용"));
+    }
+
+    @Test
     void updateAnnouncement_changesFields() throws Exception {
         PlatformAnnouncement announcement = saveAnnouncement(
                 "수정 전",
