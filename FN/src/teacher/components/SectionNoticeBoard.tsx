@@ -6,6 +6,7 @@ import {
 } from '../../api/teacher.api';
 import { ApiError } from '../../api/types/api-error';
 import type { TeacherNotice } from '../../api/types/teacher';
+import { Btn, Field, Input, Textarea } from '../../components/ui';
 import { TEACHER_SECTIONS } from '../constants';
 import { formatDateTime } from '../teacherUtils';
 import TeacherSectionCard from './TeacherSectionCard';
@@ -99,13 +100,8 @@ export default function SectionNoticeBoard({ onSuccess, onError }: SectionNotice
       helper="담당 학생에게 공지할 내용을 작성해 주세요."
     >
       <form className="teacher-form" onSubmit={handleSubmit}>
-        <div className="teacher-field">
-          <label className="teacher-field__label" htmlFor="noticeTitle">
-            제목
-          </label>
-          <input
-            id="noticeTitle"
-            className="teacher-field__input"
+        <Field id="noticeTitle" label="제목">
+          <Input
             type="text"
             maxLength={100}
             placeholder="알림 제목"
@@ -113,30 +109,21 @@ export default function SectionNoticeBoard({ onSuccess, onError }: SectionNotice
             value={form.title}
             onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
           />
-        </div>
+        </Field>
 
-        <div className="teacher-field">
-          <label className="teacher-field__label" htmlFor="noticeContent">
-            내용
-          </label>
-          <textarea
-            id="noticeContent"
-            className="teacher-field__textarea"
+        <Field id="noticeContent" label="내용">
+          <Textarea
             placeholder="학생에게 전달할 내용을 작성해 주세요."
             disabled={isSubmitting}
             value={form.content}
             onChange={(event) => setForm((prev) => ({ ...prev, content: event.target.value }))}
           />
-        </div>
+        </Field>
 
         <div className="teacher-form-actions">
-          <button
-            type="submit"
-            className="teacher-btn teacher-btn--primary"
-            disabled={isSubmitting}
-          >
+          <Btn type="submit" variant="primary" size="student" disabled={isSubmitting}>
             {isSubmitting ? '등록 중…' : '알림 등록'}
-          </button>
+          </Btn>
         </div>
       </form>
 
@@ -154,14 +141,15 @@ export default function SectionNoticeBoard({ onSuccess, onError }: SectionNotice
             <article key={notice.id} className="teacher-notice-item">
               <div className="teacher-notice-item__header">
                 <h3 className="teacher-notice-item__title">{notice.title}</h3>
-                <button
+                <Btn
                   type="button"
-                  className="teacher-btn teacher-btn--danger"
+                  variant="danger"
+                  size="student"
                   disabled={deletingId === notice.id}
                   onClick={() => handleDelete(notice.id)}
                 >
                   {deletingId === notice.id ? '삭제 중…' : '삭제'}
-                </button>
+                </Btn>
               </div>
               <p className="teacher-post-meta">{formatDateTime(notice.createdAt)}</p>
               <div className="teacher-notice-item__content">{notice.content}</div>
