@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
+import { getMyCounselingPosts } from '../api/counseling.api';
+import type { CounselingPost } from '../api/types/counseling';
 import type { ProfileSchoolResponse } from '../api/types/home';
 import type {
   MealDayResponse,
@@ -6,13 +8,22 @@ import type {
   TimetableDayResponse,
   WeatherTodayResponse,
 } from '../api/types/home';
-import type { StudentAssignment, StudentNotice } from '../api/types/student';
+import type {
+  MoodTodayResponse,
+  PreCounselingProfile,
+  StudentAssignment,
+  StudentNotice,
+} from '../api/types/student';
+import type { SuggestionPost } from '../api/types/suggestion';
 import { ApiError } from '../api/types/api-error';
+import { getMySuggestions } from '../api/suggestion.api';
 import {
   getStudentAssignmentOptional,
   getStudentNotices,
+  getStudentPreCounselingProfile,
   getStudentProfileSchool,
   getStudentTodayMeals,
+  getStudentTodayMood,
   getStudentTodayTimetable,
   getStudentTodayWeather,
   getStudentUpcomingSchoolSchedule,
@@ -34,6 +45,11 @@ export interface StudentSchoolLifeState {
   timetableError: string | null;
   notices: StudentNotice[] | null;
   noticesError: string | null;
+  todayMood: MoodTodayResponse | null;
+  preCounselProfile: PreCounselingProfile | null;
+  counselingPosts: CounselingPost[] | null;
+  suggestions: SuggestionPost[] | null;
+  workspaceLoaded: boolean;
 }
 
 const initialState: StudentSchoolLifeState = {
@@ -52,6 +68,11 @@ const initialState: StudentSchoolLifeState = {
   timetableError: null,
   notices: null,
   noticesError: null,
+  todayMood: null,
+  preCounselProfile: null,
+  counselingPosts: null,
+  suggestions: null,
+  workspaceLoaded: false,
 };
 
 function resolveErrorMessage(error: unknown, fallback: string): string {
@@ -84,6 +105,17 @@ async function loadTimetableSafe(): Promise<
   }
 }
 
+async function loadWorkspaceData() {
+  const [todayMood, preCounselProfile, counselingPosts, suggestions] = await Promise.all([
+    getStudentTodayMood().catch(() => null),
+    getStudentPreCounselingProfile().catch(() => null),
+    getMyCounselingPosts().catch(() => null),
+    getMySuggestions().catch(() => null),
+  ]);
+
+  return { todayMood, preCounselProfile, counselingPosts, suggestions };
+}
+
 export function useStudentSchoolLife(enabled: boolean) {
   const [state, setState] = useState<StudentSchoolLifeState>(initialState);
   const [reloadToken, setReloadToken] = useState(0);
@@ -100,6 +132,18 @@ export function useStudentSchoolLife(enabled: boolean) {
       }
       return { ...prev, timetable: result.timetable, timetableError: null };
     });
+  }, []);
+
+  const reloadWorkspace = useCallback(async () => {
+    const workspace = await loadWorkspaceData();
+    setState((prev) => ({
+      ...prev,
+      todayMood: workspace.todayMood,
+      preCounselProfile: workspace.preCounselProfile,
+      counselingPosts: workspace.counselingPosts,
+      suggestions: workspace.suggestions,
+      workspaceLoaded: true,
+    }));
   }, []);
 
   const applyAssignment = useCallback(async (assignment: StudentAssignment | null) => {
@@ -135,27 +179,32 @@ export function useStudentSchoolLife(enabled: boolean) {
       setState({ ...initialState, isLoading: true });
 
       try {
-        const [schoolProfile, assignment] = await Promise.all([
+        const [
+          schoolProfile,
+          assignment,
+          mealsResult,
+          weatherResult,
+          scheduleResult,
+          timetableResult,
+          workspace,
+        ] = await Promise.all([
           getStudentProfileSchool(),
           getStudentAssignmentOptional(),
+          getStudentTodayMeals().catch((error) => ({
+            error: resolveErrorMessage(error, '급식 정보를 불러올 수 없습니다.'),
+          })),
+          getStudentTodayWeather().catch((error) => ({
+            error: resolveErrorMessage(error, '날씨 정보를 불러올 수 없습니다.'),
+          })),
+          getStudentUpcomingSchoolSchedule(14).catch((error) => ({
+            error: resolveErrorMessage(error, '학사일정을 불러올 수 없습니다.'),
+          })),
+          loadTimetableSafe(),
+          loadWorkspaceData(),
         ]);
 
         const hasAssignment = assignment !== null;
-
-        const [mealsResult, weatherResult, scheduleResult, timetableResult, noticesResult] =
-          await Promise.all([
-            getStudentTodayMeals().catch((error) => ({
-              error: resolveErrorMessage(error, '급식 정보를 불러올 수 없습니다.'),
-            })),
-            getStudentTodayWeather().catch((error) => ({
-              error: resolveErrorMessage(error, '날씨 정보를 불러올 수 없습니다.'),
-            })),
-            getStudentUpcomingSchoolSchedule(14).catch((error) => ({
-              error: resolveErrorMessage(error, '학사일정을 불러올 수 없습니다.'),
-            })),
-            loadTimetableSafe(),
-            hasAssignment ? loadNoticesSafe() : Promise.resolve(null),
-          ]);
+        const noticesResult = hasAssignment ? await loadNoticesSafe() : null;
 
         if (cancelled) {
           return;
@@ -177,6 +226,11 @@ export function useStudentSchoolLife(enabled: boolean) {
           timetableError: null,
           notices: hasAssignment ? [] : null,
           noticesError: null,
+          todayMood: workspace.todayMood,
+          preCounselProfile: workspace.preCounselProfile,
+          counselingPosts: workspace.counselingPosts,
+          suggestions: workspace.suggestions,
+          workspaceLoaded: true,
         };
 
         if ('error' in mealsResult) {
@@ -234,6 +288,7 @@ export function useStudentSchoolLife(enabled: boolean) {
     ...state,
     reload,
     reloadTimetable,
+    reloadWorkspace,
     applyAssignment,
   };
 }

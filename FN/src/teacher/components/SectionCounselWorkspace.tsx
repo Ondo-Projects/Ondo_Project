@@ -24,14 +24,16 @@ import { formatDateTime, formatTeacherDisplay, scrollToTeacherSection } from '..
 import TeacherSectionCard from './TeacherSectionCard';
 
 interface SectionCounselWorkspaceProps {
-  refreshToken: number;
+  prefetchedPosts: CounselingPost[] | null;
+  postsLoaded: boolean;
   onSuccess: (message: string) => void;
   onError: (message: string) => void;
   onDataChange: () => void;
 }
 
 export default function SectionCounselWorkspace({
-  refreshToken,
+  prefetchedPosts,
+  postsLoaded,
   onSuccess,
   onError,
   onDataChange,
@@ -62,8 +64,13 @@ export default function SectionCounselWorkspace({
   }, [onError, statusFilter]);
 
   useEffect(() => {
+    if (postsLoaded && statusFilter === '') {
+      setPosts(prefetchedPosts ?? []);
+      setIsLoading(false);
+      return;
+    }
     loadPosts();
-  }, [loadPosts, refreshToken]);
+  }, [loadPosts, postsLoaded, prefetchedPosts, statusFilter]);
 
   useEffect(() => {
     if (!selectedPostId || !posts.some((post) => post.id === selectedPostId)) {

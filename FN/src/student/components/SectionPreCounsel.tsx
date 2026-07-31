@@ -2,7 +2,6 @@ import { type FormEvent, useEffect, useState } from 'react';
 import { ApiError } from '../../api/types/api-error';
 import type { PreCounselingProfile } from '../../api/types/student';
 import {
-  getStudentPreCounselingProfile,
   saveStudentPreCounselingProfile,
 } from '../../api/student.api';
 import { Badge, Btn, Field, Input, Textarea } from '../../components/ui';
@@ -17,12 +16,16 @@ import { scrollToStudentSection } from '../studentUtils';
 import StudentSectionCard from './StudentSectionCard';
 
 interface SectionPreCounselProps {
+  prefetchedProfile: PreCounselingProfile | null;
+  profileLoaded: boolean;
   navFocusToken?: number;
   onSuccess: (message: string) => void;
   onError: (message: string) => void;
 }
 
 export default function SectionPreCounsel({
+  prefetchedProfile,
+  profileLoaded,
   navFocusToken = 0,
   onSuccess,
   onError,
@@ -36,26 +39,16 @@ export default function SectionPreCounsel({
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    let cancelled = false;
+    if (!profileLoaded) {
+      setIsLoading(true);
+      return;
+    }
 
-    getStudentPreCounselingProfile()
-      .then((profile) => {
-        if (!cancelled) {
-          applyProfile(profile);
-          setIsLoading(false);
-        }
-      })
-      .catch((error) => {
-        if (!cancelled) {
-          setIsLoading(false);
-          onError(resolveErrorMessage(error, '사전 상담 카드를 불러오지 못했습니다.'));
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    if (prefetchedProfile) {
+      applyProfile(prefetchedProfile);
+    }
+    setIsLoading(false);
+  }, [profileLoaded, prefetchedProfile]);
 
   useEffect(() => {
     if (navFocusToken === 0) {

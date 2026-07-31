@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   getTeacherPreCounselingProfile,
-  getTeacherPreCounselingProfiles,
 } from '../../api/teacher.api';
 import { ApiError } from '../../api/types/api-error';
 import type { PreCounselingProfileSummary } from '../../api/types/home';
@@ -17,12 +16,14 @@ import { Badge, Btn, CardHelper } from '../../components/ui';
 import TeacherSectionCard from './TeacherSectionCard';
 
 interface SectionPreCounselReadProps {
-  refreshToken: number;
+  prefetchedSummaries: PreCounselingProfileSummary[] | null;
+  summariesLoaded: boolean;
   onError: (message: string) => void;
 }
 
 export default function SectionPreCounselRead({
-  refreshToken,
+  prefetchedSummaries,
+  summariesLoaded,
   onError,
 }: SectionPreCounselReadProps) {
   const [summaries, setSummaries] = useState<PreCounselingProfileSummary[]>([]);
@@ -33,24 +34,12 @@ export default function SectionPreCounselRead({
   const [showIncompleteMessage, setShowIncompleteMessage] = useState(false);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
 
-  const loadSummaries = useCallback(async () => {
-    setIsLoading(true);
-
-    try {
-      const data = await getTeacherPreCounselingProfiles();
-      setSummaries(data);
-      return data;
-    } catch (error) {
-      onError(resolveErrorMessage(error, '사전 상담 목록을 불러오지 못했습니다.'));
-      return null;
-    } finally {
+  useEffect(() => {
+    if (summariesLoaded) {
+      setSummaries(prefetchedSummaries ?? []);
       setIsLoading(false);
     }
-  }, [onError]);
-
-  useEffect(() => {
-    loadSummaries();
-  }, [loadSummaries, refreshToken]);
+  }, [summariesLoaded, prefetchedSummaries]);
 
   useEffect(() => {
     if (!selectedUsername) {

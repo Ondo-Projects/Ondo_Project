@@ -21,7 +21,8 @@ import { formatDateTime, scrollToTeacherSection } from '../teacherUtils';
 import TeacherSectionCard from './TeacherSectionCard';
 
 interface SectionSuggestionProps {
-  refreshToken: number;
+  prefetchedSuggestions: SuggestionPost[] | null;
+  suggestionsLoaded: boolean;
   onSuccess: (message: string) => void;
   onError: (message: string) => void;
 }
@@ -46,7 +47,8 @@ const EMPTY_CREATE_FORM: CreateFormState = {
 };
 
 export default function SectionSuggestion({
-  refreshToken,
+  prefetchedSuggestions,
+  suggestionsLoaded,
   onSuccess,
   onError,
 }: SectionSuggestionProps) {
@@ -76,8 +78,11 @@ export default function SectionSuggestion({
   }, [onError]);
 
   useEffect(() => {
-    loadSuggestions();
-  }, [loadSuggestions, refreshToken]);
+    if (suggestionsLoaded) {
+      setSuggestions(prefetchedSuggestions ?? []);
+      setIsLoading(false);
+    }
+  }, [suggestionsLoaded, prefetchedSuggestions]);
 
   useEffect(() => {
     if (!selectedId || !suggestions.some((item) => item.id === selectedId)) {

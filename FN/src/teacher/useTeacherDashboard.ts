@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { getTeacherCounselingPosts, getTeacherUnreadCount } from '../api/counseling.api';
 import { getTeacherPreCounselingProfiles, getTeacherSuggestions } from '../api/teacher.api';
 import { ApiError } from '../api/types/api-error';
+import type { CounselingPost } from '../api/types/counseling';
+import type { PreCounselingProfileSummary } from '../api/types/home';
 import type { SuggestionPost } from '../api/types/suggestion';
 
 export interface TeacherSuggestionSummary {
@@ -19,19 +21,35 @@ export interface TeacherDashboardSummary {
   error: string | null;
 }
 
+export interface TeacherDashboardData {
+  summary: TeacherDashboardSummary;
+  counselingPosts: CounselingPost[] | null;
+  preCounselSummaries: PreCounselingProfileSummary[] | null;
+  suggestions: SuggestionPost[] | null;
+  listsLoaded: boolean;
+}
+
 const initialSuggestionSummary: TeacherSuggestionSummary = {
   count: '-',
   hint: '불러오는 중…',
   highlight: false,
 };
 
-const initialState: TeacherDashboardSummary = {
+const initialSummary: TeacherDashboardSummary = {
   unreadCount: null,
   waitingCount: null,
   preCounselPendingCount: null,
   suggestion: initialSuggestionSummary,
   isLoading: true,
   error: null,
+};
+
+const initialState: TeacherDashboardData = {
+  summary: initialSummary,
+  counselingPosts: null,
+  preCounselSummaries: null,
+  suggestions: null,
+  listsLoaded: false,
 };
 
 function resolveErrorMessage(error: unknown, fallback: string): string {
@@ -78,11 +96,30 @@ function buildSuggestionSummary(
   };
 }
 
+function buildSummaryFromLists(
+  unreadResult: { count: number } | null,
+  postsResult: CounselingPost[] | null,
+  preCounselResult: PreCounselingProfileSummary[] | null,
+  suggestionsResult: SuggestionPost[] | null,
+): TeacherDashboardSummary {
+  return {
+    unreadCount: unreadResult?.count ?? 0,
+    waitingCount: postsResult?.filter((post) => post.status === 'WAITING').length ?? 0,
+    preCounselPendingCount: preCounselResult?.filter((item) => !item.completed).length ?? 0,
+    suggestion: buildSuggestionSummary(suggestionsResult, suggestionsResult !== null),
+    isLoading: false,
+    error: null,
+  };
+}
+
 export function useTeacherDashboard(enabled: boolean, refreshToken = 0) {
-  const [summary, setSummary] = useState<TeacherDashboardSummary>(initialState);
+  const [data, setData] = useState<TeacherDashboardData>(initialState);
 
   const reloadSummary = useCallback(async () => {
-    setSummary((prev) => ({ ...prev, isLoading: true, error: null }));
+    setData((prev) => ({
+      ...prev,
+      summary: { ...prev.summary, isLoading: true, error: null },
+    }));
 
     try {
       const [unreadResult, postsResult, preCounselResult, suggestionsResult] = await Promise.all([
@@ -92,25 +129,34 @@ export function useTeacherDashboard(enabled: boolean, refreshToken = 0) {
         getTeacherSuggestions().catch(() => null),
       ]);
 
-      setSummary({
-        unreadCount: unreadResult?.count ?? 0,
-        waitingCount: postsResult?.filter((post) => post.status === 'WAITING').length ?? 0,
-        preCounselPendingCount:
-          preCounselResult?.filter((item) => !item.completed).length ?? 0,
-        suggestion: buildSuggestionSummary(suggestionsResult, suggestionsResult !== null),
-        isLoading: false,
-        error: null,
+      setData({
+        summary: buildSummaryFromLists(
+          unreadResult,
+          postsResult,
+          preCounselResult,
+          suggestionsResult,
+        ),
+        counselingPosts: postsResult,
+        preCounselSummaries: preCounselResult,
+        suggestions: suggestionsResult,
+        listsLoaded: true,
       });
     } catch (error) {
-      setSummary({
-        ...initialState,
-        isLoading: false,
-        error: resolveErrorMessage(error, '요약 정보를 불러오지 못했습니다.'),
-        suggestion: {
-          count: '-',
-          hint: '불러오기 실패',
-          highlight: false,
+      setData({
+        summary: {
+          ...initialSummary,
+          isLoading: false,
+          error: resolveErrorMessage(error, '요약 정보를 불러오지 못했습니다.'),
+          suggestion: {
+            count: '-',
+            hint: '불러오기 실패',
+            highlight: false,
+          },
         },
+        counselingPosts: null,
+        preCounselSummaries: null,
+        suggestions: null,
+        listsLoaded: false,
       });
     }
   }, []);
@@ -122,5 +168,5 @@ export function useTeacherDashboard(enabled: boolean, refreshToken = 0) {
     reloadSummary();
   }, [enabled, refreshToken, reloadSummary]);
 
-  return { summary, reloadSummary };
+  return { ...data, summary: data.summary, reloadSummary };
 }

@@ -1,54 +1,45 @@
 import { useEffect, useState } from 'react';
 import { ApiError } from '../../api/types/api-error';
-import type { MoodLevel, MoodLevelCode } from '../../api/types/student';
-import { getStudentTodayMood, saveStudentTodayMood } from '../../api/student.api';
+import type { MoodLevel, MoodLevelCode, MoodTodayResponse } from '../../api/types/student';
+import { saveStudentTodayMood } from '../../api/student.api';
 import { CardHelper } from '../../components/ui';
 import { MOOD_OPTIONS, STUDENT_SECTIONS } from '../constants';
 import StudentSectionCard from './StudentSectionCard';
 
 interface SectionMoodProps {
+  prefetchedMood: MoodTodayResponse | null;
+  moodLoaded: boolean;
   onSuccess: (message: string) => void;
   onError: (message: string) => void;
 }
 
-export default function SectionMood({ onSuccess, onError }: SectionMoodProps) {
+export default function SectionMood({
+  prefetchedMood,
+  moodLoaded,
+  onSuccess,
+  onError,
+}: SectionMoodProps) {
   const [selectedMood, setSelectedMood] = useState<MoodLevelCode | null>(null);
   const [statusText, setStatusText] = useState('불러오는 중…');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    let cancelled = false;
+    if (!moodLoaded) {
+      setIsLoading(true);
+      setStatusText('불러오는 중…');
+      return;
+    }
 
-    getStudentTodayMood()
-      .then((data) => {
-        if (cancelled) {
-          return;
-        }
-        if (data.recorded === false || !data.moodLevel) {
-          setSelectedMood(null);
-          setStatusText('아직 오늘 기록이 없습니다.');
-          return;
-        }
-        setSelectedMood(data.moodLevel.code);
-        setStatusText(buildMoodStatusText(data.moodLevel));
-      })
-      .catch((error) => {
-        if (!cancelled) {
-          setStatusText('마음 날씨를 불러오지 못했습니다.');
-          onError(resolveErrorMessage(error, '마음 날씨를 불러오지 못했습니다.'));
-        }
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    if (prefetchedMood?.recorded === false || !prefetchedMood?.moodLevel) {
+      setSelectedMood(null);
+      setStatusText('아직 오늘 기록이 없습니다.');
+    } else {
+      setSelectedMood(prefetchedMood.moodLevel.code);
+      setStatusText(buildMoodStatusText(prefetchedMood.moodLevel));
+    }
+    setIsLoading(false);
+  }, [moodLoaded, prefetchedMood]);
 
   async function handleSelect(code: MoodLevelCode) {
     if (isSaving || isLoading) {

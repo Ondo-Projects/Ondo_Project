@@ -91,14 +91,9 @@ export function useHomeData(user: AuthUser | null): HomeDataState {
       setState({ ...initialState, isLoading: true });
 
       try {
-        let schoolProfile: ProfileSchoolResponse | null = null;
-        let schoolProfileError: string | null = null;
-
-        try {
-          schoolProfile = await getProfileSchool(currentUser.role);
-        } catch (error) {
-          schoolProfileError = resolveErrorMessage(error, '학교 정보를 불러오지 못했습니다.');
-        }
+        const schoolProfilePromise = getProfileSchool(currentUser.role).catch((error) => ({
+          error: resolveErrorMessage(error, '학교 정보를 불러오지 못했습니다.'),
+        }));
 
         const weatherPromise = getTodayWeather().catch((error) => ({
           error: resolveErrorMessage(error, '날씨 정보를 불러올 수 없습니다.'),
@@ -133,8 +128,9 @@ export function useHomeData(user: AuthUser | null): HomeDataState {
               }))
             : Promise.resolve(null);
 
-        const [weatherResult, scheduleResult, mealsResult, timetableResult, teacherResult] =
+        const [schoolProfileResult, weatherResult, scheduleResult, mealsResult, timetableResult, teacherResult] =
           await Promise.all([
+            schoolProfilePromise,
             weatherPromise,
             schedulePromise,
             studentMealsPromise,
@@ -144,6 +140,15 @@ export function useHomeData(user: AuthUser | null): HomeDataState {
 
         if (cancelled) {
           return;
+        }
+
+        let schoolProfile: ProfileSchoolResponse | null = null;
+        let schoolProfileError: string | null = null;
+        const profileResult = schoolProfileResult as ProfileSchoolResponse | { error: string };
+        if ('error' in profileResult) {
+          schoolProfileError = profileResult.error;
+        } else {
+          schoolProfile = profileResult;
         }
 
         const nextState: HomeDataState = {

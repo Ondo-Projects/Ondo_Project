@@ -46,7 +46,7 @@ node scripts/measure-api-baseline.mjs
 
 `WeatherApiClient` — 기상청 **2회** (초단기실황 + 단기예보, 순차).  
 `NeisApiClient` — 급식·학사일정·시간표.  
-**조회 결과 캐시 없음** (`@Cacheable` / Redis 캐시 미사용, OTP·토큰만 Redis).
+**Phase 1:** Caffeine `@Cacheable` (날씨 15분, NEIS 30분 TTL).
 
 서버 기동 시 로그 레벨 `DEBUG` 또는 AOP 타이밍 추가 후 외부 호출 ms 기록 권장.
 
@@ -201,7 +201,25 @@ sequenceDiagram
 | 날씨 병렬 | 초단기실황 + 단기예보 `CompletableFuture.supplyAsync` |
 | 로깅 | `[cache HIT/MISS] {cacheName} key=…` (debug, `logging-enabled`) |
 
-**다음 (Phase 2):**
+---
 
-1. 프론트 — `useHomeData` / `useStudentSchoolLife` **단일 병렬**, 섹션 **중복 제거**  
-2. BN 기동 후 `npm run measure:api-baseline` 재측정 → §3·§5 TODO 갱신
+## 7. Phase 2 — 프론트 워터폴·중복 제거 (완료)
+
+| 항목 | 변경 |
+|------|------|
+| `useHomeData` | `getProfileSchool`을 `Promise.all`에 포함 (선행 워터폴 제거) |
+| `useStudentSchoolLife` | W1+W2+W3 → **단일 병렬** (+ 담당 교사 있을 때 notices 1회) |
+| `useStudentTodayTodo` | API 호출 제거, `schoolLife` 상태에서 todo만 derive |
+| 학생 섹션 | mood / pre-counsel / suggestions / counsel-list → **prefetch props** (중복 fetch 제거) |
+| `useTeacherDashboard` | 상담·사전상담·건의 **전체 목록** 보관 |
+| 교사 섹션 | workspace / pre-counsel / suggestion → dashboard prefetch **동기화** |
+
+**1차 로드 HTTP 추정 (중복 제거 후):**
+
+| 페이지 | 이전 | 이후 |
+|--------|------|------|
+| 학교 홈 (학생) | ~7 (순차 구간) | ~6 (전부 병렬) |
+| 학생 홈 | ~16–20 | ~11–12 (+ class-profile 1) |
+| 교사 홈 | ~13–15 | ~10–11 |
+
+**다음 (Phase 3+):** BFF aggregate (`/api/student/home`), React Query, BN 기동 후 재측정

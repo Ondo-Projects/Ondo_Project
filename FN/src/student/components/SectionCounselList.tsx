@@ -21,7 +21,8 @@ import StudentSectionCard from './StudentSectionCard';
 
 interface SectionCounselListProps {
   isActive: boolean;
-  refreshToken: number;
+  prefetchedPosts: CounselingPost[] | null;
+  postsLoaded: boolean;
   onSuccess: (message: string) => void;
   onError: (message: string) => void;
 }
@@ -36,7 +37,8 @@ interface EditFormState {
 
 export default function SectionCounselList({
   isActive,
-  refreshToken,
+  prefetchedPosts,
+  postsLoaded,
   onSuccess,
   onError,
 }: SectionCounselListProps) {
@@ -67,8 +69,13 @@ export default function SectionCounselList({
     if (!isActive) {
       return;
     }
+    if (postsLoaded) {
+      setPosts(prefetchedPosts ?? []);
+      setIsLoading(false);
+      return;
+    }
     loadPosts();
-  }, [isActive, refreshToken, loadPosts]);
+  }, [isActive, postsLoaded, prefetchedPosts, loadPosts]);
 
   useEffect(() => {
     if (!selectedPostId || !posts.some((post) => post.id === selectedPostId)) {
