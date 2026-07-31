@@ -1,30 +1,125 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 | 온도 상담웹</title>
+    <style>
+        * { box-sizing: border-box; }
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 480px;
+            margin: 48px auto;
+            padding: 0 16px 40px;
+            min-width: 0;
+        }
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        }
+        h1 { margin: 0 0 8px; font-size: 28px; }
+        .subtitle { color: #6b7280; margin-bottom: 24px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+        .field { margin-bottom: 16px; }
+        .submit-btn {
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 16px;
+            font-weight: 600;
+            background: #111827;
+            color: #fff;
+            cursor: pointer;
+            margin-top: 8px;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .message {
+            margin-bottom: 16px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+        .success-message {
+            margin-bottom: 16px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #ecfdf5;
+            color: #047857;
+        }
+        .footer-links {
+            margin-top: 20px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        .footer-links a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            min-height: 44px;
+            padding: 8px 4px;
+        }
+        .footer-links a:hover { text-decoration: underline; }
+        @media (max-width: 640px) {
+            .container { margin: 24px auto; padding: 0 12px 32px; }
+            .card { padding: 22px; }
+            h1 { font-size: 24px; }
+        }
+    </style>
 </head>
 <body>
-    <h1>LOGIN PAGE</h1>
-    <form action="/login" method="post">
-        USERNAME : <input type="text" name="username"><br/>
-        PASSWORD : <input type="password" name="password"><br/>
+<div class="container">
+    <div class="card">
+        <h1>로그인</h1>
+        <p class="subtitle">학생·교사 계정으로 온도 상담웹에 접속합니다.</p>
 
-        <!--   CSRF 활성화시 hidden 추가     -->
-<!--        <input type="text" name="_csrf" th:value="${_csrf.token}" />-->
-        <input type="submit" value="login" />
-    </form>
-    <hr>
+        <div class="message" th:if="${param.error}">아이디 또는 비밀번호가 올바르지 않습니다.</div>
+        <div class="success-message" th:if="${param.logout}">로그아웃되었습니다.</div>
+        <div class="success-message" th:if="${param.joined}">회원가입이 완료되었습니다. 로그인해 주세요.</div>
+        <div class="message" th:if="${param.sessionExpired}">로그인이 만료되었습니다. 다시 로그인해 주세요.</div>
 
-    <a href="/oauth2/authorization/kakao">카카오 로그인</a> <br/>
-    <a href="/oauth2/authorization/naver">네이버 로그인</a> <br/>
-    <a href="/oauth2/authorization/google">구글 로그인</a> <br/>
+        <form action="/login" method="post">
+            <div class="field">
+                <label for="username">아이디</label>
+                <input type="text" id="username" name="username" minlength="4" maxlength="50" required autofocus>
+            </div>
+            <div class="field">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" name="password" minlength="8" maxlength="100" required>
+            </div>
+            <button type="submit" class="submit-btn">로그인</button>
+        </form>
 
-    
-    <hr>
-    
-    <span th:text="${param.error}"></span>
-    <span th:text="${param.logout}"></span>
-
+        <div class="footer-links">
+            계정이 없으신가요? <a href="/join">회원가입</a>
+            · <a href="/">홈으로</a>
+        </div>
+    </div>
+</div>
 </body>
 </html>

@@ -1,0 +1,268 @@
+/**
+ * 온도(Ondo) Design Tokens
+ * Source: FN/DOCS/DESIGN/2026_UIUX_디자인가이드.md (2026.1)
+ *
+ * Usage:
+ *   @import url('./tokens.css');
+ *   또는 HTML <link rel="stylesheet" href="/DOCS/DESIGN/tokens.css" />
+ */
+
+:root {
+  /* ─── Brand — Warm Sky Blue ─── */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+
+  /* ─── Neutral — Slate ─── */
+  --color-neutral-50: #f8fafc;
+  --color-neutral-100: #f1f5f9;
+  --color-neutral-200: #e2e8f0;
+  --color-neutral-400: #94a3b8;
+  --color-neutral-600: #475569;
+  --color-neutral-800: #1e293b;
+  --color-neutral-900: #0f172a;
+
+  /* ─── Surface ─── */
+  --color-bg-page: linear-gradient(180deg, #eff6ff 0%, #f8fafc 100%);
+  --color-bg-page-solid: #f8fafc;
+  --color-bg-card: #ffffff;
+  --color-bg-elevated: #ffffff;
+  --color-border-subtle: rgba(226, 232, 240, 0.8);
+  --color-on-primary: #ffffff;
+  --color-skeleton-base: var(--color-neutral-100);
+  --color-skeleton-shine: var(--color-neutral-200);
+
+  /* ─── Semantic ─── */
+  --color-success: #059669;
+  --color-success-bg: #ecfdf5;
+  --color-warning: #d97706;
+  --color-warning-bg: #fffbeb;
+  --color-error: #dc2626;
+  --color-error-bg: #fef2f2;
+  --color-info: #0284c7;
+  --color-info-bg: #e0f2fe;
+
+  /* ─── Role & Status Badges (§2.3) ─── */
+  --badge-student-bg: #dbeafe;
+  --badge-student-text: #1d4ed8;
+  --badge-teacher-bg: #dcfce7;
+  --badge-teacher-text: #166534;
+  --badge-admin-bg: #fef3c7;
+  --badge-admin-text: #92400e;
+  --badge-pending-bg: #fef3c7;
+  --badge-pending-text: #b45309;
+  --badge-in-progress-bg: #dbeafe;
+  --badge-in-progress-text: #1d4ed8;
+  --badge-completed-bg: #dcfce7;
+  --badge-completed-text: #166534;
+
+  /* ─── Typography ─── */
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --font-mono: "Pretendard Variable", ui-monospace, monospace;
+
+  --font-size-display: 32px;
+  --font-size-display-mobile: 28px;
+  --line-height-display: 1.25;
+  --font-weight-display: 700;
+
+  --font-size-h1: 24px;
+  --line-height-h1: 1.35;
+  --font-weight-h1: 700;
+
+  --font-size-h2: 20px;
+  --line-height-h2: 1.4;
+  --font-weight-h2: 600;
+
+  --font-size-h3: 18px;
+  --line-height-h3: 1.45;
+  --font-weight-h3: 600;
+
+  --font-size-body-lg: 17px;
+  --line-height-body-lg: 1.7;
+  --font-weight-body-lg: 400;
+
+  --font-size-body: 15px;
+  --line-height-body: 1.65;
+  --font-weight-body: 400;
+
+  --font-size-caption: 13px;
+  --line-height-caption: 1.5;
+  --font-weight-caption: 400;
+
+  --font-size-label: 14px;
+  --line-height-label: 1.4;
+  --font-weight-label: 600;
+
+  --font-size-badge: 12px;
+  --font-weight-badge: 600;
+
+  /* ─── Layout & Breakpoints ─── */
+  --bp-sm: 640px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+
+  --container-max-default: 720px;
+  --container-max-dashboard: 1200px;
+  --container-padding-mobile: 16px;
+  --container-padding-desktop: 24px;
+
+  --bento-gap-mobile: 16px;
+  --bento-gap-desktop: 20px;
+  --card-padding: 24px;
+  --card-padding-compact: 20px;
+  --section-gap-student: 32px;
+  --section-gap-admin: 24px;
+
+  /* ─── Spacing — 8pt system (§4.4) ─── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ─── Radius ─── */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+
+  /* ─── Shadow ─── */
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 24px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 10px 40px rgba(15, 23, 42, 0.1);
+  --shadow-card: 0 4px 24px rgba(15, 23, 42, 0.06);
+
+  /* ─── Z-index ─── */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal: 300;
+  --z-toast: 400;
+
+  /* ─── Motion ─── */
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-page: 200ms;
+  --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-default: ease;
+
+  /* ─── Component — Button (§5.1) ─── */
+  --btn-radius: var(--radius-md);
+  --btn-padding-y: 12px;
+  --btn-padding-x: 20px;
+  --btn-font-size: var(--font-size-body);
+  --btn-font-weight: 600;
+  --btn-min-height: 44px;
+  --btn-min-height-student: 48px;
+  --btn-focus-ring: 3px solid var(--color-primary-100);
+  --btn-focus-offset: 2px;
+  --btn-active-scale: 0.98;
+
+  /* ─── Component — Card (§5.2) ─── */
+  --card-radius: var(--radius-lg);
+  --card-border: 1px solid var(--color-border-subtle);
+  --card-hover-translate-y: -2px;
+
+  /* ─── Component — Input (§5.3) ─── */
+  --input-min-height: 48px;
+  --input-padding-y: 12px;
+  --input-padding-x: 16px;
+  --input-border-width: 1.5px;
+  --input-border-color: var(--color-neutral-200);
+  --input-radius: var(--radius-md);
+  --input-font-size: 16px;
+  --input-focus-border: var(--color-primary-500);
+  --input-focus-ring: 0 0 0 4px var(--color-primary-50);
+
+  /* ─── Component — Badge (§5.5) ─── */
+  --badge-padding-y: 4px;
+  --badge-padding-x: 10px;
+  --badge-gap: 4px;
+  --badge-radius: var(--radius-full);
+
+  /* ─── Accessibility (§7) ─── */
+  --touch-target-min: 44px;
+  --touch-target-student: 48px;
+  --focus-ring: var(--btn-focus-ring);
+  --focus-offset: var(--btn-focus-offset);
+
+  /* ─── Icon (§8.1) ─── */
+  --icon-size-inline: 20px;
+  --icon-size-tab: 24px;
+  --icon-stroke-width: 1.75;
+
+  /* ─── Safe area (§5.4, §9) ─── */
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ─── Dark mode (§2.4) ─── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-primary-50: #1e3a5f;
+    --color-primary-100: #1e40af;
+    --color-primary-500: #60a5fa;
+    --color-primary-600: #60a5fa;
+    --color-primary-700: #3b82f6;
+
+    --color-neutral-50: #0f172a;
+    --color-neutral-100: #1e293b;
+    --color-neutral-200: #334155;
+    --color-neutral-800: #f1f5f9;
+    --color-neutral-600: #cbd5e1;
+    --color-neutral-400: #94a3b8;
+
+    --color-bg-page: #0f172a;
+    --color-bg-page-solid: #0f172a;
+    --color-bg-card: #1e293b;
+    --color-bg-elevated: #334155;
+    --color-border-subtle: rgba(51, 65, 85, 0.8);
+    --color-on-primary: #f8fafc;
+    --color-skeleton-base: #334155;
+    --color-skeleton-shine: #475569;
+
+    --color-success-bg: #064e3b;
+    --color-warning-bg: #78350f;
+    --color-error-bg: #7f1d1d;
+    --color-info-bg: #0c4a6e;
+
+    --badge-student-bg: #1e3a8a;
+    --badge-student-text: #bfdbfe;
+    --badge-teacher-bg: #14532d;
+    --badge-teacher-text: #bbf7d0;
+    --badge-admin-bg: #78350f;
+    --badge-admin-text: #fde68a;
+    --badge-pending-bg: #78350f;
+    --badge-pending-text: #fde68a;
+    --badge-in-progress-bg: #1e3a8a;
+    --badge-in-progress-text: #bfdbfe;
+    --badge-completed-bg: #14532d;
+    --badge-completed-text: #bbf7d0;
+
+    --btn-focus-ring: 3px solid color-mix(in srgb, var(--color-primary-500) 45%, transparent);
+    --input-focus-ring: 0 0 0 4px color-mix(in srgb, var(--color-primary-500) 25%, transparent);
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.25);
+    --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.3);
+    --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* ─── Reduced motion (§6.4, §7) ─── */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+    --duration-page: 0ms;
+    --btn-active-scale: 1;
+    --card-hover-translate-y: 0;
+  }
+}

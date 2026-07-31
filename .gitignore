@@ -1,0 +1,7 @@
+FN/node_modules/
+FN/dist/
+
+# BN local secrets (never commit)
+BN/config/application-local.properties
+**/application-local.properties
+!**/application-local.properties.example

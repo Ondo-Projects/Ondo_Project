@@ -1,0 +1,80 @@
+.brand-mark-wrap {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+  flex-shrink: 0;
+}
+
+.brand-mark {
+  display: block;
+  height: 7.5rem;
+  width: auto;
+  max-width: 13.5rem;
+  object-fit: contain;
+  object-position: center;
+}
+
+.brand-mark-wrap--auth {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 0 0 var(--space-4);
+}
+
+.brand-mark-wrap--auth .brand-mark {
+  height: 9rem;
+  max-width: 16rem;
+}
+
+.brand-mark-wrap--compact {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+}
+
+.brand-mark-wrap--compact .brand-mark {
+  height: 4.5rem;
+  max-width: 8rem;
+}
+
+.brand-mark-wrap--dashboard {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+}
+
+.brand-mark-wrap--dashboard .brand-mark {
+  height: 5.75rem;
+  max-width: 10.5rem;
+}
+
+@media (max-width: 640px) {
+  .brand-mark-wrap {
+    align-self: flex-start;
+  }
+
+  .brand-mark {
+    height: 6.375rem;
+    max-width: 11.25rem;
+  }
+
+  .brand-mark-wrap--auth {
+    align-self: center;
+    margin-bottom: var(--space-3);
+  }
+
+  .brand-mark-wrap--auth .brand-mark {
+    height: 7.5rem;
+    max-width: 13.5rem;
+  }
+
+  .brand-mark-wrap--compact .brand-mark {
+    height: 3.75rem;
+    max-width: 6.75rem;
+  }
+
+  .brand-mark-wrap--dashboard .brand-mark {
+    height: 4.75rem;
+    max-width: 8.75rem;
+  }
+}

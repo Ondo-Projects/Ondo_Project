@@ -1,0 +1,237 @@
+.role-home-zone {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  border: 1px solid color-mix(in srgb, var(--color-neutral-200) 88%, transparent);
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: var(--shadow-card);
+  min-width: 0;
+}
+
+.role-home-zone--student {
+  border-color: color-mix(in srgb, var(--color-primary-200) 40%, var(--color-neutral-200));
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--color-primary-50) 80%, transparent), transparent 48%),
+    linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.role-home-zone--teacher {
+  border-color: color-mix(in srgb, #93c5fd 35%, var(--color-neutral-200));
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, #eff6ff 85%, transparent), transparent 48%),
+    linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.role-home-zone__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.role-home-zone__badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.role-home-zone--student .role-home-zone__badge {
+  background: color-mix(in srgb, var(--color-primary-100) 85%, #ffffff);
+  color: var(--color-primary-800);
+}
+
+.role-home-zone--teacher .role-home-zone__badge {
+  background: color-mix(in srgb, #dbeafe 85%, #ffffff);
+  color: #1d4ed8;
+}
+
+.role-home-zone__title {
+  margin: 0;
+  font-size: clamp(1.25rem, 2.5vw, var(--font-size-h2));
+  line-height: var(--line-height-h2);
+  font-weight: var(--font-weight-h2);
+  color: var(--color-neutral-900);
+}
+
+.role-home-zone__desc {
+  margin: 0;
+  max-width: 42rem;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  color: var(--color-neutral-600);
+}
+
+.role-home-zone__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.role-home-zone .student-card,
+.role-home-zone .teacher-card {
+  border: 1px solid color-mix(in srgb, var(--color-neutral-200) 90%, transparent);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 5%);
+}
+
+.role-home-zone .student-card__title,
+.role-home-zone .teacher-card__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-neutral-200) 80%, transparent);
+}
+
+.role-home-zone .student-card__title-mark,
+.role-home-zone .teacher-card__title-mark {
+  width: 0.35rem;
+  height: 1.125rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.role-home-zone--student .student-card__title-mark {
+  background: linear-gradient(180deg, var(--color-primary-500), var(--color-primary-300));
+}
+
+.role-home-zone--teacher .teacher-card__title-mark {
+  background: linear-gradient(180deg, #3b82f6, #93c5fd);
+}
+
+.student-quick-bar,
+.teacher-quick-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, #ffffff 78%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-neutral-200) 85%, transparent);
+}
+
+.student-quick-bar__btn,
+.teacher-quick-bar__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  padding: 0.625rem 0.875rem;
+  border: 1px solid color-mix(in srgb, var(--color-neutral-200) 90%, transparent);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--color-neutral-800);
+  font-size: var(--font-size-label);
+  line-height: var(--line-height-label);
+  font-weight: var(--font-weight-label);
+  cursor: pointer;
+  transition:
+    background var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    color var(--duration-fast) ease,
+    transform 0.1s ease;
+}
+
+.role-home-zone--student .student-quick-bar__btn:hover {
+  border-color: var(--color-primary-300);
+  color: var(--color-primary-800);
+  background: var(--color-primary-50);
+}
+
+.role-home-zone--teacher .teacher-quick-bar__btn:hover {
+  border-color: #93c5fd;
+  color: #1d4ed8;
+  background: #eff6ff;
+}
+
+.student-quick-bar__btn:focus-visible,
+.teacher-quick-bar__btn:focus-visible {
+  outline: 3px solid var(--color-primary-100);
+  outline-offset: 2px;
+}
+
+.student-message,
+.teacher-message {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+.student-message::before,
+.teacher-message::before {
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+.student-message--error::before,
+.teacher-message--error::before {
+  content: '!';
+}
+
+.student-message--success::before,
+.teacher-message--success::before {
+  content: '✓';
+}
+
+.student-workspace-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-neutral-100) 70%, #ffffff);
+  border: 1px solid color-mix(in srgb, var(--color-neutral-200) 85%, transparent);
+}
+
+.student-workspace-tabs__btn {
+  flex: 1 1 8rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  transition:
+    background var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
+}
+
+.student-workspace-tabs__btn.is-active {
+  background: #ffffff;
+  border-color: var(--color-primary-200);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 6%);
+}
+
+.teacher-summary-item {
+  transition:
+    transform 0.1s ease,
+    box-shadow var(--duration-fast) ease;
+}
+
+.teacher-summary-item--action:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgb(15 23 42 / 8%);
+}
+
+.student-today-todo-item {
+  border-radius: var(--radius-md);
+  transition:
+    transform 0.1s ease,
+    box-shadow var(--duration-fast) ease;
+}
+
+.student-today-todo-item:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgb(15 23 42 / 8%);
+}
+
+@media (max-width: 639px) {
+  .role-home-zone {
+    padding: var(--space-4);
+  }
+}

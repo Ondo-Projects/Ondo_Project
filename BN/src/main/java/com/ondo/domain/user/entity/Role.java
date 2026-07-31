@@ -1,4 +1,7 @@
 package com.ondo.domain.user.entity;
 
-public class Role {
+public enum Role {
+    TEACHER,
+    STUDENT,
+    ADMIN
 }

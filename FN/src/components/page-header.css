@@ -1,0 +1,376 @@
+.page-header {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--color-primary-200) 35%, var(--color-neutral-200));
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--color-primary-100) 80%, transparent), transparent 55%),
+    linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-bg-card) 58%, var(--color-neutral-50) 100%);
+  box-shadow: var(--shadow-card);
+}
+
+.page-header::after {
+  content: '';
+  position: absolute;
+  inset: auto -20% -70% auto;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-primary-200) 25%, transparent);
+  pointer-events: none;
+}
+
+.page-header--tone-student {
+  border-color: color-mix(in srgb, var(--color-primary-300) 35%, var(--color-neutral-200));
+}
+
+.page-header--tone-teacher {
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, #dbeafe 80%, transparent), transparent 55%),
+    linear-gradient(135deg, #eff6ff 0%, var(--color-bg-card) 58%, var(--color-neutral-50) 100%);
+}
+
+.page-header--tone-admin {
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, #fef3c7 70%, transparent), transparent 55%),
+    linear-gradient(135deg, #fffbeb 0%, var(--color-bg-card) 58%, var(--color-neutral-50) 100%);
+  border-color: color-mix(in srgb, #fcd34d 35%, var(--color-neutral-200));
+}
+
+.page-header--tone-home {
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--color-primary-100) 70%, transparent), transparent 55%),
+    linear-gradient(135deg, #f0fdf4 0%, var(--color-bg-card) 58%, var(--color-neutral-50) 100%);
+  border-color: color-mix(in srgb, #86efac 35%, var(--color-neutral-200));
+}
+
+.page-header--dashboard {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--space-4);
+  align-items: start;
+  padding: var(--space-5);
+}
+
+.page-header--auth,
+.page-header--landing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-5);
+  margin-bottom: var(--space-4);
+  text-align: center;
+}
+
+.page-header--toolbar {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-4);
+}
+
+.page-header__logo {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-bg-card) 82%, transparent);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 6%);
+}
+
+.page-header__logo--center {
+  padding: var(--space-3);
+  background: transparent;
+  box-shadow: none;
+}
+
+.page-header--tone-student.page-header--dashboard,
+.page-header--tone-teacher.page-header--dashboard,
+.page-header--tone-home.page-header--dashboard {
+  gap: var(--space-5);
+}
+
+.page-header--tone-student.page-header--dashboard .page-header__logo,
+.page-header--tone-teacher.page-header--dashboard .page-header__logo,
+.page-header--tone-home.page-header--dashboard .page-header__logo {
+  align-self: center;
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-bg-card) 90%, transparent);
+  box-shadow: var(--shadow-sm);
+}
+
+.page-header--tone-student.page-header--dashboard .page-header__content,
+.page-header--tone-teacher.page-header--dashboard .page-header__content,
+.page-header--tone-home.page-header--dashboard .page-header__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-1);
+  padding-top: var(--space-1);
+}
+
+.page-header--tone-student.page-header--dashboard .page-header__eyebrow,
+.page-header--tone-teacher.page-header--dashboard .page-header__eyebrow,
+.page-header--tone-home.page-header--dashboard .page-header__eyebrow {
+  margin: 0;
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+  font-weight: var(--font-weight-label);
+  letter-spacing: 0.02em;
+  color: var(--color-neutral-600);
+}
+
+.page-header--tone-student.page-header--dashboard .page-header__title,
+.page-header--tone-teacher.page-header--dashboard .page-header__title,
+.page-header--tone-home.page-header--dashboard .page-header__title {
+  font-size: clamp(1.375rem, 3.5vw, var(--font-size-h2));
+  line-height: var(--line-height-h2);
+  font-weight: var(--font-weight-h2);
+}
+
+.page-header--tone-student.page-header--dashboard .page-header__subtitle,
+.page-header--tone-teacher.page-header--dashboard .page-header__subtitle,
+.page-header--tone-home.page-header--dashboard .page-header__subtitle {
+  margin: var(--space-1) 0 0;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  color: var(--color-neutral-600);
+  max-width: 26rem;
+}
+
+.page-header--tone-student.page-header--dashboard .page-header__eyebrow {
+  color: var(--color-primary-700);
+}
+
+.page-header--tone-teacher.page-header--dashboard .page-header__eyebrow {
+  color: #1d4ed8;
+}
+
+.page-header--tone-home.page-header--dashboard .page-header__eyebrow {
+  color: #15803d;
+}
+
+.page-header__content {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.page-header__eyebrow {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  font-weight: var(--font-weight-label);
+  color: var(--color-primary-800);
+  overflow-wrap: anywhere;
+  word-break: keep-all;
+}
+
+.page-header__eyebrow--center {
+  margin: 0;
+  font-size: var(--font-size-caption);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-primary-700);
+}
+
+.page-header__title {
+  margin: 0;
+  font-size: var(--font-size-h1);
+  line-height: var(--line-height-h1);
+  font-weight: var(--font-weight-h1);
+  color: var(--color-neutral-900);
+}
+
+.page-header__title--center {
+  font-size: clamp(1.5rem, 4vw, var(--font-size-h1));
+}
+
+.page-header__title--toolbar {
+  margin: 0;
+  text-align: center;
+  font-size: var(--font-size-h2);
+  line-height: var(--line-height-h2);
+}
+
+.page-header__subtitle {
+  margin: var(--space-2) 0 0;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  color: var(--color-neutral-600);
+}
+
+.page-header__subtitle--center {
+  margin: 0;
+  max-width: 28rem;
+  font-size: var(--font-size-body-lg);
+  line-height: var(--line-height-body-lg);
+}
+
+.page-header__actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-2);
+  justify-content: flex-start;
+  min-width: 8.75rem;
+  align-self: start;
+}
+
+.page-header__back {
+  position: relative;
+  z-index: 1;
+  justify-self: start;
+  min-height: var(--touch-target-min);
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-neutral-700);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-label);
+  cursor: pointer;
+}
+
+.page-header__back:focus-visible {
+  outline: 3px solid var(--color-primary-100);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.page-header-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: var(--touch-target-min);
+  padding: 0.6875rem var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1.5px solid transparent;
+  font-size: var(--btn-font-size);
+  font-weight: var(--btn-font-weight);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--duration-fast) ease,
+    color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease;
+}
+
+.page-header-action--ghost {
+  background: color-mix(in srgb, var(--color-bg-card) 72%, transparent);
+  color: var(--color-neutral-800);
+  border-color: color-mix(in srgb, var(--color-neutral-300) 80%, transparent);
+}
+
+.page-header-action--secondary {
+  background: var(--color-neutral-800);
+  color: var(--color-on-primary);
+}
+
+.page-header-action--danger-ghost {
+  background: transparent;
+  color: var(--color-neutral-600);
+  border-color: color-mix(in srgb, var(--color-neutral-300) 80%, transparent);
+}
+
+@media (hover: hover) {
+  .page-header-action--ghost:hover {
+    background: var(--color-bg-card);
+    color: var(--color-primary-700);
+    border-color: var(--color-primary-200);
+  }
+
+  .page-header-action--secondary:hover {
+    background: var(--color-neutral-900);
+  }
+
+  .page-header-action--danger-ghost:hover {
+    color: var(--color-error);
+    border-color: color-mix(in srgb, var(--color-error) 35%, var(--color-neutral-300));
+    background: var(--color-error-bg);
+  }
+
+  .page-header__back:hover:not(:disabled) {
+    color: var(--color-neutral-900);
+  }
+}
+
+@media (max-width: 720px) {
+  .page-header--dashboard {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'logo content'
+      'actions actions';
+  }
+
+  .page-header__logo {
+    grid-area: logo;
+  }
+
+  .page-header__content {
+    grid-area: content;
+  }
+
+  .page-header--tone-student.page-header--dashboard .page-header__logo,
+  .page-header--tone-teacher.page-header--dashboard .page-header__logo,
+  .page-header--tone-home.page-header--dashboard .page-header__logo {
+    align-self: start;
+  }
+
+  .page-header--tone-student.page-header--dashboard .page-header__content,
+  .page-header--tone-teacher.page-header--dashboard .page-header__content,
+  .page-header--tone-home.page-header--dashboard .page-header__content {
+    padding-top: 0;
+  }
+
+  .page-header__actions {
+    grid-area: actions;
+    width: 100%;
+    min-width: 0;
+    max-width: 16rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-header--dashboard,
+  .page-header--auth,
+  .page-header--landing,
+  .page-header--toolbar {
+    padding: var(--space-4);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .page-header,
+  .page-header--tone-teacher,
+  .page-header--tone-admin,
+  .page-header--tone-home {
+    border-color: var(--color-neutral-200);
+    background:
+      radial-gradient(circle at top right, color-mix(in srgb, var(--color-primary-900) 35%, transparent), transparent 55%),
+      linear-gradient(135deg, var(--color-bg-elevated) 0%, var(--color-bg-card) 58%, var(--color-bg-page) 100%);
+  }
+
+  .page-header__title {
+    color: var(--color-neutral-800);
+  }
+
+  .page-header__eyebrow,
+  .page-header__eyebrow--center {
+    color: var(--color-primary-300);
+  }
+
+  .page-header--tone-student.page-header--dashboard .page-header__eyebrow,
+  .page-header--tone-teacher.page-header--dashboard .page-header__eyebrow,
+  .page-header--tone-home.page-header--dashboard .page-header__eyebrow {
+    color: var(--color-neutral-400);
+  }
+}
