@@ -2,6 +2,7 @@ import { type FormEvent, useState } from 'react';
 import { createCounselingPost } from '../../api/counseling.api';
 import { ApiError } from '../../api/types/api-error';
 import type { CounselingType } from '../../api/types/counseling';
+import { Btn, Field, Input, Select, Textarea } from '../../components/ui';
 import {
   COUNSELING_TYPE_OPTIONS,
   getTodayDateInputValue,
@@ -77,13 +78,8 @@ export default function SectionCounselCreate({
       compact
     >
       <form className="student-form" onSubmit={handleSubmit}>
-        <div className="student-field">
-          <label className="student-field__label" htmlFor="counselTitle">
-            제목
-          </label>
-          <input
-            id="counselTitle"
-            className="student-field__input"
+        <Field id="counselTitle" label="제목" required>
+          <Input
             type="text"
             maxLength={100}
             required
@@ -91,15 +87,10 @@ export default function SectionCounselCreate({
             value={form.title}
             onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
           />
-        </div>
+        </Field>
 
-        <div className="student-field">
-          <label className="student-field__label" htmlFor="counselType">
-            상담 분류
-          </label>
-          <select
-            id="counselType"
-            className="student-field__input"
+        <Field id="counselType" label="상담 분류" required>
+          <Select
             required
             disabled={formDisabled}
             value={form.counselingType}
@@ -116,16 +107,11 @@ export default function SectionCounselCreate({
                 {option.label}
               </option>
             ))}
-          </select>
-        </div>
+          </Select>
+        </Field>
 
-        <div className="student-field">
-          <label className="student-field__label" htmlFor="counselDesiredDate">
-            희망 상담일
-          </label>
-          <input
-            id="counselDesiredDate"
-            className="student-field__input"
+        <Field id="counselDesiredDate" label="희망 상담일" required>
+          <Input
             type="date"
             required
             disabled={formDisabled}
@@ -135,31 +121,22 @@ export default function SectionCounselCreate({
               setForm((prev) => ({ ...prev, desiredDate: event.target.value }))
             }
           />
-        </div>
+        </Field>
 
-        <div className="student-field">
-          <label className="student-field__label" htmlFor="counselContent">
-            상담 내용
-          </label>
-          <textarea
-            id="counselContent"
-            className="student-field__textarea"
+        <Field id="counselContent" label="상담 내용" required>
+          <Textarea
             required
             disabled={formDisabled}
             placeholder="상담하고 싶은 내용을 작성해 주세요."
             value={form.content}
             onChange={(event) => setForm((prev) => ({ ...prev, content: event.target.value }))}
           />
-        </div>
+        </Field>
 
         <div className="student-form-actions">
-          <button
-            type="submit"
-            className="student-btn student-btn--primary"
-            disabled={formDisabled}
-          >
+          <Btn type="submit" variant="primary" size="student" disabled={formDisabled}>
             {isSubmitting ? '등록 중…' : '상담 신청하기'}
-          </button>
+          </Btn>
         </div>
       </form>
     </StudentSectionCard>

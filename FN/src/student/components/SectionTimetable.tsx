@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { TimetableDayResponse } from '../../api/types/home';
+import { CardHelper } from '../../components/ui';
 import { TIMETABLE_SUMMARY_LIMIT, STUDENT_SECTIONS } from '../constants';
 import StudentSectionCard from './StudentSectionCard';
 import {
@@ -90,7 +91,7 @@ function TimetableContent({
           {expanded ? '접기' : `전체 ${periods.length}교시 보기`}
         </button>
       ) : null}
-      {data.message ? <p className="student-card__helper">{data.message}</p> : null}
+      {data.message ? <CardHelper>{data.message}</CardHelper> : null}
     </div>
   );
 }

@@ -7,8 +7,10 @@ import {
 } from '../../api/counseling.api';
 import { ApiError } from '../../api/types/api-error';
 import type { CounselingPost, CounselingType } from '../../api/types/counseling';
+import { Badge, Btn, Field, Input, Select, Textarea } from '../../components/ui';
 import {
   COUNSELING_TYPE_OPTIONS,
+  getCounselingStatusBadgeVariant,
   getCounselingStatusLabel,
   getCounselingTypeLabel,
   getTodayDateInputValue,
@@ -179,9 +181,9 @@ export default function SectionCounselList({
               >
                 <div className="student-post-item__header">
                   <h3 className="student-post-item__title">{post.title}</h3>
-                  <span className={`student-badge student-badge--${post.status.toLowerCase()}`}>
+                  <Badge variant={getCounselingStatusBadgeVariant(post.status)}>
                     {getCounselingStatusLabel(post.status)}
-                  </span>
+                  </Badge>
                 </div>
                 <p className="student-post-item__meta">
                   {getCounselingTypeLabel(post.counselingType)} · 희망{' '}
@@ -197,14 +199,9 @@ export default function SectionCounselList({
         <StudentSectionCard id={STUDENT_SECTIONS.COUNSEL_DETAIL} title="상담 상세" compact>
           <div className="student-detail-header">
             <span className="student-detail-header__spacer" aria-hidden="true" />
-            <button
-              type="button"
-              className="student-btn student-btn--secondary"
-              onClick={closeDetail}
-              aria-label="상담 상세 닫기"
-            >
+            <Btn type="button" variant="secondary" size="student" onClick={closeDetail} aria-label="상담 상세 닫기">
               닫기
-            </button>
+            </Btn>
           </div>
 
           {isDetailLoading || !detailPost ? (
@@ -213,9 +210,9 @@ export default function SectionCounselList({
             <>
               <div className="student-post-item__header">
                 <h3 className="student-post-item__title">{detailPost.title}</h3>
-                <span className={`student-badge student-badge--${detailPost.status.toLowerCase()}`}>
+                <Badge variant={getCounselingStatusBadgeVariant(detailPost.status)}>
                   {getCounselingStatusLabel(detailPost.status)}
-                </span>
+                </Badge>
               </div>
 
               <p className="student-post-item__meta">
@@ -242,22 +239,24 @@ export default function SectionCounselList({
 
               {detailPost.status === 'WAITING' ? (
                 <div className="student-form-actions">
-                  <button
+                  <Btn
                     type="button"
-                    className="student-btn student-btn--primary"
+                    variant="primary"
+                    size="student"
                     onClick={() => openEditForm(detailPost)}
                     disabled={isDeleting}
                   >
                     수정
-                  </button>
-                  <button
+                  </Btn>
+                  <Btn
                     type="button"
-                    className="student-btn student-btn--danger"
+                    variant="danger"
+                    size="student"
                     onClick={() => handleDelete(detailPost.id)}
                     disabled={isDeleting}
                   >
                     {isDeleting ? '삭제 중…' : '삭제'}
-                  </button>
+                  </Btn>
                 </div>
               ) : null}
 
@@ -265,13 +264,8 @@ export default function SectionCounselList({
                 <div className="student-detail-panel">
                   <h3 className="student-detail-panel__title">수정하기</h3>
                   <form className="student-form" onSubmit={handleEditSubmit}>
-                    <div className="student-field">
-                      <label className="student-field__label" htmlFor="editCounselTitle">
-                        제목
-                      </label>
-                      <input
-                        id="editCounselTitle"
-                        className="student-field__input"
+                    <Field id="editCounselTitle" label="제목" required>
+                      <Input
                         type="text"
                         maxLength={100}
                         required
@@ -283,15 +277,10 @@ export default function SectionCounselList({
                           )
                         }
                       />
-                    </div>
+                    </Field>
 
-                    <div className="student-field">
-                      <label className="student-field__label" htmlFor="editCounselType">
-                        상담 분류
-                      </label>
-                      <select
-                        id="editCounselType"
-                        className="student-field__input"
+                    <Field id="editCounselType" label="상담 분류" required>
+                      <Select
                         required
                         disabled={isSavingEdit}
                         value={editForm.counselingType}
@@ -311,16 +300,11 @@ export default function SectionCounselList({
                             {option.label}
                           </option>
                         ))}
-                      </select>
-                    </div>
+                      </Select>
+                    </Field>
 
-                    <div className="student-field">
-                      <label className="student-field__label" htmlFor="editCounselDesiredDate">
-                        희망 상담일
-                      </label>
-                      <input
-                        id="editCounselDesiredDate"
-                        className="student-field__input"
+                    <Field id="editCounselDesiredDate" label="희망 상담일" required>
+                      <Input
                         type="date"
                         required
                         disabled={isSavingEdit}
@@ -332,15 +316,10 @@ export default function SectionCounselList({
                           )
                         }
                       />
-                    </div>
+                    </Field>
 
-                    <div className="student-field">
-                      <label className="student-field__label" htmlFor="editCounselContent">
-                        상담 내용
-                      </label>
-                      <textarea
-                        id="editCounselContent"
-                        className="student-field__textarea"
+                    <Field id="editCounselContent" label="상담 내용" required>
+                      <Textarea
                         required
                         disabled={isSavingEdit}
                         value={editForm.content}
@@ -350,19 +329,16 @@ export default function SectionCounselList({
                           )
                         }
                       />
-                    </div>
+                    </Field>
 
                     <div className="student-form-actions">
-                      <button
-                        type="submit"
-                        className="student-btn student-btn--primary"
-                        disabled={isSavingEdit}
-                      >
+                      <Btn type="submit" variant="primary" size="student" disabled={isSavingEdit}>
                         {isSavingEdit ? '저장 중…' : '저장'}
-                      </button>
-                      <button
+                      </Btn>
+                      <Btn
                         type="button"
-                        className="student-btn student-btn--secondary"
+                        variant="secondary"
+                        size="student"
                         disabled={isSavingEdit}
                         onClick={() => {
                           setIsEditOpen(false);
@@ -370,7 +346,7 @@ export default function SectionCounselList({
                         }}
                       >
                         취소
-                      </button>
+                      </Btn>
                     </div>
                   </form>
                 </div>

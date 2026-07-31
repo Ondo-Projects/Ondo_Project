@@ -1,4 +1,5 @@
 import type { MealDayResponse, WeatherTodayResponse } from '../../api/types/home';
+import { CardHelper } from '../../components/ui';
 import StudentSectionCard from './StudentSectionCard';
 import { STUDENT_SECTIONS } from '../constants';
 import {
@@ -68,7 +69,7 @@ function MealContent({ data, error }: { data: MealDayResponse | null; error: str
           <p className="student-meal-item__menu">{meal.menu}</p>
         </article>
       ))}
-      {data.message ? <p className="student-card__helper">{data.message}</p> : null}
+      {data.message ? <CardHelper>{data.message}</CardHelper> : null}
     </div>
   );
 }
@@ -94,7 +95,7 @@ function WeatherContent({
 
   return (
     <>
-      {data.region ? <p className="student-card__helper">{data.region} 날씨입니다.</p> : null}
+      {data.region ? <CardHelper>{data.region} 날씨입니다.</CardHelper> : null}
       <div className="student-weather">
         <div className="student-weather__icon" aria-hidden="true">
           {data.icon || '🌡️'}
@@ -103,7 +104,7 @@ function WeatherContent({
           <div className="student-weather__temp">{data.temperature || '-'}</div>
           <div className="student-weather__condition">{data.condition || '정보 없음'}</div>
           {minMax ? <div className="student-weather__range">{minMax}</div> : null}
-          {data.message ? <p className="student-card__helper">{data.message}</p> : null}
+          {data.message ? <CardHelper>{data.message}</CardHelper> : null}
         </div>
       </div>
     </>

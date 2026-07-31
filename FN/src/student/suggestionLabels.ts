@@ -1,4 +1,5 @@
 import type { SuggestionCategory, SuggestionStatus } from '../api/types/suggestion';
+import type { BadgeVariant } from '../components/ui';
 
 export const SUGGESTION_CATEGORY_OPTIONS: Array<{ value: SuggestionCategory; label: string }> = [
   { value: 'BUG', label: '버그 / 오류' },
@@ -22,8 +23,19 @@ export function getSuggestionStatusLabel(status: SuggestionStatus): string {
   return SUGGESTION_STATUS_LABELS[status] ?? status;
 }
 
-export function getSuggestionStatusBadgeClass(status: SuggestionStatus): string {
-  return `student-badge--${status.toLowerCase().replace('_', '-')}`;
+export function getSuggestionStatusBadgeVariant(status: SuggestionStatus): BadgeVariant {
+  switch (status) {
+    case 'OPEN':
+      return 'pending';
+    case 'IN_REVIEW':
+      return 'inProgress';
+    case 'RESOLVED':
+      return 'completed';
+    case 'CLOSED':
+      return 'neutral';
+    default:
+      return 'neutral';
+  }
 }
 
 export function isSuggestionOpen(status: SuggestionStatus): boolean {

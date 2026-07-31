@@ -1,3 +1,4 @@
+import { Card } from '../../components/ui';
 import type { TodayTodoItem } from '../studentTodayTodo';
 
 interface SectionTodayTodoProps {
@@ -7,12 +8,13 @@ interface SectionTodayTodoProps {
 
 export default function SectionTodayTodo({ items, onNavigate }: SectionTodayTodoProps) {
   return (
-    <section className="student-card" aria-labelledby="student-today-todo-title">
-      <h2 id="student-today-todo-title" className="student-card__title">
-        <span className="student-card__title-mark" aria-hidden="true" />
-        오늘 할 일
-      </h2>
-      <p className="student-card__helper">항목을 누르면 해당 메뉴로 이동합니다.</p>
+    <Card
+      title="오늘 할 일"
+      titleId="student-today-todo-title"
+      helper="항목을 누르면 해당 메뉴로 이동합니다."
+      titleMark
+      aria-labelledby="student-today-todo-title"
+    >
       <div className="student-today-todo-list" role="list">
         {items.map((item) => (
           <button
@@ -28,6 +30,6 @@ export default function SectionTodayTodo({ items, onNavigate }: SectionTodayTodo
           </button>
         ))}
       </div>
-    </section>
+    </Card>
   );
 }

@@ -1,5 +1,5 @@
 import { type FormEvent, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import {
   getSignupSuccessMessage,
@@ -61,13 +61,13 @@ export default function LoginPage() {
   return (
     <AppLayout>
       <AuthPageShell title="로그인" subtitle="학생·교사 계정으로 온도에 접속해요.">
-        <Card compact>
+        <Card compact className="auth-login-card">
           {successMessage ? <Alert variant="success">{successMessage}</Alert> : null}
 
           {errorMessage ? <Alert variant="error">{errorMessage}</Alert> : null}
 
           <form className="auth-form" onSubmit={handleSubmit} noValidate>
-            <Field id="username" label="아이디" required>
+            <Field id="login-username" label="아이디" required>
               <Input
                 type="text"
                 name="username"
@@ -78,7 +78,7 @@ export default function LoginPage() {
               />
             </Field>
 
-            <Field id="password" label="비밀번호" required>
+            <Field id="login-password" label="비밀번호" required>
               <Input
                 type="password"
                 name="password"
@@ -94,20 +94,20 @@ export default function LoginPage() {
             </Btn>
           </form>
 
-          <div className="auth-footer">
-            <Link className="auth-footer__link" to={PATHS.FIND_ID}>
+          <nav className="auth-footer" aria-label="로그인 관련 링크">
+            <Btn variant="ghost" size="student" to={PATHS.FIND_ID}>
               아이디 찾기
-            </Link>
-            <Link className="auth-footer__link" to={PATHS.RESET_PASSWORD}>
+            </Btn>
+            <Btn variant="ghost" size="student" to={PATHS.RESET_PASSWORD}>
               비밀번호 재설정
-            </Link>
-            <Link className="auth-footer__link" to={PATHS.JOIN}>
+            </Btn>
+            <Btn variant="ghost" size="student" to={PATHS.JOIN}>
               회원가입
-            </Link>
-            <Link className="auth-footer__link" to={PATHS.ROOT}>
+            </Btn>
+            <Btn variant="ghost" size="student" to={PATHS.ROOT}>
               처음으로
-            </Link>
-          </div>
+            </Btn>
+          </nav>
         </Card>
       </AuthPageShell>
     </AppLayout>
