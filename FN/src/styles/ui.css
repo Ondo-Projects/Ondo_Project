@@ -1,5 +1,5 @@
 /**
- * Shared UI components (§5.1–5.5)
+ * Shared UI components (§5.1–5.5 + Drawer shell)
  * Source: FN/DOCS/DESIGN/2026_UIUX_디자인가이드.md
  */
 
@@ -391,4 +391,103 @@
   background: var(--color-info-bg);
   color: var(--color-info);
   border-left-color: var(--color-info);
+}
+
+/* ─── Drawer shell ─── */
+
+.ui-drawer {
+  --drawer-width: 32rem;
+
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ui-drawer--wide {
+  --drawer-width: 36rem;
+}
+
+.ui-drawer__backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: color-mix(in srgb, var(--color-neutral-900) 45%, transparent);
+  cursor: pointer;
+}
+
+.ui-drawer__backdrop:focus-visible {
+  outline: var(--btn-focus-ring);
+  outline-offset: var(--btn-focus-offset);
+}
+
+.ui-drawer__panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, var(--drawer-width));
+  max-height: 100%;
+  background: var(--color-bg-card);
+  box-shadow: var(--shadow-lg);
+  padding-bottom: var(--safe-area-bottom);
+}
+
+.ui-drawer__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border-bottom: 1px solid var(--color-neutral-200);
+}
+
+.ui-drawer__title {
+  margin: 0;
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-h3);
+  font-weight: var(--font-weight-h3);
+  color: var(--color-neutral-900);
+}
+
+.ui-drawer__close {
+  flex-shrink: 0;
+  min-height: var(--touch-target-min);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-card);
+  color: var(--color-neutral-900);
+  font-family: inherit;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-label);
+  cursor: pointer;
+}
+
+.ui-drawer__close:focus-visible {
+  outline: var(--btn-focus-ring);
+  outline-offset: var(--btn-focus-offset);
+}
+
+@media (hover: hover) {
+  .ui-drawer__close:hover {
+    background: var(--color-neutral-50);
+  }
+}
+
+.ui-drawer__body {
+  padding: var(--space-5);
+  overflow-y: auto;
+}
+
+@media (max-width: 639px) {
+  .ui-drawer {
+    align-items: flex-end;
+  }
+
+  .ui-drawer__panel {
+    width: 100%;
+    max-height: calc(92vh - var(--safe-area-bottom));
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
 }

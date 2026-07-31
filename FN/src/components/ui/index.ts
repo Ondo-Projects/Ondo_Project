@@ -21,3 +21,12 @@ export type { BadgeProps, BadgeVariant } from './Badge';
 
 export { default as Alert } from './Alert';
 export type { AlertProps, AlertVariant } from './Alert';
+
+export {
+  default as Drawer,
+  DrawerBody,
+  DrawerClose,
+  DrawerHeader,
+  DrawerTitle,
+} from './Drawer';
+export type { DrawerProps, DrawerSize } from './Drawer';
