@@ -9,6 +9,7 @@ import { getPostLoginPath } from '../auth/redirects';
 import { ApiError } from '../api/types/api-error';
 import AppLayout from '../components/layout/AppLayout';
 import AuthPageShell from '../components/AuthPageShell';
+import { Alert, Btn, Card, Field, Input } from '../components/ui';
 import { PATHS } from '../routes/paths';
 import '../auth/auth.css';
 
@@ -60,33 +61,14 @@ export default function LoginPage() {
   return (
     <AppLayout>
       <AuthPageShell title="로그인" subtitle="학생·교사 계정으로 온도에 접속해요.">
-        <div className="auth-card">
-          {successMessage ? (
-            <p className="auth-message auth-message--success" role="status">
-              <span className="auth-message__icon" aria-hidden="true">
-                ✓
-              </span>
-              <span>{successMessage}</span>
-            </p>
-          ) : null}
+        <Card compact>
+          {successMessage ? <Alert variant="success">{successMessage}</Alert> : null}
 
-          {errorMessage ? (
-            <p className="auth-message auth-message--error" role="alert">
-              <span className="auth-message__icon" aria-hidden="true">
-                !
-              </span>
-              <span>{errorMessage}</span>
-            </p>
-          ) : null}
+          {errorMessage ? <Alert variant="error">{errorMessage}</Alert> : null}
 
           <form className="auth-form" onSubmit={handleSubmit} noValidate>
-            <div className="auth-field">
-              <label className="auth-field__label" htmlFor="username">
-                아이디 (필수)
-              </label>
-              <input
-                id="username"
-                className="auth-field__input"
+            <Field id="username" label="아이디" required>
+              <Input
                 type="text"
                 name="username"
                 autoComplete="username"
@@ -94,15 +76,10 @@ export default function LoginPage() {
                 onChange={(event) => setUsername(event.target.value)}
                 disabled={isSubmitting}
               />
-            </div>
+            </Field>
 
-            <div className="auth-field">
-              <label className="auth-field__label" htmlFor="password">
-                비밀번호 (필수)
-              </label>
-              <input
-                id="password"
-                className="auth-field__input"
+            <Field id="password" label="비밀번호" required>
+              <Input
                 type="password"
                 name="password"
                 autoComplete="current-password"
@@ -110,11 +87,11 @@ export default function LoginPage() {
                 onChange={(event) => setPassword(event.target.value)}
                 disabled={isSubmitting}
               />
-            </div>
+            </Field>
 
-            <button className="auth-submit" type="submit" disabled={isSubmitting}>
+            <Btn type="submit" variant="primary" size="student" fullWidth disabled={isSubmitting}>
               {isSubmitting ? '로그인 중…' : '로그인'}
-            </button>
+            </Btn>
           </form>
 
           <div className="auth-footer">
@@ -131,7 +108,7 @@ export default function LoginPage() {
               처음으로
             </Link>
           </div>
-        </div>
+        </Card>
       </AuthPageShell>
     </AppLayout>
   );
