@@ -1,4 +1,5 @@
 import type { AdminPageResponse } from '../../api/types/admin';
+import { Btn } from '../../components/ui';
 
 interface AdminPagerProps<T> {
   pageData: AdminPageResponse<T> | null;
@@ -21,22 +22,12 @@ export default function AdminPager<T>({ pageData, onPageChange }: AdminPagerProp
         {pageData.totalElements}건 · {currentPage}/{totalPages}페이지
       </span>
       <div className="admin-pager__actions">
-        <button
-          type="button"
-          className="admin-btn admin-btn--muted"
-          disabled={!canPrev}
-          onClick={() => onPageChange(pageData.page - 1)}
-        >
+        <Btn variant="ghost" disabled={!canPrev} onClick={() => onPageChange(pageData.page - 1)}>
           이전
-        </button>
-        <button
-          type="button"
-          className="admin-btn admin-btn--muted"
-          disabled={!canNext}
-          onClick={() => onPageChange(pageData.page + 1)}
-        >
+        </Btn>
+        <Btn variant="ghost" disabled={!canNext} onClick={() => onPageChange(pageData.page + 1)}>
           다음
-        </button>
+        </Btn>
       </div>
     </div>
   );

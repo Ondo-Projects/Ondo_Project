@@ -12,6 +12,7 @@ import TeacherHomeBlock from '../home/components/TeacherHomeBlock';
 import '../home/home.css';
 import { buildSchoolMeta, buildUserGreeting, formatTodayDate } from '../home/homeUtils';
 import { useHomeData } from '../home/useHomeData';
+import { Alert } from '../components/ui';
 import { PATHS } from '../routes/paths';
 
 export default function HomePage() {
@@ -62,16 +63,10 @@ export default function HomePage() {
           }
         />
 
-        {homeData.pageError ? (
-          <p className="home-message" role="alert">
-            {homeData.pageError}
-          </p>
-        ) : null}
+        {homeData.pageError ? <Alert variant="error">{homeData.pageError}</Alert> : null}
 
         {homeData.schoolProfileError ? (
-          <p className="home-message" role="alert">
-            {homeData.schoolProfileError}
-          </p>
+          <Alert variant="error">{homeData.schoolProfileError}</Alert>
         ) : null}
 
         <PlatformAnnouncementSection />

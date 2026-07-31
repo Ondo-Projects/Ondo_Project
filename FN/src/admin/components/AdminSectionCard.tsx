@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Card } from '../../components/ui';
 
 interface AdminSectionCardProps {
   id?: string;
@@ -9,16 +10,15 @@ interface AdminSectionCardProps {
 
 export default function AdminSectionCard({ id, title, helper, children }: AdminSectionCardProps) {
   return (
-    <section
+    <Card
       id={id}
-      className="admin-card"
+      title={title}
+      titleId={id ? `${id}-title` : undefined}
+      helper={helper}
+      titleMark
       aria-labelledby={id ? `${id}-title` : undefined}
     >
-      <h2 id={id ? `${id}-title` : undefined} className="admin-card__title">
-        {title}
-      </h2>
-      {helper ? <p className="admin-card__helper">{helper}</p> : null}
       {children}
-    </section>
+    </Card>
   );
 }

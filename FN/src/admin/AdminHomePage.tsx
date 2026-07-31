@@ -14,6 +14,7 @@ import SectionStatistics from './components/SectionStatistics';
 import SectionSuggestionAdmin from './components/SectionSuggestionAdmin';
 import SectionSystemStatus from './components/SectionSystemStatus';
 import SectionUserSearch from './components/SectionUserSearch';
+import { Alert } from '../components/ui';
 import './admin.css';
 
 export default function AdminHomePage() {
@@ -65,17 +66,9 @@ export default function AdminHomePage() {
           }
         />
 
-        {sectionError ? (
-          <p className="admin-message admin-message--error" role="alert">
-            {sectionError}
-          </p>
-        ) : null}
+        {sectionError ? <Alert variant="error">{sectionError}</Alert> : null}
 
-        {pageSuccess ? (
-          <p className="admin-message admin-message--success" role="status">
-            {pageSuccess}
-          </p>
-        ) : null}
+        {pageSuccess ? <Alert variant="success">{pageSuccess}</Alert> : null}
 
         <SectionDashboard refreshToken={refreshToken} onError={handleError} />
         <SectionUserSearch

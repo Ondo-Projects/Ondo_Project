@@ -15,6 +15,7 @@ import type {
   AnnouncementSummary,
 } from '../../api/types/announcement';
 import { ApiError } from '../../api/types/api-error';
+import { Badge, Btn, Field, Input, Select, Textarea } from '../../components/ui';
 import {
   ADMIN_SECTIONS,
   ANNOUNCEMENT_AUDIENCE_LABELS,
@@ -48,10 +49,8 @@ const EMPTY_CREATE_FORM: AnnouncementCreateFormState = {
   audience: 'ALL',
 };
 
-function getStatusBadgeClass(status: AnnouncementStatus): string {
-  return status === 'PUBLISHED'
-    ? 'admin-badge admin-badge--mapped'
-    : 'admin-badge admin-badge--inactive';
+function getStatusBadgeVariant(status: AnnouncementStatus): 'completed' | 'neutral' {
+  return status === 'PUBLISHED' ? 'completed' : 'neutral';
 }
 
 export default function SectionAnnouncementAdmin({
@@ -273,10 +272,8 @@ export default function SectionAnnouncementAdmin({
         helper="학생·교사 공통 홈 게시판에 올릴 공지를 작성·관리합니다."
       >
         <form className="admin-form" onSubmit={handleCreateSubmit}>
-          <div className="admin-field">
-            <label htmlFor="admin-announcement-title">제목</label>
-            <input
-              id="admin-announcement-title"
+          <Field id="admin-announcement-title" label="제목">
+            <Input
               type="text"
               maxLength={100}
               placeholder="공지 제목"
@@ -286,12 +283,10 @@ export default function SectionAnnouncementAdmin({
                 setCreateForm((prev) => ({ ...prev, title: event.target.value }))
               }
             />
-          </div>
+          </Field>
 
-          <div className="admin-field">
-            <label htmlFor="admin-announcement-audience">대상</label>
-            <select
-              id="admin-announcement-audience"
+          <Field id="admin-announcement-audience" label="대상">
+            <Select
               disabled={isSubmitting}
               value={createForm.audience}
               onChange={(event) =>
@@ -306,13 +301,11 @@ export default function SectionAnnouncementAdmin({
                   {option.label}
                 </option>
               ))}
-            </select>
-          </div>
+            </Select>
+          </Field>
 
-          <div className="admin-field">
-            <label htmlFor="admin-announcement-content">내용</label>
-            <textarea
-              id="admin-announcement-content"
+          <Field id="admin-announcement-content" label="내용">
+            <Textarea
               placeholder="공통 홈에 표시할 내용을 작성해 주세요."
               disabled={isSubmitting}
               value={createForm.content}
@@ -320,16 +313,12 @@ export default function SectionAnnouncementAdmin({
                 setCreateForm((prev) => ({ ...prev, content: event.target.value }))
               }
             />
-          </div>
+          </Field>
 
           <div className="admin-search-actions">
-            <button
-              type="submit"
-              className="admin-btn admin-btn--primary"
-              disabled={isSubmitting}
-            >
+            <Btn type="submit" variant="primary" size="student" disabled={isSubmitting}>
               {isSubmitting ? '등록 중…' : '공지 등록'}
-            </button>
+            </Btn>
           </div>
         </form>
 
@@ -368,56 +357,56 @@ export default function SectionAnnouncementAdmin({
                       <p className="admin-helper">{announcement.contentPreview}</p>
                     </td>
                     <td data-label="대상">
-                      <span className="admin-badge admin-badge--audience">
+                      <Badge variant="neutral">
                         {ANNOUNCEMENT_AUDIENCE_LABELS[announcement.audience]}
-                      </span>
+                      </Badge>
                     </td>
                     <td data-label="상태">
-                      <span className={getStatusBadgeClass(announcement.status)}>
+                      <Badge variant={getStatusBadgeVariant(announcement.status)}>
                         {ANNOUNCEMENT_STATUS_LABELS[announcement.status]}
-                      </span>
+                      </Badge>
                     </td>
                     <td data-label="고정">
-                      {announcement.pinned ? (
-                        <span className="admin-badge admin-badge--category">고정</span>
-                      ) : (
-                        '-'
-                      )}
+                      {announcement.pinned ? <Badge variant="neutral">고정</Badge> : '-'}
                     </td>
                     <td data-label="등록일">{formatDateTime(announcement.createdAt)}</td>
                     <td data-label="관리" className="admin-table__actions">
-                      <button
+                      <Btn
                         type="button"
-                        className="admin-btn admin-btn--secondary"
+                        variant="secondary"
+                        size="student"
                         disabled={updatingId === announcement.id}
                         onClick={() => void openEditDrawer(announcement.id)}
                       >
                         수정
-                      </button>
-                      <button
+                      </Btn>
+                      <Btn
                         type="button"
-                        className="admin-btn admin-btn--muted"
+                        variant="ghost"
+                        size="student"
                         disabled={updatingId === announcement.id}
                         onClick={() => void handleTogglePin(announcement)}
                       >
                         {announcement.pinned ? '고정 해제' : '고정'}
-                      </button>
-                      <button
+                      </Btn>
+                      <Btn
                         type="button"
-                        className="admin-btn admin-btn--muted"
+                        variant="ghost"
+                        size="student"
                         disabled={updatingId === announcement.id}
                         onClick={() => void handleToggleStatus(announcement)}
                       >
                         {announcement.status === 'PUBLISHED' ? '보관' : '게시'}
-                      </button>
-                      <button
+                      </Btn>
+                      <Btn
                         type="button"
-                        className="admin-btn admin-btn--danger"
+                        variant="danger"
+                        size="student"
                         disabled={deletingId === announcement.id}
                         onClick={() => void handleDelete(announcement.id)}
                       >
                         {deletingId === announcement.id ? '삭제 중…' : '삭제'}
-                      </button>
+                      </Btn>
                     </td>
                   </tr>
                 ))}

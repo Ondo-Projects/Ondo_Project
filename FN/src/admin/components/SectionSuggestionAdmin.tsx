@@ -10,6 +10,7 @@ import type { AdminPageResponse, AdminSuggestionSummary } from '../../api/types/
 import type { UserRole } from '../../api/types/auth';
 import { ApiError } from '../../api/types/api-error';
 import type { SuggestionCategory, SuggestionPost, SuggestionStatus } from '../../api/types/suggestion';
+import { Badge, Btn, Field, Input, Select, Textarea } from '../../components/ui';
 import {
   ADMIN_SECTIONS,
   PAGE_SIZE,
@@ -17,9 +18,10 @@ import {
   SUGGESTION_ROLE_FILTER_OPTIONS,
   SUGGESTION_STATUS_FILTER_OPTIONS,
 } from '../constants';
-import { formatDateTime, getRoleBadgeClass, getRoleLabel, resolveErrorMessage } from '../adminUtils';
+import { formatDateTime, getRoleBadgeVariant, getRoleLabel, resolveErrorMessage } from '../adminUtils';
 import {
   getSuggestionCategoryLabel,
+  getSuggestionStatusBadgeVariant,
   getSuggestionStatusLabel,
 } from '../../student/suggestionLabels';
 import AdminFilterChips from './AdminFilterChips';
@@ -30,10 +32,6 @@ interface SectionSuggestionAdminProps {
   onSuccess: (message: string) => void;
   onError: (message: string) => void;
   onDataChange: () => void;
-}
-
-function getSuggestionStatusBadgeClass(status: SuggestionStatus): string {
-  return `admin-badge admin-badge--suggestion-${status.toLowerCase().replace('_', '-')}`;
 }
 
 function isSuggestionClosed(post: SuggestionPost | null): boolean {
@@ -186,16 +184,14 @@ export default function SectionSuggestionAdmin({
       title="7. 운영 건의"
       helper="학생·교사가 남긴 운영 건의를 조회하고 상태 변경·관리자 답변을 처리합니다."
     >
-      <div className="admin-field">
-        <label htmlFor="admin-suggestion-keyword">제목·내용</label>
-        <input
-          id="admin-suggestion-keyword"
+      <Field id="admin-suggestion-keyword" label="제목·내용">
+        <Input
           type="text"
-          value={keyword}
           placeholder="검색어"
+          value={keyword}
           onChange={(event) => setKeyword(event.target.value)}
         />
-      </div>
+      </Field>
 
       <AdminFilterChips
         ariaLabel="건의 상태 필터"
@@ -217,14 +213,15 @@ export default function SectionSuggestionAdmin({
       />
 
       <div className="admin-search-actions">
-        <button
+        <Btn
           type="button"
-          className="admin-btn admin-btn--primary"
+          variant="primary"
+          size="student"
           disabled={isSearching}
           onClick={() => void loadSuggestions(0)}
         >
           검색
-        </button>
+        </Btn>
       </div>
 
       {!pageData ? (
@@ -264,31 +261,27 @@ export default function SectionSuggestionAdmin({
                 >
                   <td data-label="ID">{item.id}</td>
                   <td data-label="분류">
-                    <span className="admin-badge admin-badge--category">
-                      {getSuggestionCategoryLabel(item.category)}
-                    </span>
+                    <Badge variant="neutral">{getSuggestionCategoryLabel(item.category)}</Badge>
                   </td>
                   <td data-label="제목" className="admin-suggestion-title">
                     {item.title}
                   </td>
                   <td data-label="상태">
-                    <span className={getSuggestionStatusBadgeClass(item.status)}>
+                    <Badge variant={getSuggestionStatusBadgeVariant(item.status)}>
                       {getSuggestionStatusLabel(item.status)}
-                    </span>
+                    </Badge>
                   </td>
                   <td data-label="작성자">{item.authorName || item.authorUsername}</td>
                   <td data-label="역할">
-                    <span className={getRoleBadgeClass(item.authorRole)}>
+                    <Badge variant={getRoleBadgeVariant(item.authorRole)}>
                       {getRoleLabel(item.authorRole)}
-                    </span>
+                    </Badge>
                   </td>
                   <td data-label="등록일">{formatDateTime(item.createdAt)}</td>
                   <td data-label="답변">
-                    <span
-                      className={`admin-badge ${item.hasAdminReply ? 'admin-badge--mapped' : 'admin-badge--inactive'}`}
-                    >
+                    <Badge variant={item.hasAdminReply ? 'completed' : 'neutral'}>
                       {item.hasAdminReply ? '완료' : '없음'}
-                    </span>
+                    </Badge>
                   </td>
                 </tr>
               ))}
@@ -303,20 +296,18 @@ export default function SectionSuggestionAdmin({
         <div className="admin-detail-panel" id="adminSuggestionDetail">
           <div className="admin-detail-panel__header">
             <h3 className="admin-detail-panel__title">건의 상세</h3>
-            <button type="button" className="admin-btn admin-btn--secondary" onClick={closeDetail}>
+            <Btn type="button" variant="secondary" size="student" onClick={closeDetail}>
               닫기
-            </button>
+            </Btn>
           </div>
 
           <div className="admin-suggestion-detail__header">
             <h4 className="admin-suggestion-detail__title">{detailPost.title}</h4>
             <div className="admin-suggestion-detail__badges">
-              <span className="admin-badge admin-badge--category">
-                {getSuggestionCategoryLabel(detailPost.category)}
-              </span>
-              <span className={getSuggestionStatusBadgeClass(detailPost.status)}>
+              <Badge variant="neutral">{getSuggestionCategoryLabel(detailPost.category)}</Badge>
+              <Badge variant={getSuggestionStatusBadgeVariant(detailPost.status)}>
                 {getSuggestionStatusLabel(detailPost.status)}
-              </span>
+              </Badge>
             </div>
           </div>
 
@@ -333,28 +324,27 @@ export default function SectionSuggestionAdmin({
           <div className="admin-management-box">
             <h3 className="admin-subtitle admin-subtitle--flush">상태 변경</h3>
             <div className="admin-inline-actions">
-              <div className="admin-field admin-field--inline">
-                <label htmlFor="admin-suggestion-status">처리 상태</label>
-                <select
-                  id="admin-suggestion-status"
-                  value={statusValue}
+              <Field id="admin-suggestion-status" label="처리 상태" className="admin-field--inline">
+                <Select
                   disabled={closed || isUpdating}
+                  value={statusValue}
                   onChange={(event) => setStatusValue(event.target.value as SuggestionStatus)}
                 >
                   <option value="OPEN">접수</option>
                   <option value="IN_REVIEW">검토 중</option>
                   <option value="RESOLVED">처리 완료</option>
                   <option value="CLOSED">종료</option>
-                </select>
-              </div>
-              <button
+                </Select>
+              </Field>
+              <Btn
                 type="button"
-                className="admin-btn admin-btn--primary"
+                variant="primary"
+                size="student"
                 disabled={closed || isUpdating}
                 onClick={() => void handleStatusUpdate()}
               >
                 상태 변경
-              </button>
+              </Btn>
             </div>
             {closed ? (
               <p className="admin-helper">종료된 건의는 상태를 더 이상 변경할 수 없습니다.</p>
@@ -372,23 +362,24 @@ export default function SectionSuggestionAdmin({
                 <div>{detailPost.adminReply}</div>
               </div>
             ) : null}
-            <label htmlFor="admin-suggestion-reply">관리자 답변</label>
-            <textarea
-              id="admin-suggestion-reply"
-              maxLength={2000}
-              value={replyContent}
-              placeholder="건의자에게 전달할 답변을 작성해 주세요."
-              onChange={(event) => setReplyContent(event.target.value)}
-            />
+            <Field id="admin-suggestion-reply" label="관리자 답변">
+              <Textarea
+                maxLength={2000}
+                value={replyContent}
+                placeholder="건의자에게 전달할 답변을 작성해 주세요."
+                onChange={(event) => setReplyContent(event.target.value)}
+              />
+            </Field>
             <div className="admin-inline-actions admin-inline-actions--spaced">
-              <button
+              <Btn
                 type="button"
-                className="admin-btn admin-btn--primary"
+                variant="primary"
+                size="student"
                 disabled={isUpdating}
                 onClick={() => void handleReplySubmit()}
               >
                 {detailPost.adminReply ? '답변 수정' : '답변 등록'}
-              </button>
+              </Btn>
             </div>
           </div>
         </div>

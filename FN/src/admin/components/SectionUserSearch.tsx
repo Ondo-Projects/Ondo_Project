@@ -8,8 +8,9 @@ import {
 import type { AdminPageResponse, AdminUserSummary } from '../../api/types/admin';
 import type { UserRole } from '../../api/types/auth';
 import { ApiError } from '../../api/types/api-error';
+import { Badge, Btn, Field, Input } from '../../components/ui';
 import { PAGE_SIZE, USER_ROLE_FILTER_OPTIONS } from '../constants';
-import { getRoleBadgeClass, getRoleLabel, resolveErrorMessage } from '../adminUtils';
+import { getRoleBadgeVariant, getRoleLabel, resolveErrorMessage } from '../adminUtils';
 import AdminFilterChips from './AdminFilterChips';
 import AdminPager from './AdminPager';
 import AdminSectionCard from './AdminSectionCard';
@@ -127,26 +128,22 @@ export default function SectionUserSearch({
   return (
     <AdminSectionCard title="1. 회원 조회">
       <form className="admin-search-fields" onSubmit={handleSearch}>
-        <div className="admin-field">
-          <label htmlFor="admin-user-keyword">아이디·이름</label>
-          <input
-            id="admin-user-keyword"
+        <Field id="admin-user-keyword" label="아이디·이름">
+          <Input
             type="text"
             value={keyword}
             placeholder="검색어"
             onChange={(event) => setKeyword(event.target.value)}
           />
-        </div>
-        <div className="admin-field">
-          <label htmlFor="admin-user-school-code">학교 코드</label>
-          <input
-            id="admin-user-school-code"
+        </Field>
+        <Field id="admin-user-school-code" label="학교 코드">
+          <Input
             type="text"
             value={schoolCode}
             placeholder="선택"
             onChange={(event) => setSchoolCode(event.target.value)}
           />
-        </div>
+        </Field>
       </form>
 
       <AdminFilterChips
@@ -157,14 +154,15 @@ export default function SectionUserSearch({
       />
 
       <div className="admin-search-actions">
-        <button
+        <Btn
           type="button"
-          className="admin-btn admin-btn--primary"
+          variant="primary"
+          size="student"
           disabled={isSearching}
           onClick={() => void loadUsers(0)}
         >
           검색
-        </button>
+        </Btn>
       </div>
 
       {selectedUser ? (
@@ -177,37 +175,40 @@ export default function SectionUserSearch({
             </strong>
           </p>
           <div className="admin-inline-actions">
-            <input
+            <Input
               type="text"
               value={manageSchoolCode}
               placeholder="변경할 학교 코드"
               aria-label="변경할 학교 코드"
               onChange={(event) => setManageSchoolCode(event.target.value)}
             />
-            <button
+            <Btn
               type="button"
-              className="admin-btn admin-btn--secondary"
+              variant="secondary"
+              size="student"
               disabled={isUpdating}
               onClick={() => void handleSchoolChange()}
             >
               학교 변경
-            </button>
-            <button
+            </Btn>
+            <Btn
               type="button"
-              className="admin-btn admin-btn--danger"
+              variant="danger"
+              size="student"
               disabled={isUpdating || !selectedUser.active}
               onClick={() => void handleStatusChange(false)}
             >
               비활성화
-            </button>
-            <button
+            </Btn>
+            <Btn
               type="button"
-              className="admin-btn admin-btn--success"
+              variant="primary"
+              size="student"
               disabled={isUpdating || selectedUser.active}
               onClick={() => void handleStatusChange(true)}
             >
               활성화
-            </button>
+            </Btn>
           </div>
         </div>
       ) : null}
@@ -236,25 +237,21 @@ export default function SectionUserSearch({
                   <td data-label="아이디">{user.username}</td>
                   <td data-label="이름">{user.name || '-'}</td>
                   <td data-label="역할">
-                    <span className={getRoleBadgeClass(user.role)}>{getRoleLabel(user.role)}</span>
+                    <Badge variant={getRoleBadgeVariant(user.role)}>
+                      {getRoleLabel(user.role)}
+                    </Badge>
                   </td>
                   <td data-label="상태">
-                    <span
-                      className={`admin-badge ${user.active ? 'admin-badge--mapped' : 'admin-badge--inactive'}`}
-                    >
+                    <Badge variant={user.active ? 'completed' : 'neutral'}>
                       {user.active ? '활성' : '비활성'}
-                    </span>
+                    </Badge>
                   </td>
                   <td data-label="학교">{user.schoolName}</td>
                   <td data-label="지역">{user.schoolRegion || '-'}</td>
                   <td className="admin-table__actions">
-                    <button
-                      type="button"
-                      className="admin-btn admin-btn--muted"
-                      onClick={() => selectUser(user)}
-                    >
+                    <Btn type="button" variant="ghost" size="student" onClick={() => selectUser(user)}>
                       관리
-                    </button>
+                    </Btn>
                   </td>
                 </tr>
               ))}

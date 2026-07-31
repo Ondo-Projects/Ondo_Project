@@ -7,6 +7,7 @@ import {
 } from '../../api/admin.api';
 import type { AdminPageResponse, AdminSchoolSummary } from '../../api/types/admin';
 import { ApiError } from '../../api/types/api-error';
+import { Badge, Btn, Field, Input } from '../../components/ui';
 import { PAGE_SIZE, SCHOOL_MAPPED_FILTER_OPTIONS } from '../constants';
 import { resolveErrorMessage } from '../adminUtils';
 import AdminFilterChips from './AdminFilterChips';
@@ -97,16 +98,14 @@ export default function SectionSchoolSearch({
 
   return (
     <AdminSectionCard title="2. 학교 조회">
-      <div className="admin-field">
-        <label htmlFor="admin-school-keyword">학교명·지역·코드</label>
-        <input
-          id="admin-school-keyword"
+      <Field id="admin-school-keyword" label="학교명·지역·코드">
+        <Input
           type="text"
           value={keyword}
           placeholder="예: 개포중, 서울"
           onChange={(event) => setKeyword(event.target.value)}
         />
-      </div>
+      </Field>
 
       <AdminFilterChips
         ariaLabel="NEIS 매핑 필터"
@@ -116,33 +115,36 @@ export default function SectionSchoolSearch({
       />
 
       <div className="admin-search-actions">
-        <button
+        <Btn
           type="button"
-          className="admin-btn admin-btn--primary"
+          variant="primary"
+          size="student"
           disabled={isSearching}
           onClick={() => void loadSchools(0)}
         >
           검색
-        </button>
+        </Btn>
       </div>
 
       <div className="admin-inline-actions admin-inline-actions--spaced">
-        <button
+        <Btn
           type="button"
-          className="admin-btn admin-btn--secondary"
+          variant="secondary"
+          size="student"
           disabled={isSyncing}
           onClick={() => void handleSyncCsv()}
         >
           CSV 동기화 (추가·갱신)
-        </button>
-        <button
+        </Btn>
+        <Btn
           type="button"
-          className="admin-btn admin-btn--secondary"
+          variant="secondary"
+          size="student"
           disabled={isSyncing}
           onClick={() => void handleSyncNeis()}
         >
           NEIS 코드 일괄 매핑
-        </button>
+        </Btn>
       </div>
       <p className="admin-helper">
         CSV 동기화는 학교 목록 추가·갱신용입니다. NEIS 일괄 매핑은 미매핑 학교 최대 50건씩 NEIS
@@ -173,11 +175,9 @@ export default function SectionSchoolSearch({
                   <td data-label="지역">{school.region || '-'}</td>
                   <td data-label="구분">{school.schoolType || '-'}</td>
                   <td data-label="NEIS">
-                    <span
-                      className={`admin-badge ${school.neisMapped ? 'admin-badge--mapped' : 'admin-badge--unmapped'}`}
-                    >
+                    <Badge variant={school.neisMapped ? 'completed' : 'pending'}>
                       {school.neisMapped ? '매핑됨' : '미매핑'}
-                    </span>
+                    </Badge>
                   </td>
                 </tr>
               ))}
