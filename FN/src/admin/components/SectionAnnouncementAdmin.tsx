@@ -5,7 +5,7 @@ import {
   deleteAdminAnnouncement,
   getAdminAnnouncements,
 } from '../../api/admin.api';
-import type { Announcement, AnnouncementAudience } from '../../api/types/announcement';
+import type { AnnouncementAudience, AnnouncementSummary } from '../../api/types/announcement';
 import { ApiError } from '../../api/types/api-error';
 import { ADMIN_SECTIONS, ANNOUNCEMENT_AUDIENCE_LABELS, ANNOUNCEMENT_AUDIENCE_OPTIONS } from '../constants';
 import { formatDateTime, resolveErrorMessage } from '../adminUtils';
@@ -35,7 +35,7 @@ export default function SectionAnnouncementAdmin({
   onError,
 }: SectionAnnouncementAdminProps) {
   const [form, setForm] = useState<AnnouncementFormState>(EMPTY_FORM);
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [announcements, setAnnouncements] = useState<AnnouncementSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
@@ -44,8 +44,8 @@ export default function SectionAnnouncementAdmin({
     setIsLoading(true);
 
     try {
-      const data = await getAdminAnnouncements();
-      setAnnouncements(data);
+      const data = await getAdminAnnouncements(0, 50);
+      setAnnouncements(data.items);
     } catch (error) {
       onError(
         error instanceof ApiError
@@ -212,7 +212,7 @@ export default function SectionAnnouncementAdmin({
                 {announcement.adminName || announcement.adminUsername} ·{' '}
                 {formatDateTime(announcement.createdAt)}
               </p>
-              <div className="admin-announcement-item__content">{announcement.content}</div>
+              <div className="admin-announcement-item__content">{announcement.contentPreview}</div>
             </article>
           ))}
         </div>

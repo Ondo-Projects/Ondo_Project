@@ -1,5 +1,8 @@
 import { apiClient } from './client';
-import type { Announcement } from './types/announcement';
+import type {
+  AnnouncementDetail,
+  AnnouncementPageResponse,
+} from './types/announcement';
 import type {
   CounselingPostSummary,
   MealDayResponse,
@@ -16,8 +19,14 @@ export function getTodayWeather() {
   return apiClient<WeatherTodayResponse>('/api/common/weather/today');
 }
 
-export function getCommonAnnouncements() {
-  return apiClient<Announcement[]>('/api/common/announcements');
+export function getCommonAnnouncements(page = 0, size = 10) {
+  return apiClient<AnnouncementPageResponse>(
+    `/api/common/announcements?page=${page}&size=${size}`,
+  );
+}
+
+export function getCommonAnnouncement(id: number) {
+  return apiClient<AnnouncementDetail>(`/api/common/announcements/${id}`);
 }
 
 export function getUpcomingSchoolSchedule(days = 14) {
