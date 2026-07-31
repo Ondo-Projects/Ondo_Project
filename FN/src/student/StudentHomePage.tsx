@@ -8,7 +8,6 @@ import PageHeader from '../components/PageHeader';
 import RoleHomeZone from '../components/RoleHomeZone';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { PATHS } from '../routes/paths';
-import QuickActionBar from './components/QuickActionBar';
 import SectionAssignment from './components/SectionAssignment';
 import SectionClassProfile from './components/SectionClassProfile';
 import SectionCounselCreate from './components/SectionCounselCreate';
@@ -142,7 +141,7 @@ export default function StudentHomePage() {
           tone="student"
           eyebrow={schoolLife.isLoading ? '불러오는 중…' : `${greetingName} · ${schoolLabel}`}
           title="학생 홈"
-          subtitle="오늘 할 일부터 확인하고 상담까지 이어서 진행하세요."
+          subtitle="오늘 할 일을 확인하고 상담까지 이어서 진행하세요."
           actions={
             <>
               <Link className="page-header-action page-header-action--ghost" to={PATHS.HOME}>
@@ -180,31 +179,21 @@ export default function StudentHomePage() {
           </p>
         ) : null}
 
-        <RoleHomeZone
-          badge="TODAY"
-          title="오늘 시작하기"
-          description="할 일, 날씨, 급식을 먼저 확인하고 하루를 준비하세요."
-          tone="student"
-        >
-          <div className="student-hero">
-            <QuickActionBar onNavigate={navigateToSection} />
-            <SectionTodayTodo items={todayTodoItems} onNavigate={navigateToSection} />
-            <SectionToday
-              mealHint={mealHint}
-              meals={schoolLife.meals}
-              mealsError={schoolLife.mealsError}
-              weather={schoolLife.weather}
-              weatherError={schoolLife.weatherError}
-            />
-          </div>
-        </RoleHomeZone>
+        <SectionTodayTodo items={todayTodoItems} onNavigate={navigateToSection} />
 
         <RoleHomeZone
           badge="SCHOOL LIFE"
           title="학교 생활"
-          description="마음 날씨, 공지, 학사 일정, 시간표를 한눈에 살펴보세요."
+          description="급식·날씨, 마음 날씨, 공지, 학사 일정, 시간표를 살펴보세요."
           tone="student"
         >
+          <SectionToday
+            mealHint={mealHint}
+            meals={schoolLife.meals}
+            mealsError={schoolLife.mealsError}
+            weather={schoolLife.weather}
+            weatherError={schoolLife.weatherError}
+          />
           <div className="student-daily-grid">
             <SectionMood onSuccess={handleSuccess} onError={handleError} />
             <SectionNotice
