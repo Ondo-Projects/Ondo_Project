@@ -15,3 +15,9 @@ export type { TextareaProps } from './Textarea';
 
 export { default as Select } from './Select';
 export type { SelectProps } from './Select';
+
+export { default as Badge } from './Badge';
+export type { BadgeProps, BadgeVariant } from './Badge';
+
+export { default as Alert } from './Alert';
+export type { AlertProps, AlertVariant } from './Alert';
