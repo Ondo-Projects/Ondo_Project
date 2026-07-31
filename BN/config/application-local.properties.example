@@ -1,27 +1,61 @@
-# 로컬 API 키 설정 예시
-# 사용 방법:
-# 1. 이 파일을 application-local.properties 로 복사
-# 2. 아래 값을 실제 발급받은 키로 교체
+# 로컬 개발 전용 설정 (Git에 커밋하지 않음)
 #
-#   copy application-local.properties.example application-local.properties   (Windows)
-#   cp application-local.properties.example application-local.properties   (macOS/Linux)
+# 사용 방법:
+#   cd BN\config
+#   copy application-local.properties.example application-local.properties
+#   (값을 본인 환경에 맞게 수정)
+#
+# BN 폴더에서 bootRun: .\gradlew.bat bootRun
 
-# NEIS (나이스) Open API - 급식 등
+# ----------------------------------------------------------------
+# JWT (32바이트 이상 — 로컬 전용, 운영과 다른 값 사용)
+# ----------------------------------------------------------------
+ondo.jwt.secret=local-dev-jwt-secret-key-at-least-32-bytes!!
+
+# ----------------------------------------------------------------
+# APP / SERVER (로컬)
+# ----------------------------------------------------------------
+ondo.app.base-url=http://localhost:8081
+
+# ----------------------------------------------------------------
+# MAIL (Mailpit 등 로컬 SMTP)
+# ----------------------------------------------------------------
+ondo.mail.dev-mode=true
+spring.mail.host=localhost
+spring.mail.port=1025
+spring.mail.properties.mail.smtp.auth=false
+spring.mail.properties.mail.smtp.starttls.enable=false
+
+# ----------------------------------------------------------------
+# Solapi SMS — 로컬은 dev-mode true 가능 (실 발송 없이 테스트)
+# ----------------------------------------------------------------
+ondo.solapi.dev-mode=true
+ondo.solapi.api-key=
+ondo.solapi.api-secret=
+ondo.solapi.sender-phone=
+
+# ----------------------------------------------------------------
+# FIELD ENCRYPTION — 로컬 dev-mode (키 없이 동작)
+# ----------------------------------------------------------------
+ondo.encryption.dev-mode=true
+ondo.encryption.key=
+
+# ----------------------------------------------------------------
+# NEIS (나이스) Open API
+# ----------------------------------------------------------------
 ondo.neis.dev-mode=false
 ondo.neis.api-key=your-neis-api-key
 
+# ----------------------------------------------------------------
 # 기상청 단기예보 (data.go.kr)
+# ----------------------------------------------------------------
 ondo.weather.dev-mode=false
 ondo.weather.api-key=your-weather-api-key
 
-# Admin 최초 계정 (서버 기동 시 1회 생성, username이 없을 때만)
+# ----------------------------------------------------------------
+# Admin 최초 계정 (username 없을 때 1회 생성 — 이후 enabled=false 권장)
+# ----------------------------------------------------------------
 ondo.admin.bootstrap.enabled=true
 ondo.admin.bootstrap.username=admin
-ondo.admin.bootstrap.password=change-me-admin-password
+ondo.admin.bootstrap.password=qudtjs123.
 ondo.admin.bootstrap.name=시스템관리자
-
-# Solapi SMS (https://console.solapi.com/)
-ondo.solapi.dev-mode=false
-ondo.solapi.api-key=your-solapi-api-key
-ondo.solapi.api-secret=your-solapi-api-secret
-ondo.solapi.sender-phone=01012345678
