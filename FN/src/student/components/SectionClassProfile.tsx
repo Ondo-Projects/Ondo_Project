@@ -5,6 +5,7 @@ import {
   getStudentClassProfile,
   updateStudentClassProfile,
 } from '../../api/student.api';
+import { Btn, Field, Input } from '../../components/ui';
 import { STUDENT_SECTIONS } from '../constants';
 import StudentSectionCard from './StudentSectionCard';
 
@@ -108,12 +109,8 @@ export default function SectionClassProfile({
           <p className="student-profile-status">{statusText}</p>
           <form className="student-form" onSubmit={handleSubmit}>
             <div className="student-form-grid">
-              <div className="student-field">
-                <label className="student-field__label" htmlFor="classProfileGrade">
-                  학년
-                </label>
-                <input
-                  id="classProfileGrade"
+              <Field id="classProfileGrade" label="학년">
+                <Input
                   type="number"
                   min={1}
                   max={6}
@@ -122,13 +119,9 @@ export default function SectionClassProfile({
                   onChange={(event) => setGrade(event.target.value)}
                   disabled={isSaving}
                 />
-              </div>
-              <div className="student-field">
-                <label className="student-field__label" htmlFor="classProfileClassNumber">
-                  반
-                </label>
-                <input
-                  id="classProfileClassNumber"
+              </Field>
+              <Field id="classProfileClassNumber" label="반">
+                <Input
                   type="number"
                   min={1}
                   max={20}
@@ -137,20 +130,21 @@ export default function SectionClassProfile({
                   onChange={(event) => setClassNumber(event.target.value)}
                   disabled={isSaving}
                 />
-              </div>
+              </Field>
             </div>
             <div className="student-form-actions">
-              <button type="submit" className="student-btn student-btn--primary" disabled={isSaving}>
+              <Btn type="submit" variant="primary" size="student" disabled={isSaving}>
                 {isSaving ? '저장 중…' : '저장'}
-              </button>
-              <button
+              </Btn>
+              <Btn
                 type="button"
-                className="student-btn student-btn--secondary"
+                variant="secondary"
+                size="student"
                 disabled={isSaving}
                 onClick={handleClear}
               >
                 초기화
-              </button>
+              </Btn>
             </div>
           </form>
         </>

@@ -8,10 +8,11 @@ import {
 } from '../../api/suggestion.api';
 import { ApiError } from '../../api/types/api-error';
 import type { SuggestionCategory, SuggestionPost } from '../../api/types/suggestion';
+import { Badge, Btn, CardHelper, Field, Input, Select, Textarea } from '../../components/ui';
 import { STUDENT_SECTIONS } from '../constants';
 import {
   getSuggestionCategoryLabel,
-  getSuggestionStatusBadgeClass,
+  getSuggestionStatusBadgeVariant,
   getSuggestionStatusLabel,
   isSuggestionOpen,
   SUGGESTION_CATEGORY_OPTIONS,
@@ -202,13 +203,8 @@ export default function SectionSuggestion({ onSuccess, onError }: SectionSuggest
       compact
     >
       <form className="student-form" onSubmit={handleCreateSubmit}>
-        <div className="student-field">
-          <label className="student-field__label" htmlFor="suggestionCategory">
-            분류
-          </label>
-          <select
-            id="suggestionCategory"
-            className="student-field__input"
+        <Field id="suggestionCategory" label="분류" required>
+          <Select
             required
             disabled={isSubmitting}
             value={createForm.category}
@@ -225,16 +221,11 @@ export default function SectionSuggestion({ onSuccess, onError }: SectionSuggest
                 {option.label}
               </option>
             ))}
-          </select>
-        </div>
+          </Select>
+        </Field>
 
-        <div className="student-field">
-          <label className="student-field__label" htmlFor="suggestionTitle">
-            제목
-          </label>
-          <input
-            id="suggestionTitle"
-            className="student-field__input"
+        <Field id="suggestionTitle" label="제목" required>
+          <Input
             type="text"
             maxLength={100}
             required
@@ -245,15 +236,10 @@ export default function SectionSuggestion({ onSuccess, onError }: SectionSuggest
               setCreateForm((prev) => ({ ...prev, title: event.target.value }))
             }
           />
-        </div>
+        </Field>
 
-        <div className="student-field">
-          <label className="student-field__label" htmlFor="suggestionContent">
-            내용
-          </label>
-          <textarea
-            id="suggestionContent"
-            className="student-field__textarea"
+        <Field id="suggestionContent" label="내용" required>
+          <Textarea
             maxLength={2000}
             required
             disabled={isSubmitting}
@@ -263,16 +249,12 @@ export default function SectionSuggestion({ onSuccess, onError }: SectionSuggest
               setCreateForm((prev) => ({ ...prev, content: event.target.value }))
             }
           />
-        </div>
+        </Field>
 
         <div className="student-form-actions">
-          <button
-            type="submit"
-            className="student-btn student-btn--primary"
-            disabled={isSubmitting}
-          >
+          <Btn type="submit" variant="primary" size="student" disabled={isSubmitting}>
             {isSubmitting ? '등록 중…' : '건의 등록하기'}
-          </button>
+          </Btn>
         </div>
       </form>
 
@@ -294,12 +276,10 @@ export default function SectionSuggestion({ onSuccess, onError }: SectionSuggest
               <div className="student-post-item__header">
                 <h4 className="student-post-item__title">{item.title}</h4>
                 <div className="student-suggestion-badges">
-                  <span className="student-badge student-badge--suggestion-cat">
-                    {getSuggestionCategoryLabel(item.category)}
-                  </span>
-                  <span className={`student-badge ${getSuggestionStatusBadgeClass(item.status)}`}>
+                  <Badge variant="neutral">{getSuggestionCategoryLabel(item.category)}</Badge>
+                  <Badge variant={getSuggestionStatusBadgeVariant(item.status)}>
                     {getSuggestionStatusLabel(item.status)}
-                  </span>
+                  </Badge>
                 </div>
               </div>
               <p className="student-post-item__meta">
@@ -320,14 +300,15 @@ export default function SectionSuggestion({ onSuccess, onError }: SectionSuggest
             <h3 className="student-suggestion-subheading student-suggestion-subheading--compact">
               건의 상세
             </h3>
-            <button
+            <Btn
               type="button"
-              className="student-btn student-btn--secondary"
+              variant="secondary"
+              size="student"
               onClick={closeDetail}
               aria-label="건의 상세 닫기"
             >
               닫기
-            </button>
+            </Btn>
           </div>
 
           {isDetailLoading || !detailPost ? (
@@ -337,14 +318,12 @@ export default function SectionSuggestion({ onSuccess, onError }: SectionSuggest
               <div className="student-post-item__header">
                 <h4 className="student-post-item__title">{detailPost.title}</h4>
                 <div className="student-suggestion-badges">
-                  <span className="student-badge student-badge--suggestion-cat">
+                  <Badge variant="neutral">
                     {getSuggestionCategoryLabel(detailPost.category)}
-                  </span>
-                  <span
-                    className={`student-badge ${getSuggestionStatusBadgeClass(detailPost.status)}`}
-                  >
+                  </Badge>
+                  <Badge variant={getSuggestionStatusBadgeVariant(detailPost.status)}>
                     {getSuggestionStatusLabel(detailPost.status)}
-                  </span>
+                  </Badge>
                 </div>
               </div>
 
@@ -372,40 +351,35 @@ export default function SectionSuggestion({ onSuccess, onError }: SectionSuggest
 
               {isSuggestionOpen(detailPost.status) ? (
                 <div className="student-form-actions">
-                  <button
+                  <Btn
                     type="button"
-                    className="student-btn student-btn--primary"
+                    variant="primary"
+                    size="student"
                     onClick={() => openEditForm(detailPost)}
                     disabled={isDeleting}
                   >
                     수정
-                  </button>
-                  <button
+                  </Btn>
+                  <Btn
                     type="button"
-                    className="student-btn student-btn--danger"
+                    variant="danger"
+                    size="student"
                     onClick={() => handleDelete(detailPost.id)}
                     disabled={isDeleting}
                   >
                     {isDeleting ? '삭제 중…' : '삭제'}
-                  </button>
+                  </Btn>
                 </div>
               ) : (
-                <p className="student-card__helper">
-                  검토 중이거나 처리된 건의는 수정할 수 없습니다.
-                </p>
+                <CardHelper>검토 중이거나 처리된 건의는 수정할 수 없습니다.</CardHelper>
               )}
 
               {isEditOpen && editForm ? (
                 <div className="student-detail-panel">
                   <h3 className="student-detail-panel__title">건의 수정</h3>
                   <form className="student-form" onSubmit={handleEditSubmit}>
-                    <div className="student-field">
-                      <label className="student-field__label" htmlFor="suggestionEditCategory">
-                        분류
-                      </label>
-                      <select
-                        id="suggestionEditCategory"
-                        className="student-field__input"
+                    <Field id="suggestionEditCategory" label="분류" required>
+                      <Select
                         required
                         disabled={isSavingEdit}
                         value={editForm.category}
@@ -425,16 +399,11 @@ export default function SectionSuggestion({ onSuccess, onError }: SectionSuggest
                             {option.label}
                           </option>
                         ))}
-                      </select>
-                    </div>
+                      </Select>
+                    </Field>
 
-                    <div className="student-field">
-                      <label className="student-field__label" htmlFor="suggestionEditTitle">
-                        제목
-                      </label>
-                      <input
-                        id="suggestionEditTitle"
-                        className="student-field__input"
+                    <Field id="suggestionEditTitle" label="제목" required>
+                      <Input
                         type="text"
                         maxLength={100}
                         required
@@ -446,15 +415,10 @@ export default function SectionSuggestion({ onSuccess, onError }: SectionSuggest
                           )
                         }
                       />
-                    </div>
+                    </Field>
 
-                    <div className="student-field">
-                      <label className="student-field__label" htmlFor="suggestionEditContent">
-                        내용
-                      </label>
-                      <textarea
-                        id="suggestionEditContent"
-                        className="student-field__textarea"
+                    <Field id="suggestionEditContent" label="내용" required>
+                      <Textarea
                         maxLength={2000}
                         required
                         disabled={isSavingEdit}
@@ -465,19 +429,16 @@ export default function SectionSuggestion({ onSuccess, onError }: SectionSuggest
                           )
                         }
                       />
-                    </div>
+                    </Field>
 
                     <div className="student-form-actions">
-                      <button
-                        type="submit"
-                        className="student-btn student-btn--primary"
-                        disabled={isSavingEdit}
-                      >
+                      <Btn type="submit" variant="primary" size="student" disabled={isSavingEdit}>
                         {isSavingEdit ? '저장 중…' : '저장'}
-                      </button>
-                      <button
+                      </Btn>
+                      <Btn
                         type="button"
-                        className="student-btn student-btn--secondary"
+                        variant="secondary"
+                        size="student"
                         disabled={isSavingEdit}
                         onClick={() => {
                           setIsEditOpen(false);
@@ -485,7 +446,7 @@ export default function SectionSuggestion({ onSuccess, onError }: SectionSuggest
                         }}
                       >
                         취소
-                      </button>
+                      </Btn>
                     </div>
                   </form>
                 </div>

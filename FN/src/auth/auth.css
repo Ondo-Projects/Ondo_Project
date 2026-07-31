@@ -143,6 +143,8 @@
   color: var(--color-neutral-600);
 }
 
+/* Legacy auth pages (FindId, ResetPassword, Withdraw) — migrate to ui components in Phase 1 */
+
 .auth-footer__link {
   display: inline-flex;
   align-items: center;
@@ -259,6 +261,34 @@
 .auth-shell {
   max-width: 480px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.auth-login-card .ui-card__body {
+  gap: var(--space-5);
+}
+
+.auth-login-card .auth-form {
+  gap: var(--space-4);
+}
+
+.auth-login-card .auth-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-neutral-200);
+}
+
+.auth-login-card .auth-footer .ui-btn {
+  min-height: var(--touch-target-min);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-label);
 }
 
 .auth-shell--wide {

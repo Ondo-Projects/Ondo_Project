@@ -1,4 +1,5 @@
 import type { CounselingStatus, CounselingType } from '../api/types/counseling';
+import type { BadgeVariant } from '../components/ui';
 import { STUDENT_SECTIONS } from './constants';
 
 export type StudentWorkspaceTab = 'pre-counsel' | 'counsel-create' | 'counsel-list';
@@ -34,6 +35,21 @@ export function getCounselingTypeLabel(type: CounselingType): string {
 
 export function getCounselingStatusLabel(status: CounselingStatus): string {
   return COUNSELING_STATUS_LABELS[status] ?? status;
+}
+
+export function getCounselingStatusBadgeVariant(status: CounselingStatus): BadgeVariant {
+  switch (status) {
+    case 'WAITING':
+      return 'pending';
+    case 'CONFIRMED':
+      return 'inProgress';
+    case 'COMPLETED':
+      return 'completed';
+    case 'CANCELLED':
+      return 'neutral';
+    default:
+      return 'neutral';
+  }
 }
 
 export function resolveWorkspaceTabForSection(sectionId: string): StudentWorkspaceTab | null {

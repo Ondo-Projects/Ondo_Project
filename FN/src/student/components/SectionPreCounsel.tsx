@@ -5,6 +5,7 @@ import {
   getStudentPreCounselingProfile,
   saveStudentPreCounselingProfile,
 } from '../../api/student.api';
+import { Badge, Btn, Field, Input, Textarea } from '../../components/ui';
 import { PRE_COUNSEL_SECTIONS, STUDENT_SECTIONS } from '../constants';
 import {
   EMPTY_PRE_COUNSEL_FORM,
@@ -112,11 +113,7 @@ export default function SectionPreCounsel({
         <p className="student-status">불러오는 중…</p>
       ) : (
         <>
-          <span
-            className={`student-profile-status-badge${profileMeta?.completed ? ' is-done' : ''}`}
-          >
-            {statusLabel}
-          </span>
+          <Badge variant={profileMeta?.completed ? 'completed' : 'pending'}>{statusLabel}</Badge>
 
           <form className="student-form student-pre-counsel-form" onSubmit={handleSubmit}>
             <nav className="student-pre-counsel-nav" aria-label="사전 상담 섹션">
@@ -288,9 +285,9 @@ export default function SectionPreCounsel({
               </div>
             </details>
 
-            <button type="submit" className="student-btn student-btn--primary student-submit-btn" disabled={isSaving}>
+            <Btn type="submit" variant="primary" size="student" className="student-submit-btn" disabled={isSaving}>
               {isSaving ? '저장 중…' : '사전 상담 카드 저장'}
-            </button>
+            </Btn>
           </form>
         </>
       )}
@@ -299,11 +296,11 @@ export default function SectionPreCounsel({
 }
 
 function ReadonlyField({ label, value }: { label: string; value: string }) {
+  const fieldId = `preCounselReadonly-${label}`;
   return (
-    <div className="student-field">
-      <span className="student-field__label">{label}</span>
-      <input className="student-field__input student-field__input--readonly" readOnly value={value} />
-    </div>
+    <Field id={fieldId} label={label}>
+      <Input readOnly value={value} />
+    </Field>
   );
 }
 
@@ -327,13 +324,8 @@ function TextField({
   disabled?: boolean;
 }) {
   return (
-    <div className="student-field">
-      <label className="student-field__label" htmlFor={id}>
-        {label}
-      </label>
-      <input
-        id={id}
-        className="student-field__input"
+    <Field id={id} label={label} required={required}>
+      <Input
         value={value}
         placeholder={placeholder}
         maxLength={maxLength}
@@ -341,7 +333,7 @@ function TextField({
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
       />
-    </div>
+    </Field>
   );
 }
 
@@ -363,20 +355,15 @@ function TextAreaField({
   disabled?: boolean;
 }) {
   return (
-    <div className="student-field">
-      <label className="student-field__label" htmlFor={id}>
-        {label}
-      </label>
-      <textarea
-        id={id}
-        className="student-field__textarea"
+    <Field id={id} label={label} required={required}>
+      <Textarea
         value={value}
         placeholder={placeholder}
         required={required}
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
       />
-    </div>
+    </Field>
   );
 }
 

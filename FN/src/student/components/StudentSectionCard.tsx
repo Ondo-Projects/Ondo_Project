@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Card } from '../../components/ui';
 
 interface StudentSectionCardProps {
   id: string;
@@ -16,17 +17,16 @@ export default function StudentSectionCard({
   compact = false,
 }: StudentSectionCardProps) {
   return (
-    <section
+    <Card
       id={id}
-      className={`student-card${compact ? ' student-card--compact' : ''}`}
+      title={title}
+      titleId={`${id}-title`}
+      helper={helper}
+      titleMark
+      compact={compact}
       aria-labelledby={`${id}-title`}
     >
-      <h2 id={`${id}-title`} className="student-card__title">
-        <span className="student-card__title-mark" aria-hidden="true" />
-        {title}
-      </h2>
-      {helper ? <p className="student-card__helper">{helper}</p> : null}
       {children}
-    </section>
+    </Card>
   );
 }

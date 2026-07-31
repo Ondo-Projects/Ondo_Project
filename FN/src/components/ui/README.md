@@ -50,6 +50,12 @@ import { Alert, Btn, Card, Field, Input } from '../components/ui';
 | `student-badge--*`, `admin-badge--*` | `<Badge variant="…">` |
 | `home-announcement-drawer`, `admin-announcement-drawer` | `<Drawer>` compound API |
 
+## Phase 2 파일럿 (feature/design-student)
+
+- **전체 학생 섹션** — `Card`, `Field`, `Input`, `Textarea`, `Select`, `Btn`, `Badge`, `Alert`
+- **LoginPage** — `Card`, `Field`, `Input`, `Btn`, `Alert`, footer `Btn ghost`
+- **`student.css`** — 레거시 btn/field/badge/card/message 규칙 제거, 도메인 전용 스타일만 유지
+
 ## Phase 0 파일럿 (적용 완료)
 
 - **Auth:** `LoginPage` — `Card`, `Field`, `Input`, `Btn`, `Alert`

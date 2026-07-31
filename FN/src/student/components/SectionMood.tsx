@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ApiError } from '../../api/types/api-error';
 import type { MoodLevel, MoodLevelCode } from '../../api/types/student';
 import { getStudentTodayMood, saveStudentTodayMood } from '../../api/student.api';
+import { CardHelper } from '../../components/ui';
 import { MOOD_OPTIONS, STUDENT_SECTIONS } from '../constants';
 import StudentSectionCard from './StudentSectionCard';
 
@@ -91,7 +92,7 @@ export default function SectionMood({ onSuccess, onError }: SectionMoodProps) {
           </button>
         ))}
       </div>
-      <p className="student-card__helper">{statusText}</p>
+      <CardHelper>{statusText}</CardHelper>
     </StudentSectionCard>
   );
 }

@@ -5,6 +5,7 @@ import {
   getStudentAssignmentOptional,
   registerStudentAssignment,
 } from '../../api/student.api';
+import { Badge, Btn, CardHelper, Field, Input } from '../../components/ui';
 import { STUDENT_SECTIONS } from '../constants';
 import { formatDateTime, formatTeacherDisplay } from '../studentUtils';
 import StudentSectionCard from './StudentSectionCard';
@@ -96,7 +97,7 @@ export default function SectionAssignment({
 
         {assignment ? (
           <div className="student-assignment-info">
-            <span className="student-assignment-info__badge">담당 교사 등록 완료</span>
+            <Badge variant="completed">담당 교사 등록 완료</Badge>
             <p className="student-assignment-info__summary">{summaryHint}</p>
             <p>
               <strong>학교:</strong> {assignment.schoolName || '-'}
@@ -104,17 +105,13 @@ export default function SectionAssignment({
             <p>
               <strong>담당 교사:</strong> {formatTeacherDisplay(assignment)}
             </p>
-            <p className="student-card__helper">등록일: {formatDateTime(assignment.assignedAt)}</p>
+            <CardHelper>등록일: {formatDateTime(assignment.assignedAt)}</CardHelper>
           </div>
         ) : (
           <div className="student-assignment-register">
-            <p className="student-card__helper">교사가 알려준 6자리 초대 코드를 입력해 주세요.</p>
-            <div className="student-field">
-              <label className="student-field__label" htmlFor="inviteCode">
-                초대 코드
-              </label>
-              <input
-                id="inviteCode"
+            <CardHelper>교사가 알려준 6자리 초대 코드를 입력해 주세요.</CardHelper>
+            <Field id="inviteCode" label="초대 코드">
+              <Input
                 type="text"
                 inputMode="numeric"
                 maxLength={6}
@@ -123,16 +120,17 @@ export default function SectionAssignment({
                 onChange={(event) => setInviteCode(event.target.value)}
                 disabled={isSubmitting}
               />
-            </div>
+            </Field>
             <div className="student-form-actions">
-              <button
+              <Btn
                 type="button"
-                className="student-btn student-btn--primary"
+                variant="primary"
+                size="student"
                 disabled={isSubmitting}
                 onClick={handleRegister}
               >
                 {isSubmitting ? '등록 중…' : '담당 교사 등록'}
-              </button>
+              </Btn>
             </div>
           </div>
         )}

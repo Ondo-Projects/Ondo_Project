@@ -2,6 +2,7 @@ import type { HTMLAttributes, ReactNode } from 'react';
 
 export interface CardProps extends Omit<HTMLAttributes<HTMLElement>, 'title'> {
   title?: ReactNode;
+  titleId?: string;
   helper?: ReactNode;
   titleMark?: boolean;
   compact?: boolean;
@@ -61,6 +62,7 @@ export function CardHelper({ className, children, ...rest }: CardHelperProps) {
 
 export default function Card({
   title,
+  titleId,
   helper,
   titleMark = false,
   compact = false,
@@ -71,7 +73,11 @@ export default function Card({
 }: CardProps) {
   return (
     <section className={cardClassName({ compact, interactive, className })} {...rest}>
-      {title ? <CardTitle mark={titleMark}>{title}</CardTitle> : null}
+      {title ? (
+        <CardTitle mark={titleMark} id={titleId}>
+          {title}
+        </CardTitle>
+      ) : null}
       {helper ? <CardHelper>{helper}</CardHelper> : null}
       <div className="ui-card__body">{children}</div>
     </section>
