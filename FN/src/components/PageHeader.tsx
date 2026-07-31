@@ -34,6 +34,9 @@ export default function PageHeader({
     `page-header--tone-${tone}`,
   ].join(' ');
 
+  const dashboardLogoSize =
+    tone === 'student' || tone === 'teacher' || tone === 'home' ? 'dashboard' : 'compact';
+
   if (variant === 'toolbar') {
     return (
       <header className={className}>
@@ -66,7 +69,7 @@ export default function PageHeader({
     <header className={className}>
       {showLogo ? (
         <div className="page-header__logo">
-          <BrandMark size="compact" />
+          <BrandMark size={dashboardLogoSize} />
         </div>
       ) : null}
       <div className="page-header__content">

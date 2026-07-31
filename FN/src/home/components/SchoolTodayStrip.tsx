@@ -4,6 +4,7 @@ import type {
   WeatherTodayResponse,
 } from '../../api/types/home';
 import { Skeleton } from '../../components/ui';
+import PlatformAnnouncementBell from './PlatformAnnouncementBell';
 import { ScheduleSummary, WeatherWidget } from './CommonStripWidgets';
 
 interface SchoolTodayStripProps {
@@ -28,12 +29,15 @@ export default function SchoolTodayStrip({
   return (
     <section className="home-common-strip" aria-label="오늘의 학교 정보">
       <div className="home-common-strip__hero">
-        <div className="home-common-strip__intro">
-          <span className="home-common-strip__badge">TODAY</span>
-          <h2 className="home-common-strip__headline">오늘의 학교 정보</h2>
-          <p className="home-common-strip__lead">
-            학생과 교사가 함께 보는 날짜, 날씨, 학사일정을 한눈에 확인해요.
-          </p>
+        <div className="home-common-strip__top">
+          <div className="home-common-strip__intro">
+            <span className="home-common-strip__badge">TODAY</span>
+            <h2 className="home-common-strip__headline">오늘의 학교 정보</h2>
+            <p className="home-common-strip__lead">
+              학생과 교사가 함께 보는 날짜, 날씨, 학사일정을 한눈에 확인해요.
+            </p>
+          </div>
+          <PlatformAnnouncementBell placement="embedded" />
         </div>
 
         <div className="home-common-strip__facts">

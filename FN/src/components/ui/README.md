@@ -57,13 +57,21 @@ import { Alert, Btn, Card, Field, Input } from '../components/ui';
 - **Dark mode** — `tokens.css` dark 토큰 보강 (surface, semantic, badge, skeleton)
 - **Skeleton** — `Skeleton`, `SkeletonText` + `AuthLoading` 카드형 스켈레톤
 - **Toast** — `ToastProvider`, `useToast` (App 루트 연결), 관리자 성공 피드백 파일럿
+- **CSS** — `#ffffff` → 토큰 치환, home/admin/teacher/page-header dark 보정
+
+## 플랫폼 공지 종 알림 (`feature/platform-announcement-bell`)
+
+- **전역** — 로그인 후 학생/교사/관리자 화면 우측 상단 🔔 (`AppLayout`, 학교 홈 제외)
+- **학교 홈** — `SchoolTodayStrip` 「오늘의 학교 정보」 헤더 오른쪽에 🔔
+- **패널** — 공지 목록 + `AnnouncementDetailDrawer` 상세
+- **읽음** — `localStorage` 기준 미확인 건수 뱃지
+- **메타** — `adminName` 대신 `온도` 표기 (DB 이름 깨짐 방지)
+- **홈** — 본문 하단 `PlatformAnnouncementBoard` + `SchoolTodayStrip` 헤더 🔔
 
 ```tsx
 const { showToast } = useToast();
 showToast('저장했습니다.', 'success');
 ```
-
-- **CSS** — `#ffffff` → 토큰 치환, home/admin/teacher/page-header dark 보정
 
 ## Phase 1 (feature/design-auth-layout)
 
@@ -75,7 +83,7 @@ showToast('저장했습니다.', 'success');
 
 - **Admin 전체** — `AdminSectionCard` → `Card`, 섹션별 `Btn` / `Field` / `Input` / `Select` / `Textarea` / `Badge` / `Alert`
 - **AdminAnnouncementEditDrawer** — `Drawer` compound API
-- **Home** — `HomePage` Alert, role block Card+Btn, `PlatformAnnouncementSection` Btn/Alert
+- **Home** — `HomePage` Alert, role block Card+Btn, 플랫폼 공지 → 전역 종 알림
 - **`admin.css` / `home.css`** — 레거시 btn/field/card/message/badge 규칙 제거
 
 ## Phase 3 (feature/design-teacher)

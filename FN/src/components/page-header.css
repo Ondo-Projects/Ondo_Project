@@ -48,7 +48,7 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: var(--space-4);
-  align-items: center;
+  align-items: start;
   padding: var(--space-5);
 }
 
@@ -86,6 +86,73 @@
   padding: var(--space-3);
   background: transparent;
   box-shadow: none;
+}
+
+.page-header--tone-student.page-header--dashboard,
+.page-header--tone-teacher.page-header--dashboard,
+.page-header--tone-home.page-header--dashboard {
+  gap: var(--space-5);
+}
+
+.page-header--tone-student.page-header--dashboard .page-header__logo,
+.page-header--tone-teacher.page-header--dashboard .page-header__logo,
+.page-header--tone-home.page-header--dashboard .page-header__logo {
+  align-self: center;
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-bg-card) 90%, transparent);
+  box-shadow: var(--shadow-sm);
+}
+
+.page-header--tone-student.page-header--dashboard .page-header__content,
+.page-header--tone-teacher.page-header--dashboard .page-header__content,
+.page-header--tone-home.page-header--dashboard .page-header__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-1);
+  padding-top: var(--space-1);
+}
+
+.page-header--tone-student.page-header--dashboard .page-header__eyebrow,
+.page-header--tone-teacher.page-header--dashboard .page-header__eyebrow,
+.page-header--tone-home.page-header--dashboard .page-header__eyebrow {
+  margin: 0;
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+  font-weight: var(--font-weight-label);
+  letter-spacing: 0.02em;
+  color: var(--color-neutral-600);
+}
+
+.page-header--tone-student.page-header--dashboard .page-header__title,
+.page-header--tone-teacher.page-header--dashboard .page-header__title,
+.page-header--tone-home.page-header--dashboard .page-header__title {
+  font-size: clamp(1.375rem, 3.5vw, var(--font-size-h2));
+  line-height: var(--line-height-h2);
+  font-weight: var(--font-weight-h2);
+}
+
+.page-header--tone-student.page-header--dashboard .page-header__subtitle,
+.page-header--tone-teacher.page-header--dashboard .page-header__subtitle,
+.page-header--tone-home.page-header--dashboard .page-header__subtitle {
+  margin: var(--space-1) 0 0;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  color: var(--color-neutral-600);
+  max-width: 26rem;
+}
+
+.page-header--tone-student.page-header--dashboard .page-header__eyebrow {
+  color: var(--color-primary-700);
+}
+
+.page-header--tone-teacher.page-header--dashboard .page-header__eyebrow {
+  color: #1d4ed8;
+}
+
+.page-header--tone-home.page-header--dashboard .page-header__eyebrow {
+  color: #15803d;
 }
 
 .page-header__content {
@@ -149,10 +216,12 @@
   position: relative;
   z-index: 1;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: stretch;
   gap: var(--space-2);
-  justify-content: flex-end;
-  align-items: center;
+  justify-content: flex-start;
+  min-width: 8.75rem;
+  align-self: start;
 }
 
 .page-header__back {
@@ -179,6 +248,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
   min-height: var(--touch-target-min);
   padding: 0.6875rem var(--space-4);
   border-radius: var(--radius-md);
@@ -186,6 +256,7 @@
   font-size: var(--btn-font-size);
   font-weight: var(--btn-font-weight);
   text-decoration: none;
+  white-space: nowrap;
   cursor: pointer;
   transition:
     background var(--duration-fast) ease,
@@ -248,9 +319,23 @@
     grid-area: content;
   }
 
+  .page-header--tone-student.page-header--dashboard .page-header__logo,
+  .page-header--tone-teacher.page-header--dashboard .page-header__logo,
+  .page-header--tone-home.page-header--dashboard .page-header__logo {
+    align-self: start;
+  }
+
+  .page-header--tone-student.page-header--dashboard .page-header__content,
+  .page-header--tone-teacher.page-header--dashboard .page-header__content,
+  .page-header--tone-home.page-header--dashboard .page-header__content {
+    padding-top: 0;
+  }
+
   .page-header__actions {
     grid-area: actions;
-    justify-content: flex-start;
+    width: 100%;
+    min-width: 0;
+    max-width: 16rem;
   }
 }
 
@@ -281,5 +366,11 @@
   .page-header__eyebrow,
   .page-header__eyebrow--center {
     color: var(--color-primary-300);
+  }
+
+  .page-header--tone-student.page-header--dashboard .page-header__eyebrow,
+  .page-header--tone-teacher.page-header--dashboard .page-header__eyebrow,
+  .page-header--tone-home.page-header--dashboard .page-header__eyebrow {
+    color: var(--color-neutral-400);
   }
 }

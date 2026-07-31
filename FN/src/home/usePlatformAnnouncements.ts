@@ -5,7 +5,6 @@ import type { AnnouncementDetail, AnnouncementSummary } from '../api/types/annou
 import { ApiError } from '../api/types/api-error';
 
 const PAGE_SIZE = 10;
-const STRIP_PREVIEW_COUNT = 3;
 
 function resolveErrorMessage(error: unknown, fallback: string): string {
   if (error instanceof ApiError) {
@@ -17,11 +16,11 @@ function resolveErrorMessage(error: unknown, fallback: string): string {
   return fallback;
 }
 
-export function usePlatformAnnouncements() {
+export function usePlatformAnnouncementsState(enabled: boolean) {
   const [items, setItems] = useState<AnnouncementSummary[]>([]);
   const [totalElements, setTotalElements] = useState(0);
   const [page, setPage] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -30,6 +29,15 @@ export function usePlatformAnnouncements() {
   const [detailError, setDetailError] = useState<string | null>(null);
 
   const loadInitial = useCallback(async () => {
+    if (!enabled) {
+      setItems([]);
+      setTotalElements(0);
+      setPage(0);
+      setError(null);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -45,14 +53,14 @@ export function usePlatformAnnouncements() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [enabled]);
 
   useEffect(() => {
     void loadInitial();
   }, [loadInitial]);
 
   const loadMore = useCallback(async () => {
-    if (isLoadingMore || items.length >= totalElements) {
+    if (!enabled || isLoadingMore || items.length >= totalElements) {
       return;
     }
 
@@ -69,7 +77,7 @@ export function usePlatformAnnouncements() {
     } finally {
       setIsLoadingMore(false);
     }
-  }, [isLoadingMore, items.length, page, totalElements]);
+  }, [enabled, isLoadingMore, items.length, page, totalElements]);
 
   const openDetail = useCallback(async (id: number) => {
     setSelectedId(id);
@@ -94,19 +102,15 @@ export function usePlatformAnnouncements() {
     setIsDetailLoading(false);
   }, []);
 
-  const stripItems = items.slice(0, STRIP_PREVIEW_COUNT);
   const hasMore = items.length < totalElements;
-  const shouldRender = isLoading || Boolean(error) || items.length > 0;
 
   return {
     items,
-    stripItems,
     totalElements,
     isLoading,
     isLoadingMore,
     error,
     hasMore,
-    shouldRender,
     selectedId,
     detail,
     isDetailLoading,
@@ -114,5 +118,11 @@ export function usePlatformAnnouncements() {
     loadMore,
     openDetail,
     closeDetail,
+    reload: loadInitial,
   };
+}
+
+/** @deprecated Use usePlatformAnnouncementData from PlatformAnnouncementProvider */
+export function usePlatformAnnouncements() {
+  return usePlatformAnnouncementsState(true);
 }
