@@ -1,6 +1,6 @@
 import type { AnnouncementSummary } from '../../api/types/announcement';
 import { ANNOUNCEMENT_AUDIENCE_LABELS } from '../../api/types/announcement';
-import { Alert, Btn } from '../../components/ui';
+import { Alert, Btn, Skeleton } from '../../components/ui';
 import { formatDateTime } from '../homeUtils';
 import AnnouncementDetailDrawer from './AnnouncementDetailDrawer';
 import { usePlatformAnnouncements } from '../usePlatformAnnouncements';
@@ -66,7 +66,11 @@ export default function PlatformAnnouncementSection() {
 
   return (
     <>
-      <section className="home-announcement-strip" aria-label="플랫폼 공지">
+      <section
+        className="home-announcement-strip"
+        aria-label="플랫폼 공지"
+        aria-busy={isLoading}
+      >
         <div className="home-announcement-strip__intro">
           <span className="home-announcement-strip__badge">NOTICE</span>
           <h2 className="home-announcement-strip__headline">온도 공지</h2>
@@ -76,7 +80,13 @@ export default function PlatformAnnouncementSection() {
         </div>
 
         {isLoading ? (
-          <p className="home-announcement-strip__status">공지를 불러오는 중…</p>
+          <>
+            <span className="home-announcement-strip__sr-only">공지를 불러오는 중…</span>
+            <div className="home-announcement-strip__skeleton" aria-hidden="true">
+              <Skeleton height="4.5rem" rounded="md" />
+              <Skeleton height="4.5rem" rounded="md" />
+            </div>
+          </>
         ) : error && items.length === 0 ? (
           <Alert
             variant="error"

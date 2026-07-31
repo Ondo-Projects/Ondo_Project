@@ -140,7 +140,7 @@
 
 .admin-filter-chip {
   border: 1px solid var(--color-neutral-300);
-  background: #ffffff;
+  background: var(--color-bg-card);
   color: var(--color-neutral-700);
   padding: 0.625rem var(--space-4);
   border-radius: 999px;
@@ -156,7 +156,7 @@
 .admin-filter-chip--active {
   background: var(--color-neutral-900);
   border-color: var(--color-neutral-900);
-  color: #ffffff;
+  color: var(--color-on-primary);
 }
 
 .ui-field.admin-field--inline {

@@ -3,6 +3,7 @@ import type {
   SchoolScheduleUpcomingResponse,
   WeatherTodayResponse,
 } from '../../api/types/home';
+import { Skeleton } from '../../components/ui';
 import { ScheduleSummary, WeatherWidget } from './CommonStripWidgets';
 
 interface SchoolTodayStripProps {
@@ -53,7 +54,11 @@ export default function SchoolTodayStrip({
             <div className="home-common-strip__fact-body">
               <p className="home-common-strip__fact-label">우리 학교</p>
               <p className="home-common-strip__fact-value">
-                {isLoading ? '불러오는 중…' : schoolMeta}
+                {isLoading ? (
+                  <Skeleton height="1.125rem" width="70%" rounded="sm" aria-hidden="true" />
+                ) : (
+                  schoolMeta
+                )}
               </p>
             </div>
           </article>
