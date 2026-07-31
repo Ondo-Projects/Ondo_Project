@@ -43,7 +43,17 @@ public class PlatformAnnouncement {
     private User admin;
 
     @Column(nullable = false)
+    private boolean pinned;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private AnnouncementStatus status;
+
+    @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 
     @Builder
     public PlatformAnnouncement(
@@ -51,12 +61,43 @@ public class PlatformAnnouncement {
             String content,
             AnnouncementAudience audience,
             User admin,
-            LocalDateTime createdAt
+            boolean pinned,
+            AnnouncementStatus status,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
     ) {
         this.title = title;
         this.content = content;
         this.audience = audience;
         this.admin = admin;
+        this.pinned = pinned;
+        this.status = status != null ? status : AnnouncementStatus.PUBLISHED;
         this.createdAt = createdAt;
+        this.updatedAt = updatedAt != null ? updatedAt : createdAt;
+    }
+
+    public void update(
+            String title,
+            String content,
+            AnnouncementAudience audience,
+            Boolean pinned,
+            AnnouncementStatus status
+    ) {
+        if (title != null) {
+            this.title = title.trim();
+        }
+        if (content != null) {
+            this.content = content.trim();
+        }
+        if (audience != null) {
+            this.audience = audience;
+        }
+        if (pinned != null) {
+            this.pinned = pinned;
+        }
+        if (status != null) {
+            this.status = status;
+        }
+        this.updatedAt = LocalDateTime.now();
     }
 }
