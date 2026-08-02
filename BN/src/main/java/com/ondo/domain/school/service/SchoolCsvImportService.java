@@ -40,12 +40,11 @@ public class SchoolCsvImportService {
         }
 
         if (count > 0) {
-            log.info("테스트 학교 데이터 {}건을 삭제하고 전국 중·고등학교 데이터를 적재합니다.", count);
-            schoolRepository.deleteAllInBatch();
+            log.info("기존 학교 {}건 유지, CSV에서 없는 학교만 추가합니다.", count);
         }
 
-        int imported = importAll();
-        log.info("전국 중·고등학교 데이터 적재 완료: {}건", imported);
+        int imported = importMissingSchools();
+        log.info("전국 중·고등학교 데이터 적재 완료: {}건 추가", imported);
     }
 
     @Transactional
@@ -65,16 +64,25 @@ public class SchoolCsvImportService {
 
     @Transactional
     public int importAll() {
+        return importMissingSchools();
+    }
+
+    @Transactional
+    public int importMissingSchools() {
         List<School> schools = new ArrayList<>();
         schools.addAll(parseCsv("data/schools/middle_schools.csv", "중"));
         schools.addAll(parseCsv("data/schools/high_schools.csv", "고"));
 
-        for (int i = 0; i < schools.size(); i += BATCH_SIZE) {
-            int end = Math.min(i + BATCH_SIZE, schools.size());
-            schoolRepository.saveAll(schools.subList(i, end));
+        List<School> toSave = schools.stream()
+                .filter(school -> !schoolRepository.existsById(school.getSchoolCode()))
+                .toList();
+
+        for (int i = 0; i < toSave.size(); i += BATCH_SIZE) {
+            int end = Math.min(i + BATCH_SIZE, toSave.size());
+            schoolRepository.saveAll(toSave.subList(i, end));
         }
 
-        return schools.size();
+        return toSave.size();
     }
 
     private List<School> parseCsv(String classpathLocation, String schoolType) {
