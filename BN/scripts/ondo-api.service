@@ -1,0 +1,17 @@
+[Unit]
+Description=Ondo Spring Boot API
+After=network.target docker.service mysqld.service mariadb.service
+Wants=docker.service
+
+[Service]
+User=ec2-user
+WorkingDirectory=/opt/ondo/app
+Environment=SPRING_PROFILES_ACTIVE=prod
+Environment=SPRING_CONFIG_ADDITIONAL_LOCATION=file:/opt/ondo/config/application-prod.properties
+ExecStart=/usr/bin/java -jar /opt/ondo/app/ondo.jar
+Restart=always
+RestartSec=5
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target
