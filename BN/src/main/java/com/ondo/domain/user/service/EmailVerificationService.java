@@ -1,6 +1,7 @@
 package com.ondo.domain.user.service;
 
 import com.ondo.domain.user.entity.Role;
+import com.ondo.domain.user.policy.TeacherEmailDomains;
 import com.ondo.global.error.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,6 @@ public class EmailVerificationService {
 
     private static final String CODE_PREFIX = "email:code:";
     private static final String VERIFIED_PREFIX = "email:verified:";
-    private static final String KOREA_KR_DOMAIN = "@korea.kr";
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
 
     private final StringRedisTemplate redisTemplate;
@@ -108,14 +108,7 @@ public class EmailVerificationService {
             throw new BusinessException("올바른 이메일 형식을 입력해 주세요.");
         }
         if (role == Role.TEACHER) {
-            validateKoreaKrEmail(normalizedEmail);
-        }
-    }
-
-    public void validateKoreaKrEmail(String email) {
-        String normalizedEmail = normalizeEmail(email);
-        if (!normalizedEmail.endsWith(KOREA_KR_DOMAIN)) {
-            throw new BusinessException("교사 가입은 @korea.kr 이메일만 사용할 수 있습니다.");
+            TeacherEmailDomains.validateTeacherEmail(normalizedEmail);
         }
     }
 
