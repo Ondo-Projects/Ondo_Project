@@ -1,11 +1,10 @@
 import { CardHelper } from '../../components/ui';
-import { validateTeacherEmail } from '../joinValidation';
 import { useJoinForm } from '../JoinFormProvider';
-import EmailVerificationBlock from './EmailVerificationBlock';
 import JoinSection from './JoinSection';
+import TeacherEmailVerificationBlock from './TeacherEmailVerificationBlock';
 
 export default function TeacherEmailSection() {
-  const { state, fieldErrors, actions } = useJoinForm();
+  const { state } = useJoinForm();
 
   if (state.role !== 'TEACHER') {
     return null;
@@ -13,22 +12,12 @@ export default function TeacherEmailSection() {
 
   return (
     <JoinSection title="4. 교사 이메일 인증">
-      <CardHelper>교사 가입은 공직 메일(@korea.kr) 인증이 필요합니다.</CardHelper>
+      <CardHelper>
+        교사 가입은 시·도교육청 공직 메일(@sen.go.kr, @goe.go.kr 등) 또는 @korea.kr 인증이
+        필요합니다.
+      </CardHelper>
 
-      <EmailVerificationBlock
-        id="teacherEmail"
-        codeFieldId="teacherVerificationCode"
-        label="교사 이메일"
-        placeholder="example@korea.kr"
-        required
-        role="TEACHER"
-        email={state.email}
-        emailVerified={state.emailVerified}
-        emailError={fieldErrors.email ?? fieldErrors.emailVerification}
-        onEmailChange={actions.setEmail}
-        onVerifiedChange={actions.setEmailVerified}
-        validateEmail={validateTeacherEmail}
-      />
+      <TeacherEmailVerificationBlock />
     </JoinSection>
   );
 }
