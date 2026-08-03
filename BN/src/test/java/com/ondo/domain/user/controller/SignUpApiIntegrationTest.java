@@ -99,6 +99,35 @@ class SignUpApiIntegrationTest {
     }
 
     @Test
+    void signup_createsTeacherAccountWithRegionalEduDomain() throws Exception {
+        String email = "signup-api-teacher@sen.go.kr";
+        seedVerifiedEmail(email);
+
+        SignUpRequestDTO request = teacherRequest("api-teacher-seoul");
+        request.setEmail(email);
+
+        mockMvc.perform(post("/api/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.username").value("api-teacher-seoul"))
+                .andExpect(jsonPath("$.role").value("TEACHER"));
+    }
+
+    @Test
+    void signup_rejectsTeacherWithNonOfficialEmail() throws Exception {
+        mockMvc.perform(post("/api/auth/email/send")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"email":"teacher@gmail.com","role":"TEACHER"}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(
+                        "교사 가입은 시·도교육청 공직 메일(@sen.go.kr, @goe.go.kr 등) 또는 @korea.kr만 사용할 수 있습니다."
+                ));
+    }
+
+    @Test
     void signup_createsStudentAccountWhenOver14() throws Exception {
         seedVerifiedEmail(STUDENT_EMAIL);
 

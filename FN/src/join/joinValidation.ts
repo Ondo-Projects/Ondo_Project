@@ -1,5 +1,6 @@
 import type { GuardianRelation, School, SignUpRequest, SignUpRole } from '../api/types/signup';
 import { isUnder14, parseBirthDate } from './agePolicy';
+import { isAllowedTeacherEmailDomain } from './teacherEmailDomains';
 
 export type JoinFieldKey =
   | 'role'
@@ -128,9 +129,23 @@ export function validateTeacherEmail(email: string): string | null {
   if (!normalized) {
     return '교사 이메일을 입력해 주세요.';
   }
-  if (!normalized.endsWith('@korea.kr')) {
-    return '교사 가입은 @korea.kr 이메일이 필요해요.';
+
+  const atIndex = normalized.lastIndexOf('@');
+  if (atIndex <= 0 || atIndex === normalized.length - 1) {
+    return '이메일 아이디(@ 앞)와 교육청 도메인을 입력해 주세요.';
   }
+
+  const localPart = normalized.slice(0, atIndex);
+  const domain = normalized.slice(atIndex + 1);
+
+  if (!/^[a-z0-9+_.-]+$/.test(localPart)) {
+    return '이메일 아이디는 영문, 숫자, . _ - 만 사용할 수 있어요.';
+  }
+
+  if (!isAllowedTeacherEmailDomain(domain)) {
+    return '시·도교육청 공직 메일 도메인을 선택해 주세요.';
+  }
+
   return null;
 }
 

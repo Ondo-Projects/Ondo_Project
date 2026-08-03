@@ -124,7 +124,7 @@ public class UserService {
     private String validateAndGetVerifiedEmail(String rawEmail, Role role) {
         if (rawEmail == null || rawEmail.isBlank()) {
             throw new BusinessException(role == Role.TEACHER
-                    ? "교사 가입은 @korea.kr 이메일이 필요합니다."
+                    ? "교사 가입은 시·도교육청 공직 메일 또는 @korea.kr 이메일이 필요합니다."
                     : "학생 이메일을 입력해 주세요.");
         }
         String email = rawEmail.trim().toLowerCase();
