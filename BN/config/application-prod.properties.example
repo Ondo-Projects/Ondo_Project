@@ -47,9 +47,19 @@ ondo.encryption.key=
 ondo.app.base-url=http://YOUR_EC2_PUBLIC_IP
 
 # ----------------------------------------------------------------
-# 외부 API / 메일 / SMS (dev-mode true 면 SMTP·SMS 없이도 기동 가능)
+# MAIL — dev-mode=true 여도 spring.mail.host 는 필수 (JavaMailSender 빈 생성용)
+# 실제 발송은 ondo.mail.dev-mode=false + SMTP 설정 시에만
 # ----------------------------------------------------------------
 ondo.mail.dev-mode=true
+spring.mail.host=localhost
+spring.mail.port=25
+spring.mail.username=ondo@ondo.local
+spring.mail.password=
+spring.mail.properties.mail.smtp.auth=false
+
+# ----------------------------------------------------------------
+# 외부 API / SMS
+# ----------------------------------------------------------------
 ondo.solapi.dev-mode=true
 ondo.neis.dev-mode=false
 ondo.neis.api-key=your-neis-api-key
