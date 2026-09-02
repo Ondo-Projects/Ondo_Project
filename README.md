@@ -332,7 +332,7 @@ GET    /api/schools/search        # 학교 검색 (가입·헬스체크)
 
 ## 13. 라이선스 · 팀
 
-- **라이선스:** (미정 — MIT 등 기입)
-- **팀 / 작성자:** (기입)
-- **문의:** GitHub Issues
+- **라이선스:** 
+- **팀 / 작성자:** wonbyeonseon
+- **문의:** ybs8624@naver.co,
 - **데모:** https://ondo.ai.kr
