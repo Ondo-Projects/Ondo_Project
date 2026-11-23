@@ -67,6 +67,14 @@ export function registerStudentAssignment(body: StudentAssignmentRegisterRequest
   });
 }
 
+/** 새 담임의 초대 코드로 담임 바꾸기 — 지난 담임에게 보낸 끝나지 않은 상담은 취소됩니다 */
+export function changeStudentAssignment(body: StudentAssignmentRegisterRequest) {
+  return apiClient<StudentAssignment>('/api/student/assignment', {
+    method: 'PUT',
+    body,
+  });
+}
+
 export function getStudentTodayMood() {
   return apiClient<MoodTodayResponse>('/api/student/mood/today');
 }

@@ -1,6 +1,8 @@
 import { apiClient } from './client';
 import type { ProfileSchoolResponse } from './types/home';
 import type {
+  ClassReleaseResult,
+  ClassStudent,
   InviteCodeResponse,
   StudentAttention,
   StudentMoodSummary,
@@ -112,4 +114,21 @@ export function deleteTeacherSuggestion(id: number) {
   return apiClient<{ message: string }>(`/api/teacher/suggestions/${id}`, {
     method: 'DELETE',
   });
+}
+
+/** 우리 반(연결된) 학생 목록 */
+export function getClassStudents() {
+  return apiClient<ClassStudent[]>('/api/teacher/class/students');
+}
+
+/** 학생 한 명 연결 해제 — 이 학생이 보낸 끝나지 않은 상담은 취소됩니다 */
+export function releaseClassStudent(studentUsername: string) {
+  return apiClient<ClassReleaseResult>(`/api/teacher/class/students/${encodeURIComponent(studentUsername)}`, {
+    method: 'DELETE',
+  });
+}
+
+/** 새 학기 학급 정리 — 연결을 모두 풀고 초대 코드를 새로 만듭니다 */
+export function releaseClass() {
+  return apiClient<ClassReleaseResult>('/api/teacher/class/release', { method: 'POST' });
 }

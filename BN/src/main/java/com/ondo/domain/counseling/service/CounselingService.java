@@ -83,9 +83,11 @@ public class CounselingService {
             return List.of();
         }
 
+        // 이 담임에게 보낸 상담만 — 학생이 담임을 바꿔도 지난 담임과의 상담은 새 담임에게 보이지 않습니다.
         List<CounselingPost> posts = status == null
-                ? counselingPostRepository.findByStudentInAndDeletedAtIsNullOrderByCreatedAtDesc(students)
-                : counselingPostRepository.findByStudentInAndStatusAndDeletedAtIsNullOrderByCreatedAtDesc(students, status);
+                ? counselingPostRepository.findByTeacherAndStudentInAndDeletedAtIsNullOrderByCreatedAtDesc(teacher, students)
+                : counselingPostRepository.findByTeacherAndStudentInAndStatusAndDeletedAtIsNullOrderByCreatedAtDesc(
+                        teacher, students, status);
 
         return posts.stream()
                 .map(CounselingResponseDTO::new)
@@ -104,7 +106,7 @@ public class CounselingService {
             return 0L;
         }
 
-        return counselingPostRepository.countUnreadByStudents(students);
+        return counselingPostRepository.countUnreadByTeacherAndStudents(teacher, students);
     }
 
     @Transactional
