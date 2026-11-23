@@ -87,7 +87,7 @@ const TRUST_ITEMS: FeatureItem[] = [
   {
     icon: FileLock2,
     title: '연락처 암호화 저장',
-    description: '사전상담에 적은 학생·보호자 연락처는 AES-256으로 암호화해 저장합니다.',
+    description: '보호자·교사 휴대전화와 사전상담에 적은 연락처는 모두 AES-256으로 암호화해 저장합니다.',
   },
   {
     icon: ScrollText,

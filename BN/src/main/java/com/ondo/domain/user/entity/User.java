@@ -1,7 +1,9 @@
 package com.ondo.domain.user.entity;
 
 import com.ondo.domain.school.entity.School;
+import com.ondo.global.crypto.EncryptedStringConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -50,10 +52,14 @@ public class User {
     @Column(length = 50)
     private String guardianName;
 
-    @Column(length = 20)
+    /** 보호자 휴대전화 — AES-256-GCM 암호문으로 저장 (예전 평문 칸 guardian_phone 은 UserPhoneEncryptionMigration 이 옮김) */
+    @Convert(converter = EncryptedStringConverter.class)
+    @Column(name = "guardian_phone_encrypted", length = 512)
     private String guardianPhone;
 
-    @Column(length = 20)
+    /** 교사 알림용 휴대전화 — AES-256-GCM 암호문으로 저장 (예전 평문 칸 phone 은 UserPhoneEncryptionMigration 이 옮김) */
+    @Convert(converter = EncryptedStringConverter.class)
+    @Column(name = "phone_encrypted", length = 512)
     private String phone;
 
     @Column(nullable = false, columnDefinition = "bit(1) not null default b'0'")
