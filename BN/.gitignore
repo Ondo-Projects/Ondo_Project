@@ -51,3 +51,5 @@ src/main/resources/application-prod.properties
 !config/application-prod.properties.example
 !**/application-local.properties.example
 !**/application-prod.properties.example
+### 이 PC 전용 Gradle 설정 (Java 경로 등) ###
+gradle.properties
