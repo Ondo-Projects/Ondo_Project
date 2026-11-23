@@ -5,6 +5,8 @@ export const PATHS = {
   FIND_ID: '/find-id',
   RESET_PASSWORD: '/reset-password',
   WITHDRAW: '/withdraw',
+  TERMS: '/terms',
+  PRIVACY: '/privacy',
   HOME: '/home',
   STUDENT: '/student',
   TEACHER: '/teacher',

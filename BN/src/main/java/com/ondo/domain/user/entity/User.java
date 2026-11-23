@@ -93,6 +93,10 @@ public class User {
     @Column
     private LocalDateTime withdrawnAt;
 
+    /** 탈퇴 후 보관 기간이 지나 개인정보를 파기한 시각 (교사 계정은 기록 연결용 빈 껍데기만 남음) */
+    @Column
+    private LocalDateTime purgedAt;
+
     @Column
     private Integer grade;
 
@@ -189,5 +193,27 @@ public class User {
         }
         this.active = false;
         this.withdrawnAt = withdrawnAt;
+    }
+
+    /**
+     * 탈퇴 교사 계정의 개인정보를 지우고, 상담 기록의 연결만 남깁니다.
+     * 학생이 남긴 상담 글이 이 계정을 담당 교사로 가리키고 있어 행 자체는 지울 수 없습니다.
+     */
+    public void anonymizeAfterPurge(String unusableEncodedPassword, LocalDateTime purgedAt) {
+        if (this.active) {
+            throw new IllegalStateException("active account cannot be purged");
+        }
+        changePassword(unusableEncodedPassword);
+        this.name = "탈퇴한 회원";
+        this.birthDate = null;
+        this.email = null;
+        this.phone = null;
+        this.smsNotifyEnabled = false;
+        this.guardianName = null;
+        this.guardianPhone = null;
+        this.guardianRelation = null;
+        this.grade = null;
+        this.classNumber = null;
+        this.purgedAt = purgedAt;
     }
 }
