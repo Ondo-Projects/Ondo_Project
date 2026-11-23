@@ -208,7 +208,9 @@ class GuardianSmsVerificationIntegrationTest {
                 "sms:code:" + normalizedPhone,
                 "sms:verified:" + normalizedPhone,
                 "sms:rate:phone:cooldown:" + normalizedPhone,
-                "sms:rate:phone:hour:" + normalizedPhone
+                "sms:rate:phone:hour:" + normalizedPhone,
+                // MockMvc 요청 IP(127.0.0.1)의 시간당 발송 횟수 — 반복 실행 시 429 방지
+                "sms:rate:ip:hour:127.0.0.1"
         ));
     }
 }

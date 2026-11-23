@@ -282,5 +282,7 @@ class AccountRecoveryIntegrationTest {
         redisTemplate.delete(findIdCodeKey(normalizedEmail));
         redisTemplate.delete("recovery:rate:email:cooldown:" + normalizedEmail);
         redisTemplate.delete("recovery:rate:email:hour:" + normalizedEmail);
+        // MockMvc 요청 IP(127.0.0.1)의 시간당 발송 횟수 — 테스트를 여러 번 돌려도 429 가 나지 않도록 초기화
+        redisTemplate.delete("recovery:rate:ip:hour:127.0.0.1");
     }
 }
