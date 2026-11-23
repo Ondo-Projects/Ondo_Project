@@ -24,6 +24,10 @@ export interface SignUpRequest {
   agreeService: boolean;
   agreePrivacy: boolean;
   agreeSensitive: boolean;
+  /** 가입 화면이 보여 준 이용약관 버전 (시행일) */
+  termsVersion?: string;
+  /** 가입 화면이 보여 준 개인정보처리방침·동의서 버전 (시행일) */
+  privacyVersion?: string;
 }
 
 export interface SignUpResponse {

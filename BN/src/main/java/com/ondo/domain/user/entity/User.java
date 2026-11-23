@@ -87,6 +87,14 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime agreedAt;
 
+    /** 가입 때 동의한 이용약관 버전(시행일). 이 기능 도입 전 가입자는 null */
+    @Column(length = 20)
+    private String agreedTermsVersion;
+
+    /** 가입 때 동의한 개인정보처리방침·동의서 버전(시행일). 이 기능 도입 전 가입자는 null */
+    @Column(length = 20)
+    private String agreedPrivacyVersion;
+
     @Column(nullable = false, columnDefinition = "bit(1) not null default b'1'")
     private boolean active = true;
 
@@ -125,6 +133,8 @@ public class User {
             boolean agreePrivacy,
             boolean agreeSensitive,
             LocalDateTime agreedAt,
+            String agreedTermsVersion,
+            String agreedPrivacyVersion,
             Boolean active,
             LocalDateTime withdrawnAt,
             Integer grade,
@@ -150,6 +160,8 @@ public class User {
         this.agreePrivacy = agreePrivacy;
         this.agreeSensitive = agreeSensitive;
         this.agreedAt = agreedAt;
+        this.agreedTermsVersion = agreedTermsVersion;
+        this.agreedPrivacyVersion = agreedPrivacyVersion;
         this.active = active != null ? active : true;
         this.withdrawnAt = withdrawnAt;
         this.grade = grade;

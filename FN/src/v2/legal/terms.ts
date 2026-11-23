@@ -10,9 +10,16 @@ export const LEGAL_OPERATOR = {
   email: 'ybs8624@naver.com',
 } as const;
 
+import { formatVersionDate } from './version';
 import type { Chapter, LegalDoc } from './types';
 
-export const TERMS_EFFECTIVE_DATE = '2026년 12월 1일';
+/**
+ * 약관 버전(시행일). 가입할 때 서버로 보내 기록합니다.
+ * 바꿀 때는 BN LegalDocumentVersions.TERMS 도 같은 값으로 바꿔야 가입이 막히지 않습니다.
+ */
+export const TERMS_VERSION = '2026-12-01';
+
+export const TERMS_EFFECTIVE_DATE = formatVersionDate(TERMS_VERSION);
 
 /** 약관 맨 위 '한눈에 보기' — 학생도 읽기 쉬운 말로 */
 export const TERMS_SUMMARY: string[] = [

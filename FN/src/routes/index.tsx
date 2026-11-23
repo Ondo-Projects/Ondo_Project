@@ -12,6 +12,7 @@ import ResetPasswordPage from '../pages/ResetPasswordPage';
 import StudentPage from '../pages/StudentPage';
 import TeacherPage from '../pages/TeacherPage';
 import WithdrawPage from '../pages/WithdrawPage';
+import PrivacyPage from '../v2/legal/PrivacyPage';
 import TermsPage from '../v2/legal/TermsPage';
 import { PATHS } from './paths';
 
@@ -107,6 +108,7 @@ export default function AppRoutes() {
           />
         ) : null}
         <Route path={PATHS.TERMS} element={<TermsPage />} />
+        <Route path={PATHS.PRIVACY} element={<PrivacyPage />} />
         <Route path="/index.html" element={<Navigate to={PATHS.ROOT} replace />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

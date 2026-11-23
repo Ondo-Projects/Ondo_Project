@@ -1,6 +1,8 @@
 import type { GuardianRelation, School, SignUpRequest, SignUpRole } from '../api/types/signup';
 import { isUnder14, parseBirthDate } from './agePolicy';
 import { isAllowedTeacherEmailDomain } from './teacherEmailDomains';
+import { PRIVACY_VERSION } from '../v2/legal/privacy';
+import { TERMS_VERSION } from '../v2/legal/terms';
 
 export type JoinFieldKey =
   | 'role'
@@ -271,5 +273,7 @@ export function buildSignUpRequest(state: JoinFormState): SignUpRequest {
     agreeService: state.agreeService,
     agreePrivacy: state.agreePrivacy,
     agreeSensitive: state.agreeSensitive,
+    termsVersion: TERMS_VERSION,
+    privacyVersion: PRIVACY_VERSION,
   };
 }

@@ -69,4 +69,12 @@ public class SignUpRequestDTO {
 
     @AssertTrue(message = "민감정보 관련 필수 약관에 동의해야 합니다.")
     private boolean agreeSensitive;
+
+    /** 가입 화면이 보여 준 이용약관 버전. 비어 있으면 서버의 현재 버전으로 기록합니다. */
+    @Size(max = 20)
+    private String termsVersion;
+
+    /** 가입 화면이 보여 준 개인정보처리방침·동의서 버전. 비어 있으면 서버의 현재 버전으로 기록합니다. */
+    @Size(max = 20)
+    private String privacyVersion;
 }
