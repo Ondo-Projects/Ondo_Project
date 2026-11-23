@@ -8,7 +8,7 @@ WORKSPACE="${WORKSPACE:-$(cd "$(dirname "$0")/../.." && pwd)}"
 
 BN_DIR="${WORKSPACE}/BN"
 FN_DIR="${WORKSPACE}/FN"
-JAR_PATH="$(ls -1 "${BN_DIR}"/build/libs/*.jar 2>/dev/null | head -1 || true)"
+JAR_PATH="$(ls -1 "${BN_DIR}"/build/libs/ondo-*.jar 2>/dev/null | grep -v -- '-plain\.jar$' | head -1 || true)"
 
 echo "=== Deploy Ondo ==="
 echo "WORKSPACE=${WORKSPACE}"
@@ -35,7 +35,7 @@ if sudo docker ps -a --format '{{.Names}}' | grep -qx 'ondo-redis'; then
 fi
 
 sudo systemctl restart ondo-api
-sleep 3
+sleep 12
 
 if ! sudo systemctl is-active --quiet ondo-api; then
   echo "FAIL: ondo-api not active"
