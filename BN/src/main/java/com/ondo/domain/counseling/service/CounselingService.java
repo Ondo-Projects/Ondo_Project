@@ -34,6 +34,7 @@ public class CounselingService {
     private final StudentTeacherAssignmentRepository assignmentRepository;
     private final UserRepository userRepository;
     private final CounselingNotificationService counselingNotificationService;
+    private final StudentReplyNotificationService studentReplyNotificationService;
 
     @Transactional
     public CounselingResponseDTO create(String username, CounselingCreateDTO request) {
@@ -83,9 +84,11 @@ public class CounselingService {
             return List.of();
         }
 
+        // 이 담임에게 보낸 상담만 — 학생이 담임을 바꿔도 지난 담임과의 상담은 새 담임에게 보이지 않습니다.
         List<CounselingPost> posts = status == null
-                ? counselingPostRepository.findByStudentInAndDeletedAtIsNullOrderByCreatedAtDesc(students)
-                : counselingPostRepository.findByStudentInAndStatusAndDeletedAtIsNullOrderByCreatedAtDesc(students, status);
+                ? counselingPostRepository.findByTeacherAndStudentInAndDeletedAtIsNullOrderByCreatedAtDesc(teacher, students)
+                : counselingPostRepository.findByTeacherAndStudentInAndStatusAndDeletedAtIsNullOrderByCreatedAtDesc(
+                        teacher, students, status);
 
         return posts.stream()
                 .map(CounselingResponseDTO::new)
@@ -104,7 +107,7 @@ public class CounselingService {
             return 0L;
         }
 
-        return counselingPostRepository.countUnreadByStudents(students);
+        return counselingPostRepository.countUnreadByTeacherAndStudents(teacher, students);
     }
 
     @Transactional
@@ -150,7 +153,12 @@ public class CounselingService {
             throw new BusinessException("취소된 상담에는 답변할 수 없습니다.");
         }
 
+        // 답변을 고칠 때마다 메일이 가지 않도록, 처음 답변할 때만 학생에게 알립니다.
+        boolean firstReply = post.getRepliedAt() == null;
         post.reply(request.getReply());
+        if (firstReply) {
+            studentReplyNotificationService.notifyReplied(post);
+        }
         return new CounselingResponseDTO(post);
     }
 

@@ -31,7 +31,7 @@ export default function CommonHome() {
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-3 px-4">
           <div className="flex items-center gap-3">
             <Link to={roleHome} className="flex items-center gap-2" aria-label="내 화면으로">
-              <img src="/ondo-logo.png" alt="" width={24} height={24} className="h-6 w-6" />
+              <img src="/ondo-mark.svg" alt="" width={24} height={24} className="h-6 w-6" />
               <span className="text-[15px] font-semibold tracking-tight">온도</span>
             </Link>
             <span className="h-4 w-px bg-gray-200" aria-hidden />

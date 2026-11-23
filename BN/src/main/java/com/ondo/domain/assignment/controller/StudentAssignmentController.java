@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +29,15 @@ public class StudentAssignmentController {
     ) {
         AssignmentResponseDTO response = assignmentService.registerAssignment(authentication.getName(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    /** 새 담임의 초대코드로 담임을 바꿉니다 */
+    @PutMapping
+    public ResponseEntity<AssignmentResponseDTO> changeAssignment(
+            Authentication authentication,
+            @Valid @RequestBody AssignmentRequestDTO request
+    ) {
+        return ResponseEntity.ok(assignmentService.changeAssignment(authentication.getName(), request));
     }
 
     @GetMapping

@@ -46,7 +46,11 @@ class JwtProviderTest {
     @Test
     void validateToken_returnsFalseForTamperedToken() {
         String token = jwtProvider.createAccessToken("teacher01", Role.TEACHER);
-        String tamperedToken = token.substring(0, token.length() - 1) + "x";
+        // 서명 첫 글자를 바꿉니다. 마지막 글자는 남는 비트 때문에 바꿔도 같은 값으로 읽힐 수 있어(약 1/16 확률) 테스트가 가끔 실패했습니다.
+        int signatureStart = token.lastIndexOf('.') + 1;
+        char original = token.charAt(signatureStart);
+        char replaced = original == 'A' ? 'B' : 'A';
+        String tamperedToken = token.substring(0, signatureStart) + replaced + token.substring(signatureStart + 1);
 
         assertThat(jwtProvider.validateToken(tamperedToken)).isFalse();
     }

@@ -1,7 +1,11 @@
 import { apiClient } from './client';
 import { ApiError } from './types/api-error';
 import type { ProfileSchoolResponse } from './types/home';
-import type { StudentAssignment, StudentNotice } from './types/student';
+import type {
+  StudentAssignment,
+  StudentNotice,
+  StudentNotificationSettings,
+} from './types/student';
 import type {
   StudentAssignmentRegisterRequest,
   StudentClassProfile,
@@ -64,6 +68,25 @@ export function registerStudentAssignment(body: StudentAssignmentRegisterRequest
   return apiClient<StudentAssignment>('/api/student/assignment', {
     method: 'POST',
     body,
+  });
+}
+
+/** 새 담임의 초대 코드로 담임 바꾸기 — 지난 담임에게 보낸 끝나지 않은 상담은 취소됩니다 */
+export function changeStudentAssignment(body: StudentAssignmentRegisterRequest) {
+  return apiClient<StudentAssignment>('/api/student/assignment', {
+    method: 'PUT',
+    body,
+  });
+}
+
+export function getStudentNotificationSettings() {
+  return apiClient<StudentNotificationSettings>('/api/student/profile/notification-settings');
+}
+
+export function updateStudentNotificationSettings(replyEmailEnabled: boolean) {
+  return apiClient<StudentNotificationSettings>('/api/student/profile/notification-settings', {
+    method: 'PUT',
+    body: { replyEmailEnabled },
   });
 }
 

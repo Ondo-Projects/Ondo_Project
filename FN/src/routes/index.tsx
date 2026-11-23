@@ -12,6 +12,8 @@ import ResetPasswordPage from '../pages/ResetPasswordPage';
 import StudentPage from '../pages/StudentPage';
 import TeacherPage from '../pages/TeacherPage';
 import WithdrawPage from '../pages/WithdrawPage';
+import PrivacyPage from '../v2/legal/PrivacyPage';
+import TermsPage from '../v2/legal/TermsPage';
 import { PATHS } from './paths';
 
 /** 새 디자인 시스템 견본 — 개발 모드(npm run dev)에서만 /ui-preview 로 열림, 운영 빌드에는 포함 안 됨 */
@@ -105,6 +107,8 @@ export default function AppRoutes() {
             }
           />
         ) : null}
+        <Route path={PATHS.TERMS} element={<TermsPage />} />
+        <Route path={PATHS.PRIVACY} element={<PrivacyPage />} />
         <Route path="/index.html" element={<Navigate to={PATHS.ROOT} replace />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

@@ -5,6 +5,7 @@ import com.ondo.domain.counseling.entity.CounselingStatus;
 import com.ondo.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,6 +18,15 @@ public interface CounselingPostRepository extends JpaRepository<CounselingPost, 
     List<CounselingPost> findByStudentInAndDeletedAtIsNullOrderByCreatedAtDesc(List<User> students);
 
     List<CounselingPost> findByStudentInAndStatusAndDeletedAtIsNullOrderByCreatedAtDesc(
+            List<User> students,
+            CounselingStatus status
+    );
+
+    /** 이 담임에게 보낸 상담만 (학생이 담임을 바꾸면 지난 담임과의 상담은 새 담임에게 보이지 않음) */
+    List<CounselingPost> findByTeacherAndStudentInAndDeletedAtIsNullOrderByCreatedAtDesc(User teacher, List<User> students);
+
+    List<CounselingPost> findByTeacherAndStudentInAndStatusAndDeletedAtIsNullOrderByCreatedAtDesc(
+            User teacher,
             List<User> students,
             CounselingStatus status
     );
@@ -43,4 +53,14 @@ public interface CounselingPostRepository extends JpaRepository<CounselingPost, 
               AND (p.readByTeacherAt IS NULL OR p.updatedAt > p.readByTeacherAt)
             """)
     long countUnreadByStudents(List<User> students);
+
+    @Query("""
+            SELECT COUNT(p)
+            FROM CounselingPost p
+            WHERE p.teacher = :teacher
+              AND p.student IN :students
+              AND p.deletedAt IS NULL
+              AND (p.readByTeacherAt IS NULL OR p.updatedAt > p.readByTeacherAt)
+            """)
+    long countUnreadByTeacherAndStudents(@Param("teacher") User teacher, @Param("students") List<User> students);
 }

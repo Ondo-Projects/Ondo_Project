@@ -47,6 +47,7 @@ function subScreen(route: StudentRoute): { title: string; back: string } | null 
   if (route.tab === 'me') {
     if (a === 'class') return { title: '학년·반', back: '#me' };
     if (a === 'teacher') return { title: '담임 선생님', back: '#me' };
+    if (a === 'notifications') return { title: '알림 설정', back: '#me' };
     if (a === 'suggestions') {
       if (!b) return { title: '운영 건의', back: '#me' };
       if (b === 'new') return { title: '새 건의', back: '#me/suggestions' };
@@ -119,7 +120,7 @@ export default function StudentApp() {
             </>
           ) : (
             <Link to={PATHS.STUDENT} className="flex items-center gap-2 px-1" aria-label="온도 학생 홈">
-              <img src="/ondo-logo.png" alt="" width={22} height={22} className="h-[22px] w-[22px]" />
+              <img src="/ondo-mark.svg" alt="" width={22} height={22} className="h-[22px] w-[22px]" />
               <span className="text-[15px] font-semibold tracking-tight">온도</span>
             </Link>
           )}

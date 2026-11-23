@@ -6,6 +6,7 @@ import com.ondo.domain.school.repository.SchoolRepository;
 import com.ondo.domain.user.dto.SignUpRequestDTO;
 import com.ondo.domain.user.entity.Role;
 import com.ondo.domain.user.entity.User;
+import com.ondo.domain.user.policy.LegalDocumentVersions;
 import com.ondo.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -193,6 +194,64 @@ class SignUpApiIntegrationTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("이메일 인증을 완료해 주세요."));
+    }
+
+    @Test
+    void signup_recordsAgreedLegalVersions() throws Exception {
+        String email = "signup-api-version@korea.kr";
+        seedVerifiedEmail(email);
+
+        SignUpRequestDTO request = teacherRequest("api-version-ok");
+        request.setEmail(email);
+        request.setTermsVersion(LegalDocumentVersions.TERMS);
+        request.setPrivacyVersion(LegalDocumentVersions.PRIVACY);
+
+        mockMvc.perform(post("/api/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated());
+
+        User saved = userRepository.findByUsername("api-version-ok").orElseThrow();
+        assertThat(saved.getAgreedTermsVersion()).isEqualTo(LegalDocumentVersions.TERMS);
+        assertThat(saved.getAgreedPrivacyVersion()).isEqualTo(LegalDocumentVersions.PRIVACY);
+    }
+
+    @Test
+    void signup_withoutVersions_recordsCurrentVersions() throws Exception {
+        String email = "signup-api-version-none@korea.kr";
+        seedVerifiedEmail(email);
+
+        SignUpRequestDTO request = teacherRequest("api-version-none");
+        request.setEmail(email);
+
+        mockMvc.perform(post("/api/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated());
+
+        User saved = userRepository.findByUsername("api-version-none").orElseThrow();
+        assertThat(saved.getAgreedTermsVersion()).isEqualTo(LegalDocumentVersions.TERMS);
+        assertThat(saved.getAgreedPrivacyVersion()).isEqualTo(LegalDocumentVersions.PRIVACY);
+    }
+
+    @Test
+    void signup_rejectsOutdatedTermsVersion() throws Exception {
+        String email = "signup-api-version-old@korea.kr";
+        seedVerifiedEmail(email);
+
+        SignUpRequestDTO request = teacherRequest("api-version-old");
+        request.setEmail(email);
+        request.setTermsVersion("2000-01-01");
+        request.setPrivacyVersion(LegalDocumentVersions.PRIVACY);
+
+        mockMvc.perform(post("/api/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(
+                        "약관이 개정되었습니다. 화면을 새로고침한 뒤 바뀐 약관을 확인하고 다시 동의해 주세요."));
+
+        assertThat(userRepository.existsByUsername("api-version-old")).isFalse();
     }
 
     private SignUpRequestDTO teacherRequest(String username) {

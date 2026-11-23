@@ -75,3 +75,12 @@ ondo.admin.bootstrap.enabled=false
 ondo.admin.bootstrap.username=admin
 ondo.admin.bootstrap.password=
 ondo.admin.bootstrap.name=시스템관리자
+
+# ----------------------------------------------------------------
+# 운영자 오류 알림 — 처리되지 않은 서버 오류, 개인정보 자동 파기 실패를 메일로 알림
+# (ondo.mail.dev-mode=false 이고 SMTP 가 설정돼 있어야 실제로 발송됩니다)
+# ----------------------------------------------------------------
+ondo.alert.enabled=true
+ondo.alert.email=운영자_메일_주소
+ondo.alert.cooldown-minutes=30
+ondo.alert.daily-limit=30
