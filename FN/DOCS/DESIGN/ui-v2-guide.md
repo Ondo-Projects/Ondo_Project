@@ -53,7 +53,7 @@
 
 | 컴포넌트 | 용도 |
 |----------|------|
-| `Button` | `variant`: primary(포인트) / secondary(기본) / ghost / danger, `size`: sm(32px) / md(36px), `icon`, `loading` |
+| `Button` | `variant`: primary(포인트) / secondary(기본) / ghost / danger, `size`: sm(32px) / md(36px) / lg(40px, 로그인·가입 버튼), `icon`, `loading` |
 | `Input`, `Textarea`, `Select` | 높이 36px(`controlSize="sm"` 이면 32px, 표 위 검색 줄용), 포커스 시 테두리 blue-600. 너비는 감싸는 요소로 정합니다 |
 | `Field` | 라벨 + 입력 + 도움말/오류 (aria 자동 연결) |
 | `Badge` | 상태 표시, `dot` 으로 작은 점. `tone`: neutral / solid / info(진행 중) / success / warning / danger |
@@ -69,9 +69,11 @@
 | `Notice` | 한 줄 결과·오류 메시지 (`tone`: info / success / danger, `onClose`) |
 | `ConsoleShell` (`src/v2/shell`) | 교사·관리자 화면 틀: 상단 바 + 왼쪽 메뉴(모바일은 가로 탭) + 본문 |
 | `useFeedback` (`src/v2/shell`) | 화면 위 한 줄 결과 메시지 상태 (성공은 4초 뒤 사라짐) |
+| `Checkbox` | 체크박스 + 글, `error` 로 아래 빨간 안내 (약관 동의 등) |
 | `Sheet` | 상세 보기 시트 — 모바일은 아래에서, 넓은 화면은 오른쪽에서 열림 (Esc·바깥 누르기로 닫힘) |
 | `AnnouncementButton`, `AnnouncementList`, `AnnouncementDetailSheet` (`src/v2/shell`) | 온도 공지 종 버튼·목록·상세. 상세 시트는 화면에 하나만 그립니다 |
 | `Block`, `StickyFooter` (`src/v2/student/ui`) | 학생 앱: 회색 화면 위 흰 묶음, 하단 탭 위 고정 저장 버튼 |
+| `AuthShell`, `AuthCard`, `PasswordRules` (`src/v2/auth`) | 로그인·가입·계정 찾기 화면 틀, 비밀번호 규칙 표시 |
 
 ## 8. 기존 화면과 함께 쓰는 동안의 규칙
 

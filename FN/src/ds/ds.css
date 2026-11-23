@@ -82,6 +82,15 @@
   font: inherit;
   color: inherit;
 }
+.ondo-ui :where(fieldset) {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+.ondo-ui :where(legend) {
+  padding: 0;
+}
 .ondo-ui :where(table) {
   border-collapse: collapse;
   border-spacing: 0;

@@ -1,7 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import type { SignUpRole } from '../api/types/signup';
 import { JoinFormProvider } from '../join/JoinFormProvider';
-import JoinForm from '../join/JoinForm';
+import JoinScreen from '../v2/join/JoinScreen';
 
 function parseRole(value: string | null): SignUpRole | undefined {
   return value === 'TEACHER' || value === 'STUDENT' ? value : undefined;
@@ -13,7 +13,7 @@ export default function JoinPage() {
 
   return (
     <JoinFormProvider initialRole={initialRole}>
-      <JoinForm />
+      <JoinScreen />
     </JoinFormProvider>
   );
 }
