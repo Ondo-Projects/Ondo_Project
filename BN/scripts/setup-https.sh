@@ -55,8 +55,16 @@ mkdir -p "${WEBROOT}/.well-known/acme-challenge"
 
 echo "=== 3. 인증서 ==="
 if [[ -f "${CERT_DIR}/fullchain.pem" ]]; then
-  echo "OK: 기존 인증서 있음 — 발급 건너뜀"
-  "${CERTBOT}" certificates -d "${DOMAIN}" 2>/dev/null | grep -E 'Expiry|Domains' || true
+  EXPIRY="$(openssl x509 -enddate -noout -in "${CERT_DIR}/fullchain.pem" | cut -d= -f2)"
+  echo "기존 인증서 있음 — 만료일: ${EXPIRY}"
+  # 만료됐거나 30일 안에 만료되면 바로 갱신 (만료된 인증서를 그대로 쓰면 HTTPS가 열리지 않음)
+  if openssl x509 -checkend $((30 * 24 * 3600)) -noout -in "${CERT_DIR}/fullchain.pem" >/dev/null; then
+    echo "OK: 30일 이상 남음 — 발급 건너뜀"
+  else
+    echo "만료됐거나 30일 안에 만료 — 갱신합니다"
+    "${CERTBOT}" renew --cert-name "${DOMAIN}" --force-renewal --non-interactive
+    echo "OK: 새 만료일: $(openssl x509 -enddate -noout -in "${CERT_DIR}/fullchain.pem" | cut -d= -f2)"
+  fi
 else
   if [[ -z "${EMAIL}" ]]; then
     echo "FAIL: 인증서 발급에는 이메일이 필요합니다 (만료 알림용)."
@@ -165,7 +173,15 @@ REDIRECT="$(curl -s -o /dev/null -m 10 -w '%{http_code}' "http://${DOMAIN}/" || 
 echo "https://${DOMAIN}/ → HTTP ${HTTP_CODE}"
 echo "http://${DOMAIN}/  → HTTP ${REDIRECT} (301 이면 정상)"
 if [[ "${HTTP_CODE}" != "200" ]]; then
-  echo "WARN: HTTPS 응답이 200이 아닙니다. EC2 보안 그룹 인바운드에 443(0.0.0.0/0) 이 열려 있는지 확인하세요."
+  # 인증서 검사를 끈 로컬 접속으로 원인 구분: 인증서 문제인지, 네트워크(보안 그룹) 문제인지
+  LOCAL_CODE="$(curl -sk -o /dev/null -m 10 -w '%{http_code}' --resolve "${DOMAIN}:443:127.0.0.1" "https://${DOMAIN}/" || true)"
+  if [[ "${LOCAL_CODE}" == "200" ]]; then
+    echo "WARN: nginx는 정상인데 인증서 검증이 실패하거나 외부에서 443에 닿지 않습니다."
+    echo "      1) sudo certbot certificates  — 만료(INVALID: EXPIRED) 여부 확인"
+    echo "      2) EC2 보안 그룹 인바운드에 443(0.0.0.0/0) 이 있는지 확인"
+  else
+    echo "WARN: 서버 안에서도 HTTPS 응답 없음 (HTTP ${LOCAL_CODE}) — sudo tail -30 /var/log/nginx/error.log 확인"
+  fi
 fi
 
 echo ""
