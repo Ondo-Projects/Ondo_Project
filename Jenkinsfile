@@ -32,8 +32,8 @@ pipeline {
 
     stage('Deploy EC2') {
       steps {
-        sh 'chmod +x BN/scripts/deploy-ec2.sh'
-        sh './BN/scripts/deploy-ec2.sh'
+        // root 소유 사본만 sudo 허용 (BN/scripts/jenkins-ec2-setup.sh 로 설치)
+        sh 'sudo /opt/ondo/bin/deploy-ec2.sh "$WORKSPACE"'
       }
     }
   }

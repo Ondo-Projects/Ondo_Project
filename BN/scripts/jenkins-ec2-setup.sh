@@ -8,11 +8,16 @@ REPO_ROOT="${REPO_ROOT:-/home/${APP_USER}/Ondo_Project}"
 
 echo "=== Ondo EC2 deploy layout ==="
 sudo mkdir -p "${APP_ROOT}/app" "${APP_ROOT}/config" "${APP_ROOT}/logs"
-sudo chown -R "${APP_USER}:${APP_USER}" "${APP_ROOT}"
+sudo chown "${APP_USER}:${APP_USER}" "${APP_ROOT}"
+sudo chown -R "${APP_USER}:${APP_USER}" "${APP_ROOT}/app" "${APP_ROOT}/config" "${APP_ROOT}/logs"
 
-if [[ -f "${REPO_ROOT}/BN/config/application-prod.properties" ]]; then
+# 운영 설정이 이미 있으면 절대 덮어쓰지 않음 (암호화 키·DB 계정이 바뀌어 있을 수 있음)
+if [[ -f "${APP_ROOT}/config/application-prod.properties" ]]; then
+  echo "OK: ${APP_ROOT}/config/application-prod.properties 이미 있음 — 덮어쓰지 않습니다."
+elif [[ -f "${REPO_ROOT}/BN/config/application-prod.properties" ]]; then
   sudo cp "${REPO_ROOT}/BN/config/application-prod.properties" "${APP_ROOT}/config/application-prod.properties"
   sudo chown "${APP_USER}:${APP_USER}" "${APP_ROOT}/config/application-prod.properties"
+  sudo chmod 600 "${APP_ROOT}/config/application-prod.properties"
   echo "Copied application-prod.properties -> ${APP_ROOT}/config/"
 else
   echo "WARN: ${REPO_ROOT}/BN/config/application-prod.properties 없음 — 수동으로 ${APP_ROOT}/config/ 에 두세요."
@@ -37,12 +42,29 @@ else
   echo "      EMAIL=you@example.com sudo -E bash ${REPO_ROOT}/BN/scripts/setup-https.sh"
 fi
 
-# Jenkins가 sudo 로 배포·재시작 (비밀번호 없이)
+# ----------------------------------------------------------------
+# 배포 스크립트 설치 (root 소유 — Jenkins가 내용을 바꿀 수 없음)
+# repo의 deploy-ec2.sh 를 고쳤다면 이 스크립트를 다시 실행해야 Jenkins 배포에 반영됩니다.
+# ----------------------------------------------------------------
+sudo install -d -o root -g root -m 755 "${APP_ROOT}/bin"
+sudo install -o root -g root -m 755 "${REPO_ROOT}/BN/scripts/deploy-ec2.sh" "${APP_ROOT}/bin/deploy-ec2.sh"
+echo "Installed ${APP_ROOT}/bin/deploy-ec2.sh"
+
+# ----------------------------------------------------------------
+# Jenkins sudo 권한 — 배포 스크립트 하나만 허용
+# (예전에는 cp·chown·docker 등을 허용해 사실상 root 권한이었음)
+# ----------------------------------------------------------------
 JENKINS_SUDOERS="/etc/sudoers.d/jenkins-ondo"
 if id jenkins &>/dev/null; then
-  echo "jenkins ALL=(ALL) NOPASSWD: /bin/systemctl restart ondo-api, /bin/systemctl status ondo-api, /bin/systemctl is-active ondo-api, /usr/sbin/nginx, /bin/cp, /usr/bin/cp, /bin/mkdir, /usr/bin/mkdir, /bin/chown, /usr/bin/chown, /usr/bin/docker" | sudo tee "${JENKINS_SUDOERS}" >/dev/null
-  sudo chmod 440 "${JENKINS_SUDOERS}"
-  echo "sudoers for jenkins configured: ${JENKINS_SUDOERS}"
+  TMP_SUDOERS="$(mktemp)"
+  echo "jenkins ALL=(root) NOPASSWD: ${APP_ROOT}/bin/deploy-ec2.sh" > "${TMP_SUDOERS}"
+  if sudo visudo -cf "${TMP_SUDOERS}" >/dev/null; then
+    sudo install -o root -g root -m 440 "${TMP_SUDOERS}" "${JENKINS_SUDOERS}"
+    echo "sudoers for jenkins configured: ${JENKINS_SUDOERS}"
+  else
+    echo "FAIL: sudoers 문법 오류 — 적용하지 않았습니다."
+  fi
+  rm -f "${TMP_SUDOERS}"
 else
   echo "WARN: jenkins 사용자 없음 — Jenkins 설치 후 이 스크립트를 다시 실행하세요."
 fi
