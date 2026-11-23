@@ -1,7 +1,11 @@
 import { apiClient } from './client';
 import { ApiError } from './types/api-error';
 import type { ProfileSchoolResponse } from './types/home';
-import type { StudentAssignment, StudentNotice } from './types/student';
+import type {
+  StudentAssignment,
+  StudentNotice,
+  StudentNotificationSettings,
+} from './types/student';
 import type {
   StudentAssignmentRegisterRequest,
   StudentClassProfile,
@@ -72,6 +76,17 @@ export function changeStudentAssignment(body: StudentAssignmentRegisterRequest) 
   return apiClient<StudentAssignment>('/api/student/assignment', {
     method: 'PUT',
     body,
+  });
+}
+
+export function getStudentNotificationSettings() {
+  return apiClient<StudentNotificationSettings>('/api/student/profile/notification-settings');
+}
+
+export function updateStudentNotificationSettings(replyEmailEnabled: boolean) {
+  return apiClient<StudentNotificationSettings>('/api/student/profile/notification-settings', {
+    method: 'PUT',
+    body: { replyEmailEnabled },
   });
 }
 

@@ -95,3 +95,11 @@ export interface PreCounselingProfileSaveResponse {
   message: string;
   profile: PreCounselingProfile;
 }
+
+/** BN StudentNotificationSettingsResponseDTO */
+export interface StudentNotificationSettings {
+  /** 선생님이 상담에 답변하면 메일로 알림 */
+  replyEmailEnabled: boolean;
+  /** 알림을 받을 메일 (가입 때 인증한 주소) */
+  email: string | null;
+}
