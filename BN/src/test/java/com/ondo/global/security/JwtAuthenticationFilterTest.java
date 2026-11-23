@@ -134,6 +134,21 @@ class JwtAuthenticationFilterTest {
         verify(filterChain).doFilter(request, response);
     }
 
+    @Test
+    void doFilterInternal_clearsOnlyAccessCookieWhenCookieTokenIsInvalid() throws Exception {
+        request.setCookies(new jakarta.servlet.http.Cookie("accessToken", "expired-token"));
+        when(tokenCookieService.resolveAccessTokenFromRequest(request)).thenReturn("expired-token");
+        when(tokenCookieService.resolveBearerToken(request)).thenReturn(null);
+        when(jwtProvider.validateToken("expired-token")).thenReturn(false);
+
+        jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
+
+        verify(tokenCookieService).clearAccessToken(response);
+        verify(tokenCookieService, never()).clearTokens(response);
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+        verify(filterChain).doFilter(request, response);
+    }
+
     private User activeUser(String username) {
         User user = mock(User.class);
         when(user.isActive()).thenReturn(true);

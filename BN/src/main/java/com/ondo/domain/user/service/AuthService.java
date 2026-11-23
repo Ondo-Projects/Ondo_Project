@@ -3,8 +3,6 @@ package com.ondo.domain.user.service;
 import com.ondo.domain.user.dto.LoginRequestDTO;
 import com.ondo.domain.user.dto.LoginResponseDTO;
 import com.ondo.domain.user.dto.MeResponseDTO;
-import com.ondo.domain.user.dto.RefreshTokenRequestDTO;
-import com.ondo.domain.user.dto.TokenRefreshResponseDTO;
 import com.ondo.domain.user.entity.User;
 import com.ondo.domain.user.repository.UserRepository;
 import com.ondo.global.error.BusinessException;
@@ -40,8 +38,8 @@ public class AuthService {
     }
 
     @Transactional
-    public TokenRefreshResponseDTO refresh(RefreshTokenRequestDTO request) {
-        String username = refreshTokenService.validateAndGetUsername(request.getRefreshToken());
+    public LoginResponseDTO refresh(String refreshToken) {
+        String username = refreshTokenService.validateAndGetUsername(refreshToken);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new BusinessException("유효하지 않은 Refresh Token입니다."));
 
@@ -49,10 +47,8 @@ public class AuthService {
             throw new BusinessException("비활성화된 계정입니다. 관리자에게 문의해 주세요.");
         }
 
-        refreshTokenService.revoke(request.getRefreshToken());
-
-        LoginResponseDTO tokens = loginTokenIssueService.issueLoginTokens(user);
-        return TokenRefreshResponseDTO.of(tokens.getAccessToken(), tokens.getRefreshToken());
+        refreshTokenService.revoke(refreshToken);
+        return loginTokenIssueService.issueLoginTokens(user);
     }
 
     private User authenticate(String username, String password) {

@@ -80,11 +80,18 @@ async function login(username, password) {
     throw new Error(`login failed (${response.status}): ${text}`);
   }
 
-  const data = await response.json();
-  return data.accessToken;
+  // 토큰은 httpOnly 쿠키로만 내려옴 → Set-Cookie 에서 accessToken 을 꺼내 Cookie 헤더로 재사용
+  const accessCookie = response.headers
+    .getSetCookie()
+    .map((cookie) => cookie.split(';')[0])
+    .find((pair) => pair.startsWith('accessToken=') && pair.length > 'accessToken='.length);
+  if (!accessCookie) {
+    throw new Error('login succeeded but accessToken cookie was not set');
+  }
+  return accessCookie;
 }
 
-async function measureEndpoint(token, endpoint) {
+async function measureEndpoint(cookie, endpoint) {
   const started = performance.now();
   let status = 0;
   let ok = false;
@@ -92,7 +99,7 @@ async function measureEndpoint(token, endpoint) {
 
   try {
     const response = await fetch(`${API_BASE}${endpoint.path}`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Cookie: cookie },
     });
     status = response.status;
     ok = response.ok;
@@ -116,11 +123,11 @@ async function measureRole(roleConfig) {
   }
 
   console.log(`\n=== ${roleConfig.label} ===`);
-  const token = await login(roleConfig.username, roleConfig.password);
+  const cookie = await login(roleConfig.username, roleConfig.password);
   const results = [];
 
   for (const endpoint of roleConfig.endpoints) {
-    const result = await measureEndpoint(token, endpoint);
+    const result = await measureEndpoint(cookie, endpoint);
     results.push(result);
     const flag = result.ok ? 'OK' : 'FAIL';
     const ext = result.external ? ` [${result.external}]` : '';
