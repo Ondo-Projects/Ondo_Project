@@ -1,6 +1,6 @@
 import './brand.css';
 
-const ONDO_LOGO_SRC = '/ondo-logo.png';
+const ONDO_LOGO_SRC = '/ondo-mark.svg';
 
 type BrandMarkSize = 'default' | 'auth' | 'compact' | 'dashboard';
 
