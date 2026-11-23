@@ -3,13 +3,14 @@ import { cn } from './cn';
 
 /**
  * 상태 배지 — 색은 상태를 알려야 할 때만 씁니다.
- *  neutral: 기본 / solid: 강조(포인트 색) / success·warning·danger: 상태
+ *  neutral: 기본 / solid: 강조(포인트 색) / info: 진행 중(포인트 색 옅게) / success·warning·danger: 상태
  */
-export type BadgeTone = 'neutral' | 'solid' | 'success' | 'warning' | 'danger';
+export type BadgeTone = 'neutral' | 'solid' | 'info' | 'success' | 'warning' | 'danger';
 
 const TONE: Record<BadgeTone, string> = {
   neutral: 'bg-gray-50 text-gray-700 border-gray-200',
   solid: 'bg-blue-700 text-white border-blue-700',
+  info: 'bg-blue-50 text-blue-700 border-blue-200',
   success: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   warning: 'bg-amber-50 text-amber-800 border-amber-200',
   danger: 'bg-red-50 text-red-700 border-red-200',
@@ -18,6 +19,7 @@ const TONE: Record<BadgeTone, string> = {
 const DOT: Record<BadgeTone, string> = {
   neutral: 'bg-gray-400',
   solid: 'bg-white',
+  info: 'bg-blue-600',
   success: 'bg-emerald-500',
   warning: 'bg-amber-500',
   danger: 'bg-red-500',

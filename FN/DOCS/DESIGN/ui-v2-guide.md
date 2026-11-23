@@ -56,7 +56,7 @@
 | `Button` | `variant`: primary(포인트) / secondary(기본) / ghost / danger, `size`: sm(32px) / md(36px), `icon`, `loading` |
 | `Input`, `Textarea`, `Select` | 높이 36px, 포커스 시 테두리 blue-600 |
 | `Field` | 라벨 + 입력 + 도움말/오류 (aria 자동 연결) |
-| `Badge` | 상태 표시, `dot` 으로 작은 점 |
+| `Badge` | 상태 표시, `dot` 으로 작은 점. `tone`: neutral / solid / info(진행 중) / success / warning / danger |
 | `Table`, `THead`, `TBody`, `Tr`, `Th`, `Td` | 행 높이 40px, `footer` 로 "총 N건" 줄 |
 | `Panel` | 1px 테두리 구역, 제목·설명·우측 버튼, `flush` 로 여백 없이 |
 | `PageTitle` | 페이지 제목 줄 |
@@ -65,6 +65,8 @@
 | `EmptyState`, `Skeleton` | 빈 상태, 로딩 |
 | `ListGroup`, `ListRow` | 모바일 설정 그룹 리스트, 셰브론·값·토글 |
 | `Toggle` | 32×18 작은 스위치 |
+| `Notice` | 한 줄 결과·오류 메시지 (`tone`: info / success / danger, `onClose`) |
+| `ConsoleShell` (`src/v2/shell`) | 교사·관리자 화면 틀: 상단 바 + 왼쪽 메뉴(모바일은 가로 탭) + 본문 |
 
 ## 8. 기존 화면과 함께 쓰는 동안의 규칙
 

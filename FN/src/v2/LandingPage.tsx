@@ -34,7 +34,7 @@ const TEACHER_FEATURES: FeatureItem[] = [
   {
     icon: MessagesSquare,
     title: '상담 답변 관리',
-    description: '진로·교우관계·학업·가정으로 나뉜 상담을 답변 대기와 답변 완료로 구분해 처리합니다.',
+    description: '진로·교우관계·학업·가정 등으로 나뉜 상담을 대기·확정·완료로 나눠 보고, 바로 답변합니다.',
   },
   {
     icon: BarChart3,
@@ -49,7 +49,7 @@ const TEACHER_FEATURES: FeatureItem[] = [
   {
     icon: KeyRound,
     title: '초대코드로 학급 연결',
-    description: '초대코드를 나눠 주면 학생이 담임으로 연결되고, 학급 공지와 건의함이 열립니다.',
+    description: '초대코드를 나눠 주면 학생이 담임으로 연결되고, 상담과 학급 공지가 이어집니다.',
   },
 ];
 
@@ -71,8 +71,8 @@ const STUDENT_FEATURES: FeatureItem[] = [
   },
   {
     icon: Bell,
-    title: '학급 공지와 건의함',
-    description: '담임 선생님의 공지를 받고, 학급에 바라는 점을 건의함으로 전할 수 있습니다.',
+    title: '학급 공지와 운영 건의',
+    description: '담임 선생님의 공지를 받고, 서비스에 바라는 점은 운영팀에 건의할 수 있습니다.',
   },
 ];
 
@@ -302,10 +302,10 @@ function FeatureSection({
 /** 우측 제품 화면 — 실제 컴포넌트로 그린 교사 대시보드 예시 (이미지 아님) */
 function ProductViewer() {
   const rows = [
-    { student: '이서준', type: '진로', title: '이과·문과 선택 상담 요청', waiting: true, date: '08:41' },
-    { student: '김하린', type: '교우관계', title: '모둠 활동 중 갈등이 있어요', waiting: true, date: '어제' },
-    { student: '박도윤', type: '학업', title: '수학 성적이 계속 떨어져요', waiting: false, date: '어제' },
-    { student: '최지아', type: '가정', title: '집중이 잘 안 됩니다', waiting: false, date: '11.21' },
+    { student: '이서준', type: '진로', title: '이과·문과 선택 상담 요청', status: 'waiting', date: '08:41' },
+    { student: '김하린', type: '교우관계', title: '모둠 활동 중 갈등이 있어요', status: 'waiting', date: '어제' },
+    { student: '박도윤', type: '학업', title: '수학 성적이 계속 떨어져요', status: 'confirmed', date: '어제' },
+    { student: '최지아', type: '가정', title: '집중이 잘 안 됩니다', status: 'done', date: '11.21' },
   ];
 
   return (
@@ -318,9 +318,9 @@ function ProductViewer() {
         <div className="flex flex-col gap-3 p-3">
           <StatStrip
             items={[
-              { label: '답변 대기 상담', value: 2 },
+              { label: '대기 중인 상담', value: 2 },
               { label: '이번 주 기분 기록', value: '26/28' },
-              { label: '확인 안 한 건의', value: 1 },
+              { label: '사전상담 미작성', value: 3 },
             ]}
           />
           <Table>
@@ -340,10 +340,12 @@ function ProductViewer() {
                   <Td muted className="hidden whitespace-nowrap sm:table-cell">{row.type}</Td>
                   <Td className="max-w-32 truncate sm:max-w-44">{row.title}</Td>
                   <Td>
-                    {row.waiting ? (
-                      <Badge tone="warning" dot>답변 대기</Badge>
+                    {row.status === 'waiting' ? (
+                      <Badge tone="warning" dot>대기</Badge>
+                    ) : row.status === 'confirmed' ? (
+                      <Badge tone="info" dot>확정</Badge>
                     ) : (
-                      <Badge tone="success" dot>답변 완료</Badge>
+                      <Badge tone="success" dot>완료</Badge>
                     )}
                   </Td>
                   <Td muted numeric className="whitespace-nowrap">{row.date}</Td>

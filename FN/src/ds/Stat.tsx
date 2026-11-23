@@ -14,7 +14,7 @@ export function StatStrip({ items, className }: { items: StatItem[]; className?:
     <dl
       className={cn(
         'grid grid-cols-2 divide-gray-200 rounded-lg border border-gray-200 bg-white md:grid-cols-[repeat(auto-fit,minmax(160px,1fr))]',
-        '[&>*]:border-gray-200 [&>*:nth-child(odd)]:border-r md:[&>*]:border-r md:[&>*:last-child]:border-r-0',
+        '[&>*]:border-gray-200 [&>*:nth-child(odd)]:border-r [&>*:nth-child(n+3)]:border-t md:[&>*]:border-r md:[&>*:nth-child(n+3)]:border-t-0 md:[&>*:last-child]:border-r-0',
         className,
       )}
     >
