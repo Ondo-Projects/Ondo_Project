@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useRef } from 'react';
+import { type ReactNode, useCallback, useEffect, useId, useRef } from 'react';
 
 import type { AnnouncementSummary } from '../../api/types/announcement';
 import { ANNOUNCEMENT_AUDIENCE_LABELS } from '../../api/types/announcement';
@@ -13,6 +13,11 @@ import '../platform-announcement.css';
 
 interface PlatformAnnouncementBellProps {
   placement?: 'fixed' | 'embedded';
+  /** 새 디자인(src/v2)에서 버튼 모양을 바꿀 때 — 주면 기본 버튼 클래스 대신 사용 */
+  triggerClassName?: string;
+  badgeClassName?: string;
+  /** 기본 아이콘(종 이모지) 대신 */
+  icon?: ReactNode;
 }
 
 function AnnouncementListItem({
@@ -49,6 +54,9 @@ function AnnouncementListItem({
 
 export default function PlatformAnnouncementBell({
   placement = 'fixed',
+  triggerClassName,
+  badgeClassName,
+  icon,
 }: PlatformAnnouncementBellProps) {
   const panelId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -116,7 +124,7 @@ export default function PlatformAnnouncementBell({
       <div className={rootClassName} ref={rootRef}>
         <button
           type="button"
-          className="platform-announcement-bell__trigger"
+          className={triggerClassName ?? 'platform-announcement-bell__trigger'}
           aria-label={
             unreadCount > 0
               ? `플랫폼 공지 ${unreadCount}건, 목록 열기`
@@ -126,11 +134,13 @@ export default function PlatformAnnouncementBell({
           aria-controls={panelId}
           onClick={togglePanel}
         >
-          <span className="platform-announcement-bell__icon" aria-hidden="true">
-            🔔
-          </span>
+          {icon ?? (
+            <span className="platform-announcement-bell__icon" aria-hidden="true">
+              🔔
+            </span>
+          )}
           {unreadCount > 0 ? (
-            <span className="platform-announcement-bell__badge" aria-hidden="true">
+            <span className={badgeClassName ?? 'platform-announcement-bell__badge'} aria-hidden="true">
               {badgeLabel}
             </span>
           ) : null}

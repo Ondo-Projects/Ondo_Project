@@ -1,3 +1,3 @@
-import TeacherHomePage from '../teacher/TeacherHomePage';
+import TeacherConsole from '../v2/teacher/TeacherConsole';
 
-export default TeacherHomePage;
+export default TeacherConsole;

@@ -1,3 +1,3 @@
-import AdminHomePage from '../admin/AdminHomePage';
+import AdminConsole from '../v2/admin/AdminConsole';
 
-export default AdminHomePage;
+export default AdminConsole;
