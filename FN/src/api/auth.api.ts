@@ -1,11 +1,7 @@
 import { apiClient } from './client';
-import type {
-  LoginRequest,
-  LoginResponse,
-  MeResponse,
-  TokenRefreshResponse,
-} from './types/auth';
+import type { LoginRequest, LoginResponse, MeResponse } from './types/auth';
 
+/** 로그인 — 토큰은 응답 쿠키(httpOnly)로 저장되고, 본문에는 사용자 정보만 옵니다. */
 export function login(request: LoginRequest) {
   return apiClient<LoginResponse>('/api/auth/login', {
     method: 'POST',
@@ -18,19 +14,9 @@ export function getMe() {
   return apiClient<MeResponse>('/api/auth/me');
 }
 
-export function refreshToken(refreshTokenValue: string) {
-  return apiClient<TokenRefreshResponse>('/api/auth/refresh', {
-    method: 'POST',
-    body: { refreshToken: refreshTokenValue },
-    auth: false,
-    skipAuthRetry: true,
-  });
-}
-
-export function logout(refreshTokenValue: string | null) {
+export function logout() {
   return apiClient<{ message: string }>('/api/auth/logout', {
     method: 'POST',
-    body: refreshTokenValue ? { refreshToken: refreshTokenValue } : undefined,
     auth: false,
     skipAuthRetry: true,
   });

@@ -8,14 +8,8 @@ import {
   type ReactNode,
 } from 'react';
 import { getMe, login as loginRequest, logout as logoutRequest } from '../api/auth.api';
-import { ApiError } from '../api/types/api-error';
 import type { AuthUser, LoginRequest } from '../api/types/auth';
-import {
-  clearStoredTokens,
-  getRefreshToken,
-  getStoredTokens,
-  setStoredTokens,
-} from './tokenStorage';
+import { clearLegacyStoredTokens } from './tokenStorage';
 
 interface AuthContextValue {
   user: AuthUser | null;
@@ -28,18 +22,14 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+/**
+ * 로그인 여부는 서버에 물어봅니다. 토큰은 httpOnly 쿠키라 스크립트에서 확인할 수 없습니다.
+ * access 토큰이 만료됐으면 apiClient 가 refresh 쿠키로 한 번 갱신한 뒤 다시 시도합니다.
+ */
 async function fetchCurrentUser(): Promise<AuthUser | null> {
-  const { accessToken, refreshToken } = getStoredTokens();
-  if (!accessToken && !refreshToken) {
-    return null;
-  }
-
   try {
     return await getMe();
-  } catch (error) {
-    if (error instanceof ApiError && (error.status === 401 || error.status === 403)) {
-      clearStoredTokens();
-    }
+  } catch {
     return null;
   }
 }
@@ -50,6 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
+    clearLegacyStoredTokens();
 
     fetchCurrentUser()
       .then((profile) => {
@@ -69,22 +60,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(async (request: LoginRequest) => {
-    const response = await loginRequest(request);
-    setStoredTokens(response.accessToken, response.refreshToken);
+    await loginRequest(request);
     const profile = await getMe();
     setUser(profile);
     return profile;
   }, []);
 
   const logout = useCallback(async () => {
-    const refreshToken = getRefreshToken();
-
     try {
-      await logoutRequest(refreshToken);
+      await logoutRequest();
     } catch {
-      // 로컬 세션은 항상 정리
+      // 서버 요청이 실패해도 화면의 로그인 상태는 정리
     } finally {
-      clearStoredTokens();
       setUser(null);
     }
   }, []);

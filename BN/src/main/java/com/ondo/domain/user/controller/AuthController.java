@@ -1,18 +1,19 @@
 package com.ondo.domain.user.controller;
 
 import com.ondo.domain.user.dto.AccountWithdrawRequestDTO;
+import com.ondo.domain.user.dto.AuthSessionResponseDTO;
 import com.ondo.domain.user.dto.LoginRequestDTO;
 import com.ondo.domain.user.dto.LoginResponseDTO;
 import com.ondo.domain.user.dto.LogoutRequestDTO;
 import com.ondo.domain.user.dto.MeResponseDTO;
-import com.ondo.domain.user.dto.RefreshTokenRequestDTO;
 import com.ondo.domain.user.dto.SignUpRequestDTO;
 import com.ondo.domain.user.dto.SignUpResponseDTO;
-import com.ondo.domain.user.dto.TokenRefreshResponseDTO;
 import com.ondo.domain.user.service.AccountWithdrawService;
 import com.ondo.domain.user.service.AuthService;
 import com.ondo.domain.user.service.LogoutService;
 import com.ondo.domain.user.service.UserService;
+import com.ondo.global.error.BusinessException;
+import com.ondo.global.security.TokenCookieService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -37,6 +38,7 @@ public class AuthController {
     private final LogoutService logoutService;
     private final UserService userService;
     private final AccountWithdrawService accountWithdrawService;
+    private final TokenCookieService tokenCookieService;
 
     @PostMapping("/signup")
     public ResponseEntity<SignUpResponseDTO> signUp(@Valid @RequestBody SignUpRequestDTO request) {
@@ -45,9 +47,17 @@ public class AuthController {
                 .body(SignUpResponseDTO.of(request.getUsername(), request.getRole()));
     }
 
+    /**
+     * 로그인 — 토큰은 httpOnly 쿠키로만 내려주고, 본문에는 사용자 정보만 담습니다.
+     */
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
-        return ResponseEntity.ok(authService.login(request));
+    public ResponseEntity<AuthSessionResponseDTO> login(
+            @Valid @RequestBody LoginRequestDTO request,
+            HttpServletResponse httpResponse
+    ) {
+        LoginResponseDTO tokens = authService.login(request);
+        tokenCookieService.writeTokens(httpResponse, tokens.getAccessToken(), tokens.getRefreshToken());
+        return ResponseEntity.ok(AuthSessionResponseDTO.from(tokens));
     }
 
     @GetMapping("/me")
@@ -70,9 +80,23 @@ public class AuthController {
         ));
     }
 
+    /**
+     * 토큰 갱신 — refresh 토큰은 쿠키(/api/auth 경로)에서만 읽습니다.
+     * 실패하면 쿠키를 지워 브라우저가 로그아웃 상태가 되게 합니다.
+     */
     @PostMapping("/refresh")
-    public ResponseEntity<TokenRefreshResponseDTO> refresh(@Valid @RequestBody RefreshTokenRequestDTO request) {
-        return ResponseEntity.ok(authService.refresh(request));
+    public ResponseEntity<Map<String, String>> refresh(
+            HttpServletRequest httpRequest,
+            HttpServletResponse httpResponse
+    ) {
+        try {
+            LoginResponseDTO tokens = authService.refresh(tokenCookieService.resolveRefreshToken(httpRequest));
+            tokenCookieService.writeTokens(httpResponse, tokens.getAccessToken(), tokens.getRefreshToken());
+            return ResponseEntity.ok(Map.of("message", "토큰이 갱신되었습니다."));
+        } catch (BusinessException exception) {
+            tokenCookieService.clearTokens(httpResponse);
+            throw exception;
+        }
     }
 
     @PostMapping("/logout")

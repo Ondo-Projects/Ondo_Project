@@ -185,6 +185,8 @@ class SignUpApiIntegrationTest {
     @Test
     void signup_rejectsUnverifiedEmail() throws Exception {
         SignUpRequestDTO request = teacherRequest("api-unverified-email");
+        // 다른 테스트가 Redis 에 남긴 인증 기록과 겹치지 않도록 이 테스트 전용 이메일 사용
+        request.setEmail("signup-api-unverified@korea.kr");
 
         mockMvc.perform(post("/api/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)

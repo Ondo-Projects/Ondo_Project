@@ -5,18 +5,10 @@ export interface LoginRequest {
   password: string;
 }
 
+/** 로그인 응답 본문 — 토큰은 httpOnly 쿠키로만 전달됩니다. */
 export interface LoginResponse {
-  accessToken: string;
-  refreshToken: string;
-  tokenType?: string;
   username: string;
   role: UserRole;
-}
-
-export interface TokenRefreshResponse {
-  accessToken: string;
-  refreshToken: string;
-  tokenType?: string;
 }
 
 export interface MeResponse {
