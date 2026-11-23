@@ -13,11 +13,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -112,5 +114,56 @@ class AuthControllerSecurityTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("유효하지 않은 토큰입니다."));
+    }
+
+    @Test
+    void login_setsHttpOnlyCookiesAndOmitsTokensFromBody() throws Exception {
+        MvcResult result = mockMvc.perform(post("/api/auth/login")
+                        .contentType("application/json")
+                        .content("{\"username\":\"student01\",\"password\":\"password\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("student01"))
+                .andExpect(jsonPath("$.role").value("STUDENT"))
+                .andExpect(jsonPath("$.accessToken").doesNotExist())
+                .andExpect(jsonPath("$.refreshToken").doesNotExist())
+                .andExpect(cookie().httpOnly("accessToken", true))
+                .andExpect(cookie().secure("accessToken", true))
+                .andExpect(cookie().path("accessToken", "/"))
+                .andExpect(cookie().httpOnly("refreshToken", true))
+                .andExpect(cookie().path("refreshToken", "/api/auth"))
+                .andReturn();
+
+        assertThat(result.getResponse().getHeaders("Set-Cookie"))
+                .anyMatch(header -> header.startsWith("accessToken=") && header.contains("SameSite=Strict"));
+    }
+
+    @Test
+    void refresh_usesRefreshCookieAndIssuesNewCookies() throws Exception {
+        MvcResult login = mockMvc.perform(post("/api/auth/login")
+                        .contentType("application/json")
+                        .content("{\"username\":\"student01\",\"password\":\"password\"}"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String refreshToken = login.getResponse().getCookie("refreshToken").getValue();
+
+        mockMvc.perform(post("/api/auth/refresh")
+                        .cookie(new Cookie("refreshToken", refreshToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").doesNotExist())
+                .andExpect(cookie().exists("accessToken"))
+                .andExpect(cookie().httpOnly("refreshToken", true));
+
+        // 한 번 쓴 refresh 토큰은 폐기됨 (재사용 불가) → 실패 시 쿠키도 지움
+        mockMvc.perform(post("/api/auth/refresh")
+                        .cookie(new Cookie("refreshToken", refreshToken)))
+                .andExpect(status().isBadRequest())
+                .andExpect(cookie().maxAge("refreshToken", 0));
+    }
+
+    @Test
+    void refresh_failsWithoutRefreshCookie() throws Exception {
+        mockMvc.perform(post("/api/auth/refresh"))
+                .andExpect(status().isBadRequest())
+                .andExpect(cookie().maxAge("accessToken", 0));
     }
 }

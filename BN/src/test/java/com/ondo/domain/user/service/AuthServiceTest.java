@@ -2,8 +2,6 @@ package com.ondo.domain.user.service;
 
 import com.ondo.domain.user.dto.LoginRequestDTO;
 import com.ondo.domain.user.dto.LoginResponseDTO;
-import com.ondo.domain.user.dto.RefreshTokenRequestDTO;
-import com.ondo.domain.user.dto.TokenRefreshResponseDTO;
 import com.ondo.domain.user.entity.Role;
 import com.ondo.domain.user.entity.User;
 import com.ondo.domain.user.repository.UserRepository;
@@ -97,20 +95,26 @@ class AuthServiceTest {
 
     @Test
     void refresh_returnsNewTokensAndRotatesRefreshToken() {
-        RefreshTokenRequestDTO request = new RefreshTokenRequestDTO();
-        request.setRefreshToken("old-refresh-token");
-
         when(refreshTokenService.validateAndGetUsername("old-refresh-token")).thenReturn("student01");
         when(userRepository.findByUsername("student01")).thenReturn(Optional.of(user));
         when(loginTokenIssueService.issueLoginTokens(user)).thenReturn(
                 LoginResponseDTO.of("new-access-token", "new-refresh-token", "student01", "STUDENT")
         );
 
-        TokenRefreshResponseDTO response = authService.refresh(request);
+        LoginResponseDTO response = authService.refresh("old-refresh-token");
 
         assertThat(response.getAccessToken()).isEqualTo("new-access-token");
         assertThat(response.getRefreshToken()).isEqualTo("new-refresh-token");
-        assertThat(response.getTokenType()).isEqualTo("Bearer");
         verify(refreshTokenService).revoke("old-refresh-token");
+    }
+
+    @Test
+    void refresh_throwsWhenRefreshTokenMissing() {
+        when(refreshTokenService.validateAndGetUsername(null))
+                .thenThrow(new BusinessException("Refresh Token이 제공되지 않았습니다."));
+
+        assertThatThrownBy(() -> authService.refresh(null))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage("Refresh Token이 제공되지 않았습니다.");
     }
 }

@@ -44,7 +44,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     return;
                 }
 
-                tokenCookieService.clearTokens(response);
+                // 쿠키의 access 토큰이 만료·무효 → access 쿠키만 지움 (refresh 쿠키는 남겨 자동 갱신 가능)
+                tokenCookieService.clearAccessToken(response);
                 filterChain.doFilter(request, response);
                 return;
             }
