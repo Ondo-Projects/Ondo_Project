@@ -8,3 +8,14 @@ BN/config/application-prod.properties
 **/application-prod.properties
 !**/application-local.properties.example
 !**/application-prod.properties.example
+
+# IDE / 자동 생성 파일
+.idea/
+*.iml
+*.iws
+out/
+FN/.vite/
+
+# IntelliJ 새 프로젝트 템플릿이 루트에 잘못 생성된 것 (실제 코드는 BN/src, FN/src)
+/src/
+/untitled/
