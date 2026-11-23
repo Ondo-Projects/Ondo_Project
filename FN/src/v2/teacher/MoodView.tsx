@@ -17,6 +17,7 @@ import {
   Tr,
   cn,
 } from '../../ds';
+import AttentionPanel from './AttentionPanel';
 import { MOOD_ORDER, MOOD_TONE, displayName, needsAttention, resolveErrorMessage } from './shared';
 
 type MoodTab = 'today' | 'weekly';
@@ -67,6 +68,7 @@ export default function MoodView({ onError }: { onError: (message: string) => vo
         title="마음 날씨"
         description="학생이 하루 한 번 남기는 기분 기록입니다. 우울·힘듦을 남긴 학생은 따로 표시합니다."
       />
+      <AttentionPanel />
       <Tabs
         items={[
           { value: 'today', label: '오늘' },

@@ -2,6 +2,7 @@ import { apiClient } from './client';
 import type { ProfileSchoolResponse } from './types/home';
 import type {
   InviteCodeResponse,
+  StudentAttention,
   StudentMoodSummary,
   TeacherNotice,
   TeacherNoticeCreateRequest,
@@ -60,6 +61,11 @@ export function deleteTeacherNotice(id: number) {
 
 export function getTeacherTodayMoodSummaries() {
   return apiClient<StudentMoodSummary[]>('/api/teacher/mood/today');
+}
+
+/** 먼저 살펴보면 좋을 학생 (오늘 '힘듦', 최근 기분 저하, 진행 중인 학교폭력 상담) */
+export function getTeacherAttention() {
+  return apiClient<StudentAttention[]>('/api/teacher/attention');
 }
 
 export function getTeacherWeeklyMoodSummaries() {

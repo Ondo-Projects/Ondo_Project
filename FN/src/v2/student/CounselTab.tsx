@@ -9,6 +9,7 @@ import {
 import type { CounselingPost, CounselingType } from '../../api/types/counseling';
 import type { PreCounselingProfile } from '../../api/types/student';
 import { Badge, Button, EmptyState, Field, Input, ListRow, Select, Skeleton, Textarea } from '../../ds';
+import HelpLines from './HelpLines';
 import {
   COUNSELING_TYPE_OPTIONS,
   getCounselingStatusLabel,
@@ -211,6 +212,18 @@ function CounselForm({
               ))}
             </Select>
           </Field>
+          {values.counselingType === 'SCHOOL_VIOLENCE' ? (
+            <HelpLines
+              title="학교폭력은 117에서도 바로 신고·상담할 수 있어요."
+              first="117"
+              description="선생님 답변은 늦을 수 있어요. 지금 위험하거나 급하다면 기다리지 말고 바로 연락하세요."
+            />
+          ) : values.counselingType === 'EMOTIONAL' ? (
+            <HelpLines
+              title="급하게 이야기할 곳이 필요하면 바로 연락하세요."
+              description="선생님 답변은 늦을 수 있어요. 지금 많이 힘들다면 기다리지 말고 아래로 연락해도 돼요."
+            />
+          ) : null}
           <Field label="제목" required error={errors.title}>
             <Input
               value={values.title}

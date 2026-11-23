@@ -6,6 +6,7 @@ import { Button, ListRow, Skeleton, cn } from '../../ds';
 import { buildStudentTodayTodos, type TodayTodoItem } from '../../student/studentTodayTodo';
 import type { StudentSchoolLifeState } from '../../student/useStudentSchoolLife';
 import { type FeedbackHandlers, formatCompactDateTime, resolveErrorMessage } from '../common';
+import HelpLines from './HelpLines';
 import { MOOD_CHOICES, legacyTargetToHash, todayLabel } from './shared';
 import { Block } from './ui';
 
@@ -75,6 +76,7 @@ export default function HomeTab({ name, schoolName, life, go, onSuccess, onError
       <MoodPicker
         key={life.todayMood?.moodLevel?.code ?? 'none'}
         initial={ready ? (life.todayMood?.moodLevel?.code ?? null) : undefined}
+        onAskCounsel={life.hasAssignment ? () => go('#counsel/new') : undefined}
         onSuccess={onSuccess}
         onError={onError}
       />
@@ -139,13 +141,19 @@ function TodoRow({ item, onOpen }: { item: TodayTodoItem; onOpen: () => void }) 
 }
 
 /** 오늘 마음 날씨 고르기 — 고르는 즉시 저장 */
+/** 이 기분을 고르면 도움받을 곳을 함께 보여 줍니다 */
+const LOW_MOODS: MoodLevelCode[] = ['RAINY', 'STORMY'];
+
 function MoodPicker({
   initial,
+  onAskCounsel,
   onSuccess,
   onError,
 }: {
   /** undefined: 아직 불러오는 중 */
   initial: MoodLevelCode | null | undefined;
+  /** 담임과 연결된 경우에만 — 상담 신청 화면으로 */
+  onAskCounsel?: () => void;
 } & FeedbackHandlers) {
   const [selected, setSelected] = useState<MoodLevelCode | null>(initial ?? null);
   const [saving, setSaving] = useState<MoodLevelCode | null>(null);
@@ -200,6 +208,20 @@ function MoodPicker({
           );
         })}
       </div>
+      {selected && LOW_MOODS.includes(selected) ? (
+        <div className="mt-4 flex flex-col gap-3">
+          <HelpLines
+            title="마음이 무거운 날이네요. 혼자 견디지 않아도 돼요."
+            description="이야기하고 싶을 때 바로 연락할 수 있는 곳이에요. 이름을 말하지 않아도 상담받을 수 있어요."
+          />
+          {onAskCounsel ? (
+            <Button variant="secondary" size="sm" className="self-start" onClick={onAskCounsel}>
+              담임 선생님께 상담 신청하기
+              <ArrowRight size={16} aria-hidden />
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
     </Block>
   );
 }
