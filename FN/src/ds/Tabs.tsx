@@ -29,7 +29,7 @@ export function Tabs<T extends string>({ items, value, onChange, className }: Ta
             onClick={() => onChange(item.value)}
             className={cn(
               '-mb-px flex h-9 items-center gap-1.5 border-b-2 text-[13px] font-medium transition-colors duration-150',
-              active ? 'border-slate-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900',
+              active ? 'border-blue-700 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900',
             )}
           >
             {item.label}

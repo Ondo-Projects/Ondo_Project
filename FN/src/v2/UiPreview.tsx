@@ -176,7 +176,7 @@ export default function UiPreview() {
                       <span className="w-20 shrink-0 text-gray-700">{row.label}</span>
                       <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-100">
                         <span
-                          className="block h-full rounded-full bg-slate-900"
+                          className="block h-full rounded-full bg-blue-600"
                           style={{ width: `${Math.round((row.count / moodTotal) * 100)}%` }}
                         />
                       </span>

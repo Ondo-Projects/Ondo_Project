@@ -9,7 +9,7 @@ export type BadgeTone = 'neutral' | 'solid' | 'success' | 'warning' | 'danger';
 
 const TONE: Record<BadgeTone, string> = {
   neutral: 'bg-gray-50 text-gray-700 border-gray-200',
-  solid: 'bg-slate-900 text-white border-slate-900',
+  solid: 'bg-blue-700 text-white border-blue-700',
   success: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   warning: 'bg-amber-50 text-amber-800 border-amber-200',
   danger: 'bg-red-50 text-red-700 border-red-200',

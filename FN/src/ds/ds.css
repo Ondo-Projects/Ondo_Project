@@ -8,7 +8,7 @@
  *  3) 유틸리티는 important — 기존 전역 CSS(body, a 등)보다 항상 우선합니다.
  *
  * 디자인 규칙 (FN/DOCS/DESIGN/ui-v2-guide.md 참고)
- *  - 무채색(white / gray-50 / gray-900) + 포인트 slate-900 하나
+ *  - 무채색(white / gray-50 / gray-900) + 포인트 blue-700 하나
  *  - 그림자 대신 1px border-gray-200, 모서리 최대 rounded-lg
  *  - 상태 배지에만 연한 red / amber / emerald 허용
  */
@@ -91,6 +91,6 @@
   max-width: 100%;
 }
 .ondo-ui :focus-visible {
-  outline: 2px solid var(--color-slate-900);
+  outline: 2px solid var(--color-blue-600);
   outline-offset: 2px;
 }

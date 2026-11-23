@@ -3,7 +3,7 @@ import { cn } from './cn';
 
 const CONTROL =
   'w-full rounded-md border bg-white text-sm text-gray-900 placeholder:text-gray-400 ' +
-  'transition-colors duration-150 outline-none focus:border-slate-900 ' +
+  'transition-colors duration-150 outline-none focus:border-blue-600 ' +
   'disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500';
 
 function borderClass(invalid?: boolean) {

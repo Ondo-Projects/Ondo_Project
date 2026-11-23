@@ -9,7 +9,6 @@ import JoinPage from '../pages/JoinPage';
 import LoginPage from '../pages/LoginPage';
 import NotFoundPage from '../pages/NotFoundPage';
 import ResetPasswordPage from '../pages/ResetPasswordPage';
-import RootPage from '../pages/RootPage';
 import StudentPage from '../pages/StudentPage';
 import TeacherPage from '../pages/TeacherPage';
 import WithdrawPage from '../pages/WithdrawPage';
@@ -23,7 +22,7 @@ export default function AppRoutes() {
     <BrowserRouter>
       <Routes>
         <Route path={PATHS.ROOT} element={<RootRedirect />} />
-        <Route path="/landing" element={<RootPage />} />
+        <Route path="/landing" element={<Navigate to={PATHS.ROOT} replace />} />
         <Route
           path={PATHS.LOGIN}
           element={

@@ -21,7 +21,7 @@ export function Toggle({ checked, onChange, label, disabled }: ToggleProps) {
       className={cn(
         'relative inline-flex h-[18px] w-8 shrink-0 items-center rounded-full transition-colors duration-200',
         'disabled:cursor-not-allowed disabled:opacity-50',
-        checked ? 'bg-slate-900' : 'bg-gray-300',
+        checked ? 'bg-blue-600' : 'bg-gray-300',
       )}
     >
       <span

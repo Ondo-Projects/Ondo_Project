@@ -14,6 +14,7 @@ import { buildSchoolMeta, buildUserGreeting, formatTodayDate } from '../home/hom
 import { useHomeData } from '../home/useHomeData';
 import { Alert } from '../components/ui';
 import { PATHS } from '../routes/paths';
+import LandingPage from '../v2/LandingPage';
 
 export default function HomePage() {
   const { user, logout } = useAuth();
@@ -107,5 +108,5 @@ export function RootRedirect() {
     return <Navigate to={getPostLoginPath(user.role)} replace />;
   }
 
-  return <Navigate to={PATHS.LOGIN} replace />;
+  return <LandingPage />;
 }
