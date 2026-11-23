@@ -149,4 +149,12 @@ public class StudentPreCounselingProfile {
         this.desiredClassRole = desiredClassRole;
         this.updatedAt = LocalDateTime.now();
     }
+
+    /**
+     * 암호화 키 변경 시 재암호화 전용. 내용이 바뀐 것이 아니므로 updatedAt 은 건드리지 않습니다.
+     */
+    public void replaceEncryptedPhones(String studentPhoneEncrypted, String parentPhoneEncrypted) {
+        this.studentPhoneEncrypted = studentPhoneEncrypted;
+        this.parentPhoneEncrypted = parentPhoneEncrypted;
+    }
 }
