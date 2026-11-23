@@ -92,3 +92,21 @@ export interface CounselingReplyRequest {
 export type TeacherSuggestionPost = SuggestionPost;
 export type TeacherSuggestionCreateRequest = SuggestionCreateRequest;
 export type TeacherSuggestionUpdateRequest = SuggestionUpdateRequest;
+
+/** 담임이 먼저 살펴보면 좋을 이유 (위기 신호 알림) */
+export type AttentionReasonCode = 'STORMY_TODAY' | 'LOW_MOOD_REPEATED' | 'SCHOOL_VIOLENCE_OPEN';
+
+export interface AttentionReason {
+  code: AttentionReasonCode;
+  message: string;
+  /** SCHOOL_VIOLENCE_OPEN 일 때 해당 상담 글 번호 */
+  counselingPostId: number | null;
+}
+
+/** BN StudentAttentionResponseDTO */
+export interface StudentAttention {
+  studentUsername: string;
+  studentName: string | null;
+  urgent: boolean;
+  reasons: AttentionReason[];
+}

@@ -28,6 +28,7 @@ import {
   cn,
 } from '../../ds';
 import { getCounselingStatusLabel, getCounselingTypeLabel } from '../../student/counselingLabels';
+import AttentionPanel from './AttentionPanel';
 import { getAllowedStatusTransitions } from '../../teacher/teacherCounselingUtils';
 import type { TeacherDashboardSummary } from '../../teacher/useTeacherDashboard';
 import {
@@ -86,6 +87,8 @@ export default function CounselView({
   const [reply, setReply] = useState('');
   const [isReplying, setIsReplying] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState<CounselingStatus | null>(null);
+  // 상담 상태가 바뀌면 '먼저 살펴볼 학생'도 다시 불러옵니다.
+  const [attentionKey, setAttentionKey] = useState(0);
 
   // 처음에는 교사 홈 묶음 응답을 그대로 쓰고, 저장 후에는 목록만 다시 불러옵니다.
   useEffect(() => {
@@ -151,6 +154,7 @@ export default function CounselView({
       const post = await updateCounselingStatus(detail.id, status);
       setDetail(post);
       onSuccess(`상담을 '${getCounselingStatusLabel(post.status)}' 상태로 바꿨습니다.`);
+      setAttentionKey((key) => key + 1);
       await reloadPosts();
       onDataChange();
     } catch (error) {
@@ -200,6 +204,8 @@ export default function CounselView({
           },
         ]}
       />
+
+      <AttentionPanel refreshKey={attentionKey} onOpenCounseling={(id) => void openDetail(id)} />
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
         <div className="flex min-w-0 flex-col gap-3">
