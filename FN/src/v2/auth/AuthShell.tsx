@@ -25,7 +25,7 @@ export function AuthShell({
       <header className="border-b border-gray-200 bg-white">
         <div className={cn('mx-auto flex h-14 items-center px-4', wide ? 'max-w-2xl' : 'max-w-md')}>
           <Link to={PATHS.ROOT} className="flex items-center gap-2" aria-label="온도 처음 화면">
-            <img src="/ondo-logo.png" alt="" width={24} height={24} className="h-6 w-6" />
+            <img src="/ondo-mark.svg" alt="" width={24} height={24} className="h-6 w-6" />
             <span className="text-[15px] font-semibold tracking-tight">온도</span>
           </Link>
         </div>

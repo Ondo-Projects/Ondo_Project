@@ -49,7 +49,7 @@ export function ConsoleShell<T extends string>({
         <div className="flex h-14 items-center justify-between gap-3 px-4 lg:px-6">
           <div className="flex min-w-0 items-center gap-3">
             <Link to={PATHS.HOME} className="flex items-center gap-2" aria-label="온도 공통 홈">
-              <img src="/ondo-logo.png" alt="" width={24} height={24} className="h-6 w-6" />
+              <img src="/ondo-mark.svg" alt="" width={24} height={24} className="h-6 w-6" />
               <span className="text-[15px] font-semibold tracking-tight">온도</span>
             </Link>
             <span className="h-4 w-px bg-gray-200" aria-hidden />

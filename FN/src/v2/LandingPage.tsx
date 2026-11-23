@@ -273,7 +273,7 @@ function SiteHeader() {
     <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/95 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
         <Link to={PATHS.ROOT} className="flex items-center gap-2" aria-label="온도 처음 화면">
-          <img src="/ondo-logo.png" alt="" width={24} height={24} className="h-6 w-6" />
+          <img src="/ondo-mark.svg" alt="" width={24} height={24} className="h-6 w-6" />
           <span className="text-[15px] font-semibold tracking-tight">온도</span>
         </Link>
         <nav className="flex items-center gap-1" aria-label="주 메뉴">
