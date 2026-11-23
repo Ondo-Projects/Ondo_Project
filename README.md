@@ -228,6 +228,18 @@ cd ../FN && npm ci && VITE_API_BASE= npm run build
 ./BN/scripts/deploy-ec2.sh
 ```
 
+### HTTPS (Let's Encrypt)
+
+```bash
+cd ~/Ondo_Project
+EMAIL=you@example.com sudo -E bash BN/scripts/setup-https.sh
+```
+
+- 인증서 발급(webroot) → `BN/scripts/nginx-ondo.conf`(80→443 리다이렉트 + 443) 적용 → 자동 갱신 타이머·nginx reload 훅 설정까지 한 번에 합니다. 여러 번 실행해도 안전합니다.
+- nginx 설정은 **repo의 `nginx-ondo.conf`에서만 수정**합니다. 서버에서 `certbot --nginx`로 직접 고치면 다음 설정 복사 때 덮어써져 HTTPS가 사라집니다.
+- EC2에는 Elastic IP를 연결하고, 보안 그룹 인바운드에 80·443을 열어 둡니다.
+- 인증서 상태 확인: `sudo certbot certificates`, `systemctl list-timers | grep certbot`
+
 ### Jenkins CI/CD
 
 `Jenkinsfile` — Checkout → bootJar → npm build → deploy-ec2.sh
@@ -318,6 +330,7 @@ GET    /api/schools/search        # 학교 검색 (가입·헬스체크)
 | plain JAR (544KB) | fat JAR 대신 배포 | `ondo-0.0.1-SNAPSHOT.jar` (~88MB) 사용 |
 | encryption key 오류 | 32바이트 키 형식 오류 | `dev-mode=true`, `key=` 비우기 |
 | Solapi Forbidden IP | IP 화이트리스트 미등록 | Solapi 콘솔에 EC2 공인 IP 추가 |
+| HTTPS 접속 불가·인증서 오류 | 인증서 만료 / nginx 443 설정 덮어써짐 / DNS·IP 불일치 | `sudo -E bash BN/scripts/setup-https.sh` 재실행 (DNS·IP 검사 포함) |
 
 ---
 
