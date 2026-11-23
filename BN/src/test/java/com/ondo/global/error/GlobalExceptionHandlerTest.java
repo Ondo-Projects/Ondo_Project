@@ -1,13 +1,15 @@
 package com.ondo.global.error;
 
+import com.ondo.global.alert.OperatorAlertService;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 class GlobalExceptionHandlerTest {
 
-    private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
+    private final GlobalExceptionHandler handler = new GlobalExceptionHandler(mock(OperatorAlertService.class));
 
     @Test
     void handleTooManyRequestsException_returns429WithErrorResponse() {

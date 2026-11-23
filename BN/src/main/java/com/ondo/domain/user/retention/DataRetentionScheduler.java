@@ -1,5 +1,6 @@
 package com.ondo.domain.user.retention;
 
+import com.ondo.global.alert.OperatorAlertService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,6 +16,7 @@ public class DataRetentionScheduler {
 
     private final DataRetentionProperties properties;
     private final DataRetentionService dataRetentionService;
+    private final OperatorAlertService operatorAlertService;
 
     @Scheduled(cron = "${ondo.retention.cron:0 30 4 * * *}", zone = "Asia/Seoul")
     public void run() {
@@ -27,6 +29,7 @@ public class DataRetentionScheduler {
             dataRetentionService.purgeExpiredLogs(now);
         } catch (RuntimeException exception) {
             log.error("[retention] 자동 파기 실행 실패", exception);
+            operatorAlertService.notifyJobFailure("개인정보 자동 파기", exception);
         }
     }
 }

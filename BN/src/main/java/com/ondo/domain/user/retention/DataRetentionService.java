@@ -1,6 +1,7 @@
 package com.ondo.domain.user.retention;
 
 import com.ondo.domain.user.entity.Role;
+import com.ondo.global.alert.OperatorAlertService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class DataRetentionService {
 
     private final DataRetentionProperties properties;
     private final WithdrawnUserPurger withdrawnUserPurger;
+    private final OperatorAlertService operatorAlertService;
 
     @PersistenceContext
     private EntityManager em;
@@ -35,6 +37,7 @@ public class DataRetentionService {
                 }
             } catch (RuntimeException exception) {
                 log.error("[retention] 탈퇴 회원 파기 실패 — 다음 실행 때 다시 시도합니다.", exception);
+                operatorAlertService.notifyJobFailure("탈퇴 회원 파기", exception);
             }
         }
         if (!targets.isEmpty()) {
