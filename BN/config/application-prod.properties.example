@@ -44,7 +44,7 @@ ondo.encryption.key=
 # ----------------------------------------------------------------
 # APP
 # ----------------------------------------------------------------
-ondo.app.base-url=http://YOUR_EC2_PUBLIC_IP
+ondo.app.base-url=https://ondo.ai.kr
 
 # ----------------------------------------------------------------
 # MAIL — dev-mode=true 여도 spring.mail.host 는 필수 (JavaMailSender 빈 생성용)
