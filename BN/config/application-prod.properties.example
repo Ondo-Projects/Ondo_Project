@@ -1,17 +1,14 @@
-# 운영(Production) 전용 설정 (Git에 커밋하지 않음)
+# 운영(Production) 전용 설정 템플릿 — 실제 파일은 Git에 커밋하지 않음
 #
-# ★ 중요: 이 example 파일은 Spring Boot가 읽지 않습니다.
-#   반드시 복사해서 application-prod.properties 를 만드세요:
+# ★ 이 example 파일은 Spring Boot가 읽지 않습니다.
+#   서버에서 실제로 읽는 파일: /opt/ondo/config/application-prod.properties
 #
-#   cd BN/config
-#   cp application-prod.properties.example application-prod.properties
-#   nano application-prod.properties
+#   sudo cp BN/config/application-prod.properties.example /opt/ondo/config/application-prod.properties
+#   sudo nano /opt/ondo/config/application-prod.properties
+#   sudo chmod 600 /opt/ondo/config/application-prod.properties
 #
-# EC2 기동:
-#   cd BN
-#   bash scripts/ec2-preflight.sh
-#   export SPRING_PROFILES_ACTIVE=prod
-#   ./gradlew bootRun --no-daemon
+# 점검:  sudo bash BN/scripts/ec2-preflight.sh   (FAIL 이 있으면 배포가 중단됩니다)
+# 배포:  sudo ./BN/scripts/deploy-ec2.sh
 
 spring.profiles.active=prod
 
