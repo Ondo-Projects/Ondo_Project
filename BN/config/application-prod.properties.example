@@ -36,10 +36,14 @@ spring.redis.port=6379
 ondo.jwt.secret=change-me-prod-jwt-secret-at-least-32-bytes!!
 
 # ----------------------------------------------------------------
-# 암호화 — 첫 기동은 dev-mode true 권장
+# 암호화 (사전상담 전화번호) — 운영은 반드시 dev-mode=false + 실제 키
+#   키 만들기: openssl rand -base64 32   (44자, 서버 밖 안전한 곳에도 보관 — 잃어버리면 복호화 불가)
+#   dev-mode=true 이고 key 가 비어 있으면 코드에 공개된 개발용 키로 암호화됩니다.
 # ----------------------------------------------------------------
-ondo.encryption.dev-mode=true
+ondo.encryption.dev-mode=false
 ondo.encryption.key=
+# 예전에 개발용 키로 저장된 데이터가 있으면 1회 true 로 기동 → 로그에서 '실패 0건' 확인 → false
+ondo.encryption.migrate-from-dev-key=false
 
 # ----------------------------------------------------------------
 # APP
@@ -67,9 +71,9 @@ ondo.weather.dev-mode=false
 ondo.weather.api-key=your-weather-api-key
 
 # ----------------------------------------------------------------
-# Admin (최초 1회 생성 후 enabled=false)
+# Admin (최초 1회 생성 후 enabled=false, password 줄도 비우기)
 # ----------------------------------------------------------------
-ondo.admin.bootstrap.enabled=true
+ondo.admin.bootstrap.enabled=false
 ondo.admin.bootstrap.username=admin
-ondo.admin.bootstrap.password=ChangeMe1!
+ondo.admin.bootstrap.password=
 ondo.admin.bootstrap.name=시스템관리자
