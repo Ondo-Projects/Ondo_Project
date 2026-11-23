@@ -130,6 +130,10 @@ if [[ "${BASE_URL}" != https://* ]]; then
   warn "ondo.app.base-url 이 https 가 아님 (${BASE_URL:-비어 있음}) — SMS 링크에 쓰입니다"
 fi
 
+if grep -qE '^[[:space:]]*spring\.redis\.' "${CONFIG}"; then
+  warn "spring.redis.* 는 Spring Boot 3 에서 무시됩니다 — spring.data.redis.* 로 이름을 바꾸세요"
+fi
+
 # ----------------------------------------------------------------
 # 8. 실행 환경
 # ----------------------------------------------------------------

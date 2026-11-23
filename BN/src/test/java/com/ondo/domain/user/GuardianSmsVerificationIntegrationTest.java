@@ -19,17 +19,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.containsString;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @SpringBootTest(properties = {
         "ondo.school.auto-import=false",
@@ -120,27 +119,11 @@ class GuardianSmsVerificationIntegrationTest {
     void under14Signup_requiresVerifiedGuardianPhone() throws Exception {
         seedVerifiedEmail();
 
-        mockMvc.perform(post("/join")
-                        .param("role", Role.STUDENT.name())
-                        .param("schoolCode", SCHOOL_CODE)
-                        .param("name", "미인증학생")
-                        .param("birthDate", "2015-01-01")
-                        .param("username", "it-sms-unverified")
-                        .param("password", "password1!")
-                        .param("passwordConfirm", "password1!")
-                        .param("email", STUDENT_EMAIL)
-                        .param("guardianName", "홍부모")
-                        .param("guardianPhone", GUARDIAN_PHONE)
-                        .param("guardianRelation", GuardianRelation.MOTHER.name())
-                        .param("agreeGuardianChildPrivacy", "true")
-                        .param("agreeGuardianChildSensitive", "true")
-                        .param("agreeGuardianIdentity", "true")
-                        .param("agreeService", "true")
-                        .param("agreePrivacy", "true")
-                        .param("agreeSensitive", "true"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("join"))
-                .andExpect(model().attribute("errorMessage", "법정대리인 SMS 인증을 완료해 주세요."));
+        mockMvc.perform(post("/api/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(under14SignupRequest("it-sms-unverified", "미인증학생"))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("법정대리인 SMS 인증을 완료해 주세요."));
 
         assertThat(userRepository.existsByUsername("it-sms-unverified")).isFalse();
     }
@@ -153,29 +136,35 @@ class GuardianSmsVerificationIntegrationTest {
         String code = redisTemplate.opsForValue().get("sms:code:" + GUARDIAN_PHONE_NORMALIZED);
         verifySmsCode(code);
 
-        mockMvc.perform(post("/join")
-                        .param("role", Role.STUDENT.name())
-                        .param("schoolCode", SCHOOL_CODE)
-                        .param("name", "인증완료학생")
-                        .param("birthDate", "2015-01-01")
-                        .param("username", "it-sms-verified")
-                        .param("password", "password1!")
-                        .param("passwordConfirm", "password1!")
-                        .param("email", STUDENT_EMAIL)
-                        .param("guardianName", "홍부모")
-                        .param("guardianPhone", GUARDIAN_PHONE)
-                        .param("guardianRelation", GuardianRelation.MOTHER.name())
-                        .param("agreeGuardianChildPrivacy", "true")
-                        .param("agreeGuardianChildSensitive", "true")
-                        .param("agreeGuardianIdentity", "true")
-                        .param("agreeService", "true")
-                        .param("agreePrivacy", "true")
-                        .param("agreeSensitive", "true"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/login?joined=true"));
+        mockMvc.perform(post("/api/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(under14SignupRequest("it-sms-verified", "인증완료학생"))))
+                .andExpect(status().isCreated());
 
         assertThat(userRepository.existsByUsername("it-sms-verified")).isTrue();
         assertThat(redisTemplate.opsForValue().get("sms:verified:" + GUARDIAN_PHONE_NORMALIZED)).isNull();
+    }
+
+    private Map<String, Object> under14SignupRequest(String username, String name) {
+        Map<String, Object> request = new LinkedHashMap<>();
+        request.put("role", Role.STUDENT.name());
+        request.put("schoolCode", SCHOOL_CODE);
+        request.put("name", name);
+        request.put("birthDate", "2015-01-01");
+        request.put("username", username);
+        request.put("password", "password1!");
+        request.put("passwordConfirm", "password1!");
+        request.put("email", STUDENT_EMAIL);
+        request.put("guardianName", "홍부모");
+        request.put("guardianPhone", GUARDIAN_PHONE);
+        request.put("guardianRelation", GuardianRelation.MOTHER.name());
+        request.put("agreeGuardianChildPrivacy", true);
+        request.put("agreeGuardianChildSensitive", true);
+        request.put("agreeGuardianIdentity", true);
+        request.put("agreeService", true);
+        request.put("agreePrivacy", true);
+        request.put("agreeSensitive", true);
+        return request;
     }
 
     private void sendSmsCode() throws Exception {
