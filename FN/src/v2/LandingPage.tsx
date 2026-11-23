@@ -12,6 +12,7 @@ import {
   ScrollText,
   ShieldCheck,
   SmilePlus,
+  Users,
   type LucideIcon,
 } from 'lucide-react';
 import { Badge, StatStrip, TBody, THead, Table, Td, Th, Tr, cn } from '../ds';
@@ -94,6 +95,24 @@ const TRUST_ITEMS: FeatureItem[] = [
   },
 ];
 
+const FACTS: FeatureItem[] = [
+  {
+    icon: KeyRound,
+    title: '초대코드 하나로 학급 연결',
+    description: '담임 선생님이 6자리 코드를 나눠 주면 학생이 바로 학급에 연결됩니다.',
+  },
+  {
+    icon: Users,
+    title: '만 14세 미만은 보호자 동의',
+    description: '보호자 휴대전화 인증과 동의를 거쳐야 가입이 끝납니다.',
+  },
+  {
+    icon: CalendarDays,
+    title: 'NEIS 학교 정보 연동',
+    description: '급식, 시간표, 학사일정을 학교 공식 정보로 보여 줍니다.',
+  },
+];
+
 export default function LandingPage() {
   usePageTitle('온도 — 학교 상담·학교생활 플랫폼');
 
@@ -103,18 +122,19 @@ export default function LandingPage() {
 
       <main>
         {/* Hero — 좌측 글, 우측 실제 화면 */}
-        <section className="border-b border-gray-200">
+        <section className="border-b border-gray-200 bg-gray-50">
           <div className="mx-auto grid max-w-6xl gap-12 px-6 py-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:items-center lg:py-24">
             <div className="max-w-xl">
-              <p className="text-[13px] font-medium text-blue-700">중·고등학교 상담·학교생활 플랫폼</p>
+              <p className="inline-flex h-7 items-center rounded-md border border-blue-200 bg-white px-2.5 text-[13px] font-semibold text-blue-700">
+                중·고등학교 상담·학교생활 플랫폼
+              </p>
               <h1 className="mt-4 text-4xl leading-[1.15] font-semibold tracking-tight text-gray-900 sm:text-5xl">
                 상담 신청부터
                 <br />
                 <span className="text-blue-700">담임 답변까지,</span>
-                <br />
-                한 화면에서.
+                <br />한 화면에서.
               </h1>
-              <p className="mt-6 text-base leading-relaxed text-gray-600">
+              <p className="mt-6 text-[17px] leading-relaxed text-gray-700">
                 학생은 휴대폰으로 상담을 신청하고 하루의 기분을 남깁니다. 담임 선생님은 답변을 기다리는 상담과 학급의
                 분위기를 표 하나로 확인합니다.
               </p>
@@ -129,12 +149,12 @@ export default function LandingPage() {
                 </Link>
                 <Link
                   to={`${PATHS.JOIN}?role=STUDENT`}
-                  className="inline-flex h-10 items-center rounded-md border border-gray-200 bg-white px-4 text-sm font-medium text-gray-900 transition-colors duration-150 hover:bg-gray-50"
+                  className="inline-flex h-10 items-center rounded-md border border-gray-300 bg-white px-4 text-sm font-medium text-gray-900 transition-colors duration-150 hover:bg-gray-100"
                 >
                   학생으로 시작하기
                 </Link>
               </div>
-              <p className="mt-4 text-[13px] text-gray-500">
+              <p className="mt-4 text-[13px] text-gray-600">
                 이미 계정이 있나요?{' '}
                 <Link to={PATHS.LOGIN} className="font-medium text-blue-700 underline-offset-4 hover:underline">
                   로그인
@@ -144,6 +164,21 @@ export default function LandingPage() {
 
             <ProductViewer />
           </div>
+        </section>
+
+        {/* 핵심 사실 — 짙은 띠로 한눈에 */}
+        <section className="bg-gray-900 text-white" aria-label="온도의 기본 원칙">
+          <ul className="mx-auto grid max-w-6xl divide-y divide-gray-700 px-6 md:grid-cols-3 md:divide-x md:divide-y-0">
+            {FACTS.map((fact) => (
+              <li key={fact.title} className="flex items-start gap-3 py-6 md:px-6 md:first:pl-0 md:last:pr-0">
+                <fact.icon size={18} className="mt-0.5 shrink-0 text-blue-300" aria-hidden />
+                <span>
+                  <span className="block text-[15px] font-semibold">{fact.title}</span>
+                  <span className="mt-1 block text-sm leading-relaxed text-gray-300">{fact.description}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
         </section>
 
         {/* 교사·학생 기능 — 에디토리얼 2단 */}
@@ -164,22 +199,22 @@ export default function LandingPage() {
         />
 
         {/* 신뢰·개인정보 */}
-        <section className="border-b border-gray-200">
-          <div className="mx-auto max-w-6xl px-6 py-16">
-            <div className="max-w-xl">
-              <p className="text-[13px] font-medium text-blue-700">개인정보 보호</p>
-              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-gray-900">
+        <section className="border-b border-gray-200 bg-white">
+          <div className="mx-auto max-w-6xl px-6 py-20">
+            <div className="max-w-2xl">
+              <p className="text-[13px] font-semibold text-blue-700">개인정보 보호</p>
+              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-gray-900">
                 학생의 이야기를 다루기 때문에, 기본부터 지킵니다.
               </h2>
             </div>
-            <dl className="mt-10 grid gap-px overflow-hidden rounded-lg border border-gray-200 bg-gray-200 md:grid-cols-3">
+            <dl className="mt-10 grid gap-4 md:grid-cols-3">
               {TRUST_ITEMS.map((item) => (
-                <div key={item.title} className="bg-white p-5">
-                  <dt className="flex items-center gap-2 text-sm font-semibold text-gray-900">
-                    <item.icon size={16} className="text-blue-700" aria-hidden />
-                    {item.title}
+                <div key={item.title} className="rounded-lg border border-gray-300 bg-gray-50 p-6">
+                  <dt>
+                    <IconChip icon={item.icon} />
+                    <span className="mt-4 block text-base font-semibold text-gray-900">{item.title}</span>
                   </dt>
-                  <dd className="mt-2 text-sm leading-relaxed text-gray-600">{item.description}</dd>
+                  <dd className="mt-2 text-[15px] leading-relaxed text-gray-700">{item.description}</dd>
                 </div>
               ))}
             </dl>
@@ -187,24 +222,24 @@ export default function LandingPage() {
         </section>
 
         {/* 마무리 CTA */}
-        <section className="bg-blue-50">
+        <section className="bg-gray-900 text-white">
           <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-16 md:flex-row md:items-center md:justify-between">
             <div>
-              <h2 className="text-2xl font-semibold tracking-tight text-gray-900">우리 반에서 바로 시작하세요.</h2>
-              <p className="mt-2 text-sm text-gray-600">
+              <h2 className="text-3xl font-semibold tracking-tight">우리 반에서 바로 시작하세요.</h2>
+              <p className="mt-2 text-[15px] text-gray-300">
                 교사로 가입한 뒤 초대코드를 나눠 주면 학생들이 학급으로 연결됩니다.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <Link
                 to={`${PATHS.JOIN}?role=TEACHER`}
-                className="inline-flex h-10 items-center rounded-md bg-blue-700 px-4 text-sm font-medium text-white transition-colors duration-150 hover:bg-blue-800"
+                className="inline-flex h-11 items-center rounded-md bg-blue-600 px-5 text-sm font-semibold text-white transition-colors duration-150 hover:bg-blue-500"
               >
                 교사로 시작하기
               </Link>
               <Link
                 to={PATHS.LOGIN}
-                className="inline-flex h-10 items-center rounded-md border border-gray-200 bg-white px-4 text-sm font-medium text-gray-900 transition-colors duration-150 hover:bg-gray-50"
+                className="inline-flex h-11 items-center rounded-md border border-gray-600 px-5 text-sm font-medium text-white transition-colors duration-150 hover:bg-gray-800"
               >
                 로그인
               </Link>
@@ -213,13 +248,19 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t border-gray-200 bg-gray-50/50">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-6 text-xs text-gray-500 sm:flex-row sm:items-center sm:justify-between">
+      <footer className="border-t border-gray-800 bg-gray-900">
+        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-6 text-xs text-gray-400 sm:flex-row sm:items-center sm:justify-between">
           <span>온도 · 중·고등학교 상담·학교생활 플랫폼</span>
           <nav className="flex gap-4" aria-label="바닥글">
-            <Link to={PATHS.LOGIN} className="hover:text-gray-900">로그인</Link>
-            <Link to={PATHS.JOIN} className="hover:text-gray-900">회원가입</Link>
-            <Link to={PATHS.FIND_ID} className="hover:text-gray-900">아이디 찾기</Link>
+            <Link to={PATHS.LOGIN} className="hover:text-white">
+              로그인
+            </Link>
+            <Link to={PATHS.JOIN} className="hover:text-white">
+              회원가입
+            </Link>
+            <Link to={PATHS.FIND_ID} className="hover:text-white">
+              아이디 찾기
+            </Link>
           </nav>
         </div>
       </footer>
@@ -236,10 +277,16 @@ function SiteHeader() {
           <span className="text-[15px] font-semibold tracking-tight">온도</span>
         </Link>
         <nav className="flex items-center gap-1" aria-label="주 메뉴">
-          <a href="#teacher" className="hidden h-8 items-center rounded-md px-3 text-[13px] text-gray-600 hover:text-gray-900 sm:inline-flex">
+          <a
+            href="#teacher"
+            className="hidden h-8 items-center rounded-md px-3 text-[13px] font-medium text-gray-700 hover:text-gray-900 sm:inline-flex"
+          >
             교사
           </a>
-          <a href="#student" className="hidden h-8 items-center rounded-md px-3 text-[13px] text-gray-600 hover:text-gray-900 sm:inline-flex">
+          <a
+            href="#student"
+            className="hidden h-8 items-center rounded-md px-3 text-[13px] font-medium text-gray-700 hover:text-gray-900 sm:inline-flex"
+          >
             학생
           </a>
           <Link
@@ -276,26 +323,36 @@ function FeatureSection({
   muted?: boolean;
 }) {
   return (
-    <section id={id} className={cn('scroll-mt-14 border-b border-gray-200', muted && 'bg-gray-50/50')}>
-      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+    <section id={id} className={cn('scroll-mt-14 border-b border-gray-200', muted ? 'bg-gray-50' : 'bg-white')}>
+      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-20 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)]">
         <div className="max-w-sm">
-          <p className="text-[13px] font-medium text-blue-700">{eyebrow}</p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-gray-900">{title}</h2>
-          <p className="mt-3 text-sm leading-relaxed text-gray-600">{description}</p>
+          <p className="text-[13px] font-semibold text-blue-700">{eyebrow}</p>
+          <h2 className="mt-2 text-3xl leading-tight font-semibold tracking-tight text-gray-900">{title}</h2>
+          <p className="mt-3 text-[15px] leading-relaxed text-gray-700">{description}</p>
         </div>
-        <ul className="divide-y divide-gray-200 border-y border-gray-200">
+        <ul className="grid gap-4 sm:grid-cols-2">
           {items.map((item) => (
-            <li key={item.title} className="grid grid-cols-[20px_minmax(0,1fr)] gap-x-4 py-5 sm:grid-cols-[20px_180px_minmax(0,1fr)]">
-              <item.icon size={18} className="mt-0.5 text-blue-700" aria-hidden />
-              <h3 className="text-sm font-semibold text-gray-900">{item.title}</h3>
-              <p className="col-start-2 mt-1 text-sm leading-relaxed text-gray-600 sm:col-start-3 sm:mt-0">
-                {item.description}
-              </p>
+            <li
+              key={item.title}
+              className={cn('rounded-lg border border-gray-300 p-5', muted ? 'bg-white' : 'bg-gray-50')}
+            >
+              <IconChip icon={item.icon} />
+              <h3 className="mt-4 text-base font-semibold text-gray-900">{item.title}</h3>
+              <p className="mt-1.5 text-[15px] leading-relaxed text-gray-700">{item.description}</p>
             </li>
           ))}
         </ul>
       </div>
     </section>
+  );
+}
+
+/** 파란 사각 아이콘 — 카드 제목 위 */
+function IconChip({ icon: Icon }: { icon: LucideIcon }) {
+  return (
+    <span className="flex h-9 w-9 items-center justify-center rounded-md bg-blue-50 text-blue-700">
+      <Icon size={18} aria-hidden />
+    </span>
   );
 }
 
@@ -310,7 +367,10 @@ function ProductViewer() {
 
   return (
     <figure className="min-w-0" aria-label="교사 대시보드 화면 예시">
-      <div className="pointer-events-none overflow-hidden rounded-lg border border-gray-200 bg-gray-50/50 select-none" aria-hidden>
+      <div
+        className="pointer-events-none overflow-hidden rounded-lg border border-gray-300 bg-white select-none"
+        aria-hidden
+      >
         <div className="flex h-9 items-center justify-between border-b border-gray-200 bg-white px-3">
           <span className="text-xs font-medium text-gray-900">상담 관리</span>
           <span className="font-mono text-[11px] text-gray-400">ondo.ai.kr/teacher</span>
@@ -337,25 +397,35 @@ function ProductViewer() {
               {rows.map((row) => (
                 <Tr key={row.student}>
                   <Td className="whitespace-nowrap">{row.student}</Td>
-                  <Td muted className="hidden whitespace-nowrap sm:table-cell">{row.type}</Td>
+                  <Td muted className="hidden whitespace-nowrap sm:table-cell">
+                    {row.type}
+                  </Td>
                   <Td className="max-w-32 truncate sm:max-w-44">{row.title}</Td>
                   <Td>
                     {row.status === 'waiting' ? (
-                      <Badge tone="warning" dot>대기</Badge>
+                      <Badge tone="warning" dot>
+                        대기
+                      </Badge>
                     ) : row.status === 'confirmed' ? (
-                      <Badge tone="info" dot>확정</Badge>
+                      <Badge tone="info" dot>
+                        확정
+                      </Badge>
                     ) : (
-                      <Badge tone="success" dot>완료</Badge>
+                      <Badge tone="success" dot>
+                        완료
+                      </Badge>
                     )}
                   </Td>
-                  <Td muted numeric className="whitespace-nowrap">{row.date}</Td>
+                  <Td muted numeric className="whitespace-nowrap">
+                    {row.date}
+                  </Td>
                 </Tr>
               ))}
             </TBody>
           </Table>
         </div>
       </div>
-      <figcaption className="mt-3 text-xs text-gray-500">담임 선생님 화면 — 예시 데이터</figcaption>
+      <figcaption className="mt-3 text-xs text-gray-600">담임 선생님 화면 — 예시 데이터</figcaption>
     </figure>
   );
 }
