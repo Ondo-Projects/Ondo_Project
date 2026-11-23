@@ -76,6 +76,23 @@ fi
 echo "JAR : ${JAR_PATH} ($(du -h "${JAR_PATH}" | cut -f1))"
 
 # ----------------------------------------------------------------
+# 2-1. 운영 설정 점검 — FAIL 이면 아무것도 바꾸지 않고 중단
+# ----------------------------------------------------------------
+if docker ps -a --format '{{.Names}}' 2>/dev/null | grep -qx 'ondo-redis'; then
+  docker start ondo-redis >/dev/null 2>&1 || true
+fi
+
+PREFLIGHT="$(dirname "$(readlink -f "$0")")/ec2-preflight.sh"
+if [[ -f "${PREFLIGHT}" ]]; then
+  if ! bash "${PREFLIGHT}" "${APP_ROOT}/config/application-prod.properties"; then
+    echo "FAIL: preflight 점검 실패 — 위 FAIL 항목을 고친 뒤 다시 배포하세요. (아무것도 바뀌지 않았습니다)"
+    exit 1
+  fi
+else
+  echo "WARN: ${PREFLIGHT} 없음 — 설정 점검을 건너뜁니다."
+fi
+
+# ----------------------------------------------------------------
 # 3. 헬스체크 — 200 이 올 때까지 최대 HEALTH_TIMEOUT 초 대기
 # ----------------------------------------------------------------
 wait_for_health() {
@@ -116,10 +133,6 @@ if [[ -d "${NGINX_HTML}" ]]; then
   mv "${NGINX_HTML}" "${NGINX_HTML}.prev"
 fi
 mv "${NGINX_HTML}.new" "${NGINX_HTML}"
-
-if docker ps -a --format '{{.Names}}' 2>/dev/null | grep -qx 'ondo-redis'; then
-  docker start ondo-redis >/dev/null 2>&1 || true
-fi
 
 systemctl restart ondo-api
 

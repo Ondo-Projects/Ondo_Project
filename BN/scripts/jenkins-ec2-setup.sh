@@ -10,6 +10,7 @@ echo "=== Ondo EC2 deploy layout ==="
 sudo mkdir -p "${APP_ROOT}/app" "${APP_ROOT}/config" "${APP_ROOT}/logs"
 sudo chown "${APP_USER}:${APP_USER}" "${APP_ROOT}"
 sudo chown -R "${APP_USER}:${APP_USER}" "${APP_ROOT}/app" "${APP_ROOT}/config" "${APP_ROOT}/logs"
+sudo chmod 700 "${APP_ROOT}/config"
 
 # 운영 설정이 이미 있으면 절대 덮어쓰지 않음 (암호화 키·DB 계정이 바뀌어 있을 수 있음)
 if [[ -f "${APP_ROOT}/config/application-prod.properties" ]]; then
@@ -48,7 +49,8 @@ fi
 # ----------------------------------------------------------------
 sudo install -d -o root -g root -m 755 "${APP_ROOT}/bin"
 sudo install -o root -g root -m 755 "${REPO_ROOT}/BN/scripts/deploy-ec2.sh" "${APP_ROOT}/bin/deploy-ec2.sh"
-echo "Installed ${APP_ROOT}/bin/deploy-ec2.sh"
+sudo install -o root -g root -m 755 "${REPO_ROOT}/BN/scripts/ec2-preflight.sh" "${APP_ROOT}/bin/ec2-preflight.sh"
+echo "Installed ${APP_ROOT}/bin/deploy-ec2.sh, ec2-preflight.sh"
 
 # ----------------------------------------------------------------
 # Jenkins sudo 권한 — 배포 스크립트 하나만 허용
