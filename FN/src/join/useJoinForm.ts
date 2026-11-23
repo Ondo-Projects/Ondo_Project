@@ -73,8 +73,8 @@ function mergeFieldErrors(
   return { ...current, ...next };
 }
 
-export function useJoinFormState(): UseJoinFormResult {
-  const [state, setState] = useState<JoinFormState>(() => createInitialJoinFormState());
+export function useJoinFormState(initialRole: SignUpRole = 'STUDENT'): UseJoinFormResult {
+  const [state, setState] = useState<JoinFormState>(() => createInitialJoinFormState(initialRole));
   const [fieldErrors, setFieldErrors] = useState<JoinFieldErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);

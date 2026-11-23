@@ -1,3 +1,3 @@
-import StudentHomePage from '../student/StudentHomePage';
+import StudentApp from '../v2/student/StudentApp';
 
-export default StudentHomePage;
+export default StudentApp;

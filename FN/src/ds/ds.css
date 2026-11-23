@@ -1,0 +1,105 @@
+/*
+ * 온도 새 디자인 시스템 (Tailwind v4)
+ *
+ * 기존 화면과 함께 쓰기 위한 규칙 — 새 디자인으로 다 옮기면 정리합니다.
+ *  1) Preflight(전역 초기화)는 넣지 않습니다. 초기화는 .ondo-ui 안에만 적용 → 기존 화면은 그대로.
+ *  2) Tailwind 가 읽는 폴더는 src/ds, src/v2 뿐입니다 (source(none) + @source).
+ *     기존 코드의 class 이름(hidden, container 등)과 겹쳐도 기존 화면에는 아무 영향이 없습니다.
+ *  3) 유틸리티는 important — 기존 전역 CSS(body, a 등)보다 항상 우선합니다.
+ *
+ * 디자인 규칙 (FN/DOCS/DESIGN/ui-v2-guide.md 참고)
+ *  - 무채색(white / gray-50 / gray-900) + 포인트 blue-700 하나
+ *  - 그림자 대신 1px border-gray-200, 모서리 최대 rounded-lg
+ *  - 상태 배지에만 연한 red / amber / emerald 허용
+ */
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities) important source(none);
+
+@source "./";
+@source "../v2";
+
+@theme {
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui,
+    "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/*
+ * 기존 tokens.css 가 Tailwind 와 같은 이름의 변수(--radius-md: 12px 등)를 :root 에 정의해서
+ * 새 디자인 영역에서는 Tailwind 기본값으로 되돌립니다. (기존 화면은 영향 없음)
+ * 새 디자인으로 모두 옮기고 tokens.css 를 지우면 이 블록도 삭제합니다.
+ */
+.ondo-ui {
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui,
+    "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --color-neutral-50: oklch(98.5% 0 none);
+  --color-neutral-100: oklch(97% 0 none);
+  --color-neutral-200: oklch(92.2% 0 none);
+  --color-neutral-400: oklch(70.8% 0 none);
+  --color-neutral-600: oklch(43.9% 0 none);
+  --color-neutral-800: oklch(26.9% 0 none);
+  --color-neutral-900: oklch(20.5% 0 none);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* 새 디자인 영역 전용 초기화 (기존 global.css 보다 우선하도록 .ondo-ui 범위로 지정) */
+.ondo-ui {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-gray-900);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "tnum" 1;
+}
+.ondo-ui :where(h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd, ul, ol) {
+  margin: 0;
+}
+.ondo-ui :where(ul, ol) {
+  list-style: none;
+  padding: 0;
+}
+.ondo-ui :where(a) {
+  color: inherit;
+  text-decoration: inherit;
+}
+.ondo-ui :where(button) {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+}
+.ondo-ui :where(button, input, select, textarea) {
+  font: inherit;
+  color: inherit;
+}
+.ondo-ui :where(fieldset) {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+.ondo-ui :where(legend) {
+  padding: 0;
+}
+.ondo-ui :where(table) {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+.ondo-ui :where(img, svg) {
+  display: block;
+  max-width: 100%;
+}
+.ondo-ui :focus-visible {
+  outline: 2px solid var(--color-blue-600);
+  outline-offset: 2px;
+}
