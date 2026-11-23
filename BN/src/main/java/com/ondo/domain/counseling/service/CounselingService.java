@@ -34,6 +34,7 @@ public class CounselingService {
     private final StudentTeacherAssignmentRepository assignmentRepository;
     private final UserRepository userRepository;
     private final CounselingNotificationService counselingNotificationService;
+    private final StudentReplyNotificationService studentReplyNotificationService;
 
     @Transactional
     public CounselingResponseDTO create(String username, CounselingCreateDTO request) {
@@ -152,7 +153,12 @@ public class CounselingService {
             throw new BusinessException("취소된 상담에는 답변할 수 없습니다.");
         }
 
+        // 답변을 고칠 때마다 메일이 가지 않도록, 처음 답변할 때만 학생에게 알립니다.
+        boolean firstReply = post.getRepliedAt() == null;
         post.reply(request.getReply());
+        if (firstReply) {
+            studentReplyNotificationService.notifyReplied(post);
+        }
         return new CounselingResponseDTO(post);
     }
 

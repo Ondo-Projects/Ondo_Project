@@ -65,6 +65,10 @@ public class User {
     @Column(nullable = false, columnDefinition = "bit(1) not null default b'0'")
     private boolean smsNotifyEnabled = false;
 
+    /** 학생: 선생님이 상담에 답변하면 메일로 알릴지 (기본 켜짐) */
+    @Column(nullable = false, columnDefinition = "bit(1) not null default b'1'")
+    private boolean replyEmailEnabled = true;
+
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private GuardianRelation guardianRelation;
@@ -193,6 +197,10 @@ public class User {
     public void updateNotificationSettings(String phone, boolean smsNotifyEnabled) {
         this.phone = phone;
         this.smsNotifyEnabled = smsNotifyEnabled;
+    }
+
+    public void updateReplyEmailEnabled(boolean replyEmailEnabled) {
+        this.replyEmailEnabled = replyEmailEnabled;
     }
 
     public void changePassword(String encodedPassword) {

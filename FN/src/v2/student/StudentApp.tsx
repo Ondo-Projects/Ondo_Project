@@ -47,6 +47,7 @@ function subScreen(route: StudentRoute): { title: string; back: string } | null 
   if (route.tab === 'me') {
     if (a === 'class') return { title: '학년·반', back: '#me' };
     if (a === 'teacher') return { title: '담임 선생님', back: '#me' };
+    if (a === 'notifications') return { title: '알림 설정', back: '#me' };
     if (a === 'suggestions') {
       if (!b) return { title: '운영 건의', back: '#me' };
       if (b === 'new') return { title: '새 건의', back: '#me/suggestions' };

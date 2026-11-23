@@ -1,16 +1,18 @@
 import { type FormEvent, useEffect, useState } from 'react';
-import { GraduationCap, LogOut, MessageSquarePlus, School, UserRound, UserX } from 'lucide-react';
+import { Bell, GraduationCap, LogOut, MessageSquarePlus, School, UserRound, UserX } from 'lucide-react';
 import {
   changeStudentAssignment,
   getStudentAssignmentOptional,
   getStudentClassProfile,
+  getStudentNotificationSettings,
   registerStudentAssignment,
   updateStudentClassProfile,
+  updateStudentNotificationSettings,
 } from '../../api/student.api';
 import { ApiError } from '../../api/types/api-error';
-import type { StudentAssignment, StudentClassProfile } from '../../api/types/student';
+import type { StudentAssignment, StudentClassProfile, StudentNotificationSettings } from '../../api/types/student';
 import type { SuggestionPost } from '../../api/types/suggestion';
-import { Button, Field, Input, ListGroup, ListRow, Skeleton } from '../../ds';
+import { Button, Field, Input, ListGroup, ListRow, Skeleton, Toggle } from '../../ds';
 import { PATHS } from '../../routes/paths';
 import { type FeedbackHandlers, formatCompactDateTime, resolveErrorMessage } from '../common';
 import SuggestionScreens from './SuggestionScreens';
@@ -35,6 +37,7 @@ export default function MeTab(props: MeTabProps) {
   const [first] = props.sub;
   if (first === 'class') return <ClassProfileScreen {...props} />;
   if (first === 'teacher') return <TeacherScreen {...props} />;
+  if (first === 'notifications') return <NotificationScreen {...props} />;
   if (first === 'suggestions') return <SuggestionScreens {...props} sub={props.sub.slice(1)} />;
   return <MeHome {...props} />;
 }
@@ -82,6 +85,10 @@ function MeHome({ name, username, schoolName, assignment, suggestions, loaded, g
           }
           onClick={() => go('#me/teacher')}
         />
+      </ListGroup>
+
+      <ListGroup title="알림">
+        <ListRow icon={<Bell size={18} />} label="알림 설정" onClick={() => go('#me/notifications')} />
       </ListGroup>
 
       <ListGroup
@@ -374,5 +381,66 @@ function ChangeTeacherForm({
         </Button>
       </Block>
     </form>
+  );
+}
+
+/** 선생님 답변 메일 알림 켜기·끄기 */
+function NotificationScreen({ onSuccess, onError }: MeTabProps) {
+  const [settings, setSettings] = useState<StudentNotificationSettings | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    getStudentNotificationSettings()
+      .then(setSettings)
+      .catch((err) => onError(resolveErrorMessage(err, '알림 설정을 불러오지 못했습니다.')));
+  }, [onError]);
+
+  async function toggle(next: boolean) {
+    if (!settings || saving) return;
+    setSaving(true);
+    setSettings({ ...settings, replyEmailEnabled: next });
+    try {
+      const saved = await updateStudentNotificationSettings(next);
+      setSettings(saved);
+      onSuccess(next ? '답변 알림 메일을 받아요.' : '답변 알림 메일을 껐어요.');
+    } catch (err) {
+      setSettings({ ...settings, replyEmailEnabled: !next });
+      onError(resolveErrorMessage(err, '알림 설정을 바꾸지 못했습니다.'));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (!settings) {
+    return (
+      <Block>
+        <Skeleton className="h-16 w-full" />
+      </Block>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-6">
+      <Block
+        title="메일 알림"
+        footer="메일에는 상담 내용 없이 확인할 주소만 담겨요. 다른 사람이 보지 않도록 메일 계정을 잘 관리해 주세요."
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-[15px] font-medium text-gray-900">선생님 답변 알림</p>
+            <p className="mt-0.5 text-[13px] leading-relaxed text-gray-500">
+              담임 선생님이 상담에 처음 답변하면 메일로 알려 드려요.
+            </p>
+            <p className="mt-1 truncate text-[13px] text-gray-700">{settings.email ?? '등록된 메일 없음'}</p>
+          </div>
+          <Toggle
+            checked={settings.replyEmailEnabled}
+            onChange={(next) => void toggle(next)}
+            label="선생님 답변 알림 메일"
+            disabled={saving || !settings.email}
+          />
+        </div>
+      </Block>
+    </div>
   );
 }
