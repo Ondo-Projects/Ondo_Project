@@ -243,6 +243,32 @@ EMAIL=you@example.com sudo -E bash BN/scripts/setup-https.sh
 - EC2에는 Elastic IP를 연결하고, 보안 그룹 인바운드에 80·443을 열어 둡니다.
 - 인증서 상태 확인: `sudo certbot certificates`, `systemctl list-timers | grep certbot`
 
+### DB 백업 · 복구
+
+```bash
+sudo bash BN/scripts/setup-backup.sh      # 최초 1회: 매일 04:07(KST) 자동 백업 설치 + 즉시 1회 실행
+sudo ls -lh /var/backups/ondo             # 백업 목록 (최근 14일 보관, root 만 읽기 가능)
+sudo systemctl start ondo-db-backup       # 지금 바로 백업
+sudo journalctl -u ondo-db-backup -n 20   # 백업 로그
+```
+
+- 백업 파일에는 학생 개인정보가 들어 있습니다. 다운로드·공유하지 말고 서버 밖으로 옮길 때는 암호화된 저장소(S3 등)만 사용합니다.
+- 서버 밖 보관(S3): `/opt/ondo/config/backup.env` 에 `ONDO_BACKUP_S3_URI=s3://버킷/ondo-db` 를 넣으면 백업할 때마다 S3 로 복사합니다 (EC2 IAM 역할에 해당 버킷 `s3:PutObject` 권한 필요).
+
+**복구** — 반드시 먼저 별도 DB 로 복구해 내용을 확인한 뒤 운영 DB 에 적용합니다. (테이블을 지우고 다시 만들어야 해서 앱 전용 계정 `ondo` 가 아닌 DB 관리자 `root` 로 실행합니다)
+
+```bash
+# 1) 복구 확인용 DB 로 풀어 보기
+sudo zcat /var/backups/ondo/ondo_DB-YYYYMMDD-HHMM.sql.gz \
+  | sed 's/`ondo_DB`/`ondo_restore_check`/g' | mysql -h 127.0.0.1 -u root -p
+mysql -h 127.0.0.1 -u root -p -e "SELECT COUNT(*) FROM ondo_restore_check.users;"
+
+# 2) 운영 DB 에 적용 (서비스 중지 → 복구 → 재시작)
+sudo systemctl stop ondo-api
+sudo zcat /var/backups/ondo/ondo_DB-YYYYMMDD-HHMM.sql.gz | mysql -h 127.0.0.1 -u root -p
+sudo systemctl start ondo-api
+```
+
 ### Jenkins CI/CD
 
 `Jenkinsfile` — Checkout → bootJar → npm build → `sudo /opt/ondo/bin/deploy-ec2.sh`
