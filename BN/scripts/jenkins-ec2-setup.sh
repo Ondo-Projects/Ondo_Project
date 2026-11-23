@@ -22,11 +22,19 @@ sudo cp "${REPO_ROOT}/BN/scripts/ondo-api.service" /etc/systemd/system/ondo-api.
 sudo systemctl daemon-reload
 sudo systemctl enable ondo-api
 
-if [[ -f "${REPO_ROOT}/BN/scripts/nginx-ondo.conf" ]]; then
+# nginx 설정은 HTTPS(443) 포함 — 인증서가 있어야 적용 가능
+# 인증서 발급·갱신·nginx 적용은 setup-https.sh 가 담당합니다.
+if [[ -f /etc/letsencrypt/live/ondo.ai.kr/fullchain.pem ]]; then
+  if [[ -f /etc/nginx/conf.d/ondo.conf ]]; then
+    sudo cp -a /etc/nginx/conf.d/ondo.conf "/etc/nginx/conf.d/ondo.conf.bak.$(date +%s)"
+  fi
   sudo cp "${REPO_ROOT}/BN/scripts/nginx-ondo.conf" /etc/nginx/conf.d/ondo.conf
   sudo nginx -t
   sudo systemctl enable nginx
-  sudo systemctl start nginx || true
+  sudo systemctl reload nginx || sudo systemctl start nginx
+else
+  echo "WARN: 인증서 없음 — nginx 설정은 건너뜁니다."
+  echo "      EMAIL=you@example.com sudo -E bash ${REPO_ROOT}/BN/scripts/setup-https.sh"
 fi
 
 # Jenkins가 sudo 로 배포·재시작 (비밀번호 없이)
