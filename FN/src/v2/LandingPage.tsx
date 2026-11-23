@@ -18,6 +18,7 @@ import {
 import { Badge, StatStrip, TBody, THead, Table, Td, Th, Tr, cn } from '../ds';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { PATHS } from '../routes/paths';
+import SiteFooter from './SiteFooter';
 
 /**
  * 로그인하지 않은 방문자가 처음 보는 화면 (/)
@@ -80,8 +81,8 @@ const STUDENT_FEATURES: FeatureItem[] = [
 const TRUST_ITEMS: FeatureItem[] = [
   {
     icon: ShieldCheck,
-    title: '교사는 학교 이메일로 확인',
-    description: '교사 가입은 교육청·학교 도메인 이메일 인증을 거친 계정만 가능합니다.',
+    title: '교사는 공직자 메일로 확인',
+    description: '시·도교육청 또는 korea.kr 메일 인증을 마친 계정만 교사로 가입할 수 있습니다.',
   },
   {
     icon: FileLock2,
@@ -248,22 +249,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t border-gray-800 bg-gray-900">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-6 text-xs text-gray-400 sm:flex-row sm:items-center sm:justify-between">
-          <span>온도 · 중·고등학교 상담·학교생활 플랫폼</span>
-          <nav className="flex gap-4" aria-label="바닥글">
-            <Link to={PATHS.LOGIN} className="hover:text-white">
-              로그인
-            </Link>
-            <Link to={PATHS.JOIN} className="hover:text-white">
-              회원가입
-            </Link>
-            <Link to={PATHS.FIND_ID} className="hover:text-white">
-              아이디 찾기
-            </Link>
-          </nav>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

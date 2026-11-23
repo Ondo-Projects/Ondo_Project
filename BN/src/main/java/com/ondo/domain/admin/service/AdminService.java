@@ -139,6 +139,9 @@ public class AdminService {
         }
 
         User user = getManagedUser(targetUsername);
+        if (user.getPurgedAt() != null) {
+            throw new BusinessException("탈퇴 후 정보가 파기된 계정은 다시 활성화할 수 없습니다.");
+        }
         if (user.getRole() == Role.ADMIN && !active) {
             long activeAdminCount = userRepository.countByRoleAndActive(Role.ADMIN, true);
             if (activeAdminCount <= 1 && user.isActive()) {
