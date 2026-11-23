@@ -6,6 +6,7 @@ import com.ondo.domain.user.dto.SignUpRequestDTO;
 import com.ondo.domain.user.dto.UsernameCheckResponseDTO;
 import com.ondo.domain.user.entity.Role;
 import com.ondo.domain.user.entity.User;
+import com.ondo.domain.user.policy.LegalDocumentVersions;
 import com.ondo.domain.user.repository.UserRepository;
 import com.ondo.global.error.BusinessException;
 import com.ondo.global.sms.SmsPhoneUtils;
@@ -84,6 +85,9 @@ public class UserService {
             }
         }
 
+        String termsVersion = resolveAgreedVersion(request.getTermsVersion(), LegalDocumentVersions.TERMS);
+        String privacyVersion = resolveAgreedVersion(request.getPrivacyVersion(), LegalDocumentVersions.PRIVACY);
+
         if (request.getRole() == Role.TEACHER) {
             validateTeacherSignup(request);
             name = request.getName().trim();
@@ -109,6 +113,8 @@ public class UserService {
                 .agreePrivacy(request.isAgreePrivacy())
                 .agreeSensitive(request.isAgreeSensitive())
                 .agreedAt(LocalDateTime.now())
+                .agreedTermsVersion(termsVersion)
+                .agreedPrivacyVersion(privacyVersion)
                 .build();
 
         userRepository.save(user);
@@ -119,6 +125,20 @@ public class UserService {
         if (guardianPhone != null) {
             guardianSmsVerificationService.clearVerification(guardianPhone);
         }
+    }
+
+    /**
+     * 가입 화면이 보여 준 약관 버전이 현재 시행 버전과 같은지 확인합니다.
+     * 화면을 열어 둔 사이 약관이 바뀌었다면, 회원이 보지 못한 약관에 동의한 것으로 기록되지 않도록 막습니다.
+     */
+    private String resolveAgreedVersion(String requestedVersion, String currentVersion) {
+        if (requestedVersion == null || requestedVersion.isBlank()) {
+            return currentVersion;
+        }
+        if (!currentVersion.equals(requestedVersion.trim())) {
+            throw new BusinessException("약관이 개정되었습니다. 화면을 새로고침한 뒤 바뀐 약관을 확인하고 다시 동의해 주세요.");
+        }
+        return currentVersion;
     }
 
     private String validateAndGetVerifiedEmail(String rawEmail, Role role) {

@@ -6,8 +6,15 @@
  */
 import { LEGAL_OPERATOR } from './terms';
 import type { LegalDoc } from './types';
+import { formatVersionDate } from './version';
 
-export const PRIVACY_EFFECTIVE_DATE = '2026년 12월 1일';
+/**
+ * 개인정보처리방침·가입 동의서 버전(시행일). 가입할 때 서버로 보내 기록합니다.
+ * 바꿀 때는 BN LegalDocumentVersions.PRIVACY 도 같은 값으로 바꿔야 가입이 막히지 않습니다.
+ */
+export const PRIVACY_VERSION = '2026-12-01';
+
+export const PRIVACY_EFFECTIVE_DATE = formatVersionDate(PRIVACY_VERSION);
 
 export const PRIVACY_DOC: LegalDoc = {
   title: '개인정보처리방침',
@@ -16,7 +23,7 @@ export const PRIVACY_DOC: LegalDoc = {
     '가입과 서비스 제공에 꼭 필요한 정보만 받고, 광고나 판매에는 쓰지 않습니다.',
     '학생의 상담 글, 기분 기록, 사전상담 프로필은 연결된 담임 선생님만 볼 수 있습니다.',
     '탈퇴하면 5일 안에 정보가 자동으로 지워집니다. 백업본에서도 14일 안에 사라집니다.',
-    '다른 회사에 개인정보를 팔거나 넘기지 않습니다. 문자 발송, 서버 운영만 전문 업체에 맡깁니다.',
+    '다른 회사에 개인정보를 팔거나 넘기지 않습니다. 문자·메일 발송과 서버 운영만 전문 업체에 맡깁니다.',
     '만 14세 미만 학생은 보호자 동의를 받고, 보호자는 언제든 자녀 정보의 열람·삭제를 요청할 수 있습니다.',
     `궁금한 점이나 요청은 개인정보 보호책임자(${LEGAL_OPERATOR.email})에게 보내 주세요.`,
   ],
@@ -161,6 +168,11 @@ export const PRIVACY_DOC: LegalDoc = {
                     '휴대전화 번호, 문자 내용',
                   ],
                   [
+                    '네이버 주식회사',
+                    '가입 인증 메일 발송 (네이버 메일)',
+                    '받는 사람 이메일 주소, 메일 내용(인증번호)',
+                  ],
+                  [
                     'Amazon Web Services, Inc.',
                     '서버 운영, 데이터 저장과 백업 (서울 리전)',
                     '서비스에 저장된 모든 개인정보',
@@ -176,7 +188,7 @@ export const PRIVACY_DOC: LegalDoc = {
           no: 7,
           title: '개인정보의 국외 이전',
           clauses: [
-            '운영자는 개인정보를 국외로 이전하지 않습니다. 서버와 백업은 Amazon Web Services의 서울(대한민국) 리전에 저장합니다.',
+            '운영자는 개인정보를 국외로 이전하지 않습니다. 서버와 백업은 Amazon Web Services의 서울(대한민국) 리전에 저장하고, 문자와 메일은 국내 업체를 통해 보냅니다.',
           ],
         },
         {
