@@ -225,8 +225,11 @@ git pull
 cd BN && ./gradlew bootJar --no-daemon -x test
 cd ../FN && npm ci && VITE_API_BASE= npm run build
 
-./BN/scripts/deploy-ec2.sh
+sudo ./BN/scripts/deploy-ec2.sh
 ```
+
+- 이전 JAR·React를 `*.prev`로 보관하고, API가 120초 안에 응답하지 않으면 **자동으로 이전 버전으로 롤백**합니다.
+- `Deploy OK` = 성공, `ROLLBACK OK` = 새 버전 실패 후 이전 버전으로 복구됨.
 
 ### HTTPS (Let's Encrypt)
 
@@ -242,7 +245,10 @@ EMAIL=you@example.com sudo -E bash BN/scripts/setup-https.sh
 
 ### Jenkins CI/CD
 
-`Jenkinsfile` — Checkout → bootJar → npm build → deploy-ec2.sh
+`Jenkinsfile` — Checkout → bootJar → npm build → `sudo /opt/ondo/bin/deploy-ec2.sh`
+
+- Jenkins sudo 권한은 `/opt/ondo/bin/deploy-ec2.sh`(root 소유 사본) 하나만 허용합니다.
+- `BN/scripts/deploy-ec2.sh`를 수정했다면 서버에서 `bash BN/scripts/jenkins-ec2-setup.sh`를 다시 실행해야 Jenkins 배포에 반영됩니다.
 
 ### 헬스체크
 
