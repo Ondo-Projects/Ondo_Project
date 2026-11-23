@@ -69,6 +69,9 @@
 | `Notice` | 한 줄 결과·오류 메시지 (`tone`: info / success / danger, `onClose`) |
 | `ConsoleShell` (`src/v2/shell`) | 교사·관리자 화면 틀: 상단 바 + 왼쪽 메뉴(모바일은 가로 탭) + 본문 |
 | `useFeedback` (`src/v2/shell`) | 화면 위 한 줄 결과 메시지 상태 (성공은 4초 뒤 사라짐) |
+| `Sheet` | 상세 보기 시트 — 모바일은 아래에서, 넓은 화면은 오른쪽에서 열림 (Esc·바깥 누르기로 닫힘) |
+| `AnnouncementButton`, `AnnouncementList`, `AnnouncementDetailSheet` (`src/v2/shell`) | 온도 공지 종 버튼·목록·상세. 상세 시트는 화면에 하나만 그립니다 |
+| `Block`, `StickyFooter` (`src/v2/student/ui`) | 학생 앱: 회색 화면 위 흰 묶음, 하단 탭 위 고정 저장 버튼 |
 
 ## 8. 기존 화면과 함께 쓰는 동안의 규칙
 

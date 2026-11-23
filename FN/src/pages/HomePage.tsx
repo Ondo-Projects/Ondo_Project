@@ -1,102 +1,14 @@
-import { Link, Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import { getPostLoginPath } from '../auth/redirects';
 import AuthLoading from '../auth/AuthLoading';
-import AppLayout from '../components/layout/AppLayout';
-import PageHeader from '../components/PageHeader';
-import { usePageTitle } from '../hooks/usePageTitle';
-import SchoolTodayStrip from '../home/components/SchoolTodayStrip';
-import PlatformAnnouncementBoard from '../home/components/PlatformAnnouncementBoard';
-import StudentHomeBlock from '../home/components/StudentHomeBlock';
-import TeacherHomeBlock from '../home/components/TeacherHomeBlock';
-import '../home/home.css';
-import { buildSchoolMeta, buildUserGreeting, formatTodayDate } from '../home/homeUtils';
-import { useHomeData } from '../home/useHomeData';
-import { Alert } from '../components/ui';
-import { PATHS } from '../routes/paths';
+import CommonHome from '../v2/home/CommonHome';
 import LandingPage from '../v2/LandingPage';
 
-export default function HomePage() {
-  const { user, logout } = useAuth();
-  const homeData = useHomeData(user);
+/** /home — 학생·교사 공통 학교 홈 */
+export default CommonHome;
 
-  usePageTitle('학교 홈 | 온도');
-
-  if (!user) {
-    return <AuthLoading message="홈을 준비하고 있어요" />;
-  }
-
-  async function handleLogout() {
-    await logout();
-  }
-
-  const greeting = buildUserGreeting(user, homeData.schoolProfile);
-  const schoolMeta = buildSchoolMeta(user, homeData.schoolProfile);
-
-  return (
-    <AppLayout>
-      <div className="home-page" data-page="school-home">
-        <PageHeader
-          tone="home"
-          eyebrow={homeData.isLoading ? '불러오는 중…' : greeting}
-          title="학교 홈"
-          subtitle="오늘의 학교 생활을 한곳에서 시작하세요."
-          actions={
-            <>
-              {user.role === 'TEACHER' ? (
-                <Link className="page-header-action page-header-action--ghost" to={PATHS.TEACHER}>
-                  교사 홈
-                </Link>
-              ) : null}
-              {user.role === 'STUDENT' ? (
-                <Link className="page-header-action page-header-action--ghost" to={PATHS.STUDENT}>
-                  학생 홈
-                </Link>
-              ) : null}
-              <button
-                type="button"
-                className="page-header-action page-header-action--secondary"
-                onClick={handleLogout}
-              >
-                로그아웃
-              </button>
-            </>
-          }
-        />
-
-        {homeData.pageError ? <Alert variant="error">{homeData.pageError}</Alert> : null}
-
-        {homeData.schoolProfileError ? (
-          <Alert variant="error">{homeData.schoolProfileError}</Alert>
-        ) : null}
-
-        <SchoolTodayStrip
-          todayLabel={formatTodayDate()}
-          schoolMeta={schoolMeta}
-          isLoading={homeData.isLoading}
-          weather={homeData.weather}
-          weatherError={homeData.weatherError}
-          schedule={homeData.schedule}
-          scheduleError={homeData.scheduleError}
-        />
-
-        {user.role === 'STUDENT' ? (
-          <StudentHomeBlock
-            meals={homeData.meals}
-            mealsError={homeData.mealsError}
-            timetable={homeData.timetable}
-            timetableError={homeData.timetableError}
-          />
-        ) : null}
-
-        {user.role === 'TEACHER' ? <TeacherHomeBlock summary={homeData.teacherSummary} /> : null}
-
-        <PlatformAnnouncementBoard />
-      </div>
-    </AppLayout>
-  );
-}
-
+/** / — 로그인했으면 역할별 첫 화면, 아니면 소개 페이지 */
 export function RootRedirect() {
   const { user, isLoading, isAuthenticated } = useAuth();
 
