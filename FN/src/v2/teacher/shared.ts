@@ -1,21 +1,14 @@
-import { ApiError } from '../../api/types/api-error';
 import type { CounselingStatus } from '../../api/types/counseling';
 import type { MoodLevelCode } from '../../api/types/student';
 import type { SuggestionStatus } from '../../api/types/suggestion';
 import type { BadgeTone } from '../../ds';
 
-/** 각 화면 → 교사 콘솔로 결과 메시지 전달 */
-export interface FeedbackHandlers {
-  onSuccess: (message: string) => void;
-  onError: (message: string) => void;
-}
-
-export function resolveErrorMessage(error: unknown, fallback: string): string {
-  if (error instanceof ApiError || error instanceof Error) {
-    return error.message || fallback;
-  }
-  return fallback;
-}
+export {
+  type FeedbackHandlers,
+  formatCompactDateTime,
+  resolveErrorMessage,
+  scrollToDetailOnNarrow,
+} from '../common';
 
 export const COUNSEL_STATUS_TONE: Record<CounselingStatus, BadgeTone> = {
   WAITING: 'warning',
@@ -46,14 +39,6 @@ export function needsAttention(code: MoodLevelCode | null | undefined): boolean 
   return code === 'RAINY' || code === 'STORMY';
 }
 
-/** "2026-11-23T08:41:00" → "11.23 08:41" */
-export function formatCompactDateTime(value: string | null | undefined): string {
-  if (!value) return '-';
-  const match = value.match(/^\d{4}-(\d{2})-(\d{2})[T ](\d{2}:\d{2})/);
-  if (!match) return value;
-  return `${match[1]}.${match[2]} ${match[3]}`;
-}
-
 /** "2026-11-23" → "11.23 (월)" */
 export function formatDayWithWeekday(value: string | null | undefined): string {
   if (!value) return '-';
@@ -65,10 +50,4 @@ export function formatDayWithWeekday(value: string | null | undefined): string {
 
 export function displayName(name: string | null | undefined, username: string): string {
   return name?.trim() || username;
-}
-
-/** 표에서 처음 고른 행이 화면 아래쪽 상세로 이어지도록 (좁은 화면만) */
-export function scrollToDetailOnNarrow(id: string) {
-  if (window.innerWidth >= 1024) return;
-  window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
 }

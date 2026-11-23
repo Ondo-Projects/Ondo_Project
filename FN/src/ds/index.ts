@@ -14,3 +14,4 @@ export { EmptyState, Skeleton } from './EmptyState';
 export { Toggle } from './Toggle';
 export { ListGroup, ListRow } from './GroupedList';
 export { Notice, type NoticeTone } from './Notice';
+export { Pagination } from './Pagination';

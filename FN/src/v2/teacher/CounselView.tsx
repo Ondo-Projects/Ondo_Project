@@ -217,7 +217,8 @@ export default function CounselView({
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="학생 이름·제목 검색"
                 aria-label="상담 검색"
-                className="h-8 pl-8 text-[13px]"
+                controlSize="sm"
+                className="pl-8"
               />
             </div>
           </div>

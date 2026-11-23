@@ -124,7 +124,7 @@ export default function UiPreview() {
                 />
                 <div className="relative w-56">
                   <Search size={16} className="absolute top-1/2 left-2.5 -translate-y-1/2 text-gray-400" aria-hidden />
-                  <Input placeholder="학생 이름·제목 검색" className="h-8 pl-8 text-[13px]" />
+                  <Input placeholder="학생 이름·제목 검색" controlSize="sm" className="pl-8" />
                 </div>
               </div>
 

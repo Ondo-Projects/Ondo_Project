@@ -10,19 +10,24 @@ function borderClass(invalid?: boolean) {
   return invalid ? 'border-red-300' : 'border-gray-200';
 }
 
-export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+/** sm: 32px (표 위 검색·필터 줄) / md: 36px (폼). 너비는 감싸는 요소로 정합니다 */
+export type ControlSize = 'sm' | 'md';
+const HEIGHT: Record<ControlSize, string> = { sm: 'h-8 text-[13px]', md: 'h-9' };
+
+export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
   invalid?: boolean;
+  controlSize?: ControlSize;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
-  { invalid, className, ...rest },
+  { invalid, controlSize = 'md', className, ...rest },
   ref,
 ) {
   return (
     <input
       ref={ref}
       aria-invalid={invalid || undefined}
-      className={cn(CONTROL, borderClass(invalid), 'h-9 px-3', className)}
+      className={cn(CONTROL, borderClass(invalid), HEIGHT[controlSize], 'px-3', className)}
       {...rest}
     />
   );
@@ -47,19 +52,20 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
   );
 });
 
-export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
+export interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'size'> {
   invalid?: boolean;
+  controlSize?: ControlSize;
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
-  { invalid, className, children, ...rest },
+  { invalid, controlSize = 'md', className, children, ...rest },
   ref,
 ) {
   return (
     <select
       ref={ref}
       aria-invalid={invalid || undefined}
-      className={cn(CONTROL, borderClass(invalid), 'h-9 pl-3 pr-8', className)}
+      className={cn(CONTROL, borderClass(invalid), HEIGHT[controlSize], 'pl-3 pr-8', className)}
       {...rest}
     >
       {children}

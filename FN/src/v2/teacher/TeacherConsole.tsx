@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CalendarHeart, ClipboardList, LogOut, Megaphone, MessagesSquare, Settings, SquarePen } from 'lucide-react';
 import { useAuth } from '../../auth/AuthProvider';
@@ -9,6 +9,7 @@ import { TEACHER_SECTIONS } from '../../teacher/constants';
 import { useTeacherDashboard } from '../../teacher/useTeacherDashboard';
 import { ConsoleShell, type ConsoleNavItem } from '../shell/ConsoleShell';
 import AnnouncementButton from '../shell/AnnouncementButton';
+import { useFeedback } from '../shell/useFeedback';
 import CounselView from './CounselView';
 import MoodView from './MoodView';
 import NoticeView from './NoticeView';
@@ -47,16 +48,12 @@ function viewFromHash(hash: string): TeacherView {
   return LEGACY_HASH[key] ?? 'counsel';
 }
 
-type Feedback = { tone: 'success' | 'danger'; message: string } | null;
-
 export default function TeacherConsole() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const view = viewFromHash(location.hash);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [feedback, setFeedback] = useState<Feedback>(null);
-  const timerRef = useRef<number | undefined>(undefined);
   const { summary, counselingPosts, preCounselSummaries, suggestions, listsLoaded } = useTeacherDashboard(
     Boolean(user),
     refreshKey,
@@ -65,31 +62,15 @@ export default function TeacherConsole() {
   usePageTitle(`${VIEW_TITLES[view]} | 온도 교사`);
 
   const refresh = useCallback(() => setRefreshKey((key) => key + 1), []);
-
-  const onSuccess = useCallback(
-    (message: string) => {
-      window.clearTimeout(timerRef.current);
-      setFeedback({ tone: 'success', message });
-      timerRef.current = window.setTimeout(() => setFeedback(null), 4000);
-      refresh();
-    },
-    [refresh],
-  );
-
-  const onError = useCallback((message: string) => {
-    window.clearTimeout(timerRef.current);
-    setFeedback({ tone: 'danger', message });
-  }, []);
-
-  useEffect(() => () => window.clearTimeout(timerRef.current), []);
+  const { feedback, onSuccess, onError, clear: clearFeedback } = useFeedback(refresh);
 
   const goTo = useCallback(
     (next: TeacherView) => {
-      setFeedback(null);
+      clearFeedback();
       navigate({ hash: next === 'counsel' ? '' : next }, { replace: false });
       window.scrollTo({ top: 0 });
     },
-    [navigate],
+    [clearFeedback, navigate],
   );
 
   if (!user) {
@@ -136,7 +117,7 @@ export default function TeacherConsole() {
       }
     >
       {feedback ? (
-        <Notice tone={feedback.tone} onClose={() => setFeedback(null)} className="mb-4">
+        <Notice tone={feedback.tone} onClose={clearFeedback} className="mb-4">
           {feedback.message}
         </Notice>
       ) : null}
