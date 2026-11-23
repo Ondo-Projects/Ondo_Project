@@ -30,7 +30,7 @@ sudo systemctl enable ondo-api
 
 # nginx 설정은 HTTPS(443) 포함 — 인증서가 있어야 적용 가능
 # 인증서 발급·갱신·nginx 적용은 setup-https.sh 가 담당합니다.
-if [[ -f /etc/letsencrypt/live/ondo.ai.kr/fullchain.pem ]]; then
+if sudo test -f /etc/letsencrypt/live/ondo.ai.kr/fullchain.pem; then
   if [[ -f /etc/nginx/conf.d/ondo.conf ]]; then
     sudo cp -a /etc/nginx/conf.d/ondo.conf "/etc/nginx/conf.d/ondo.conf.bak.$(date +%s)"
   fi
