@@ -1,6 +1,7 @@
 import { type FormEvent, useEffect, useState } from 'react';
 import { GraduationCap, LogOut, MessageSquarePlus, School, UserRound, UserX } from 'lucide-react';
 import {
+  changeStudentAssignment,
   getStudentAssignmentOptional,
   getStudentClassProfile,
   registerStudentAssignment,
@@ -269,6 +270,7 @@ function TeacherScreen({ assignment, loaded, go, onSuccess, onAssignmentChanged 
           <ListRow label="학교" value={assignment.schoolName || '-'} />
           <ListRow label="연결한 날" value={formatCompactDateTime(assignment.assignedAt)} />
         </ListGroup>
+        <ChangeTeacherForm assignment={assignment} go={go} onSuccess={onSuccess} onAssignmentChanged={onAssignmentChanged} />
       </div>
     );
   }
@@ -300,6 +302,77 @@ function TeacherScreen({ assignment, loaded, go, onSuccess, onAssignmentChanged 
           연결하기
         </Button>
       </StickyFooter>
+    </form>
+  );
+}
+
+/** 새 학기에 담임이 바뀌면 새 선생님의 초대 코드로 연결을 옮깁니다 */
+function ChangeTeacherForm({
+  assignment,
+  go,
+  onSuccess,
+  onAssignmentChanged,
+}: Pick<MeTabProps, 'go' | 'onSuccess' | 'onAssignmentChanged'> & { assignment: StudentAssignment }) {
+  const [code, setCode] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const currentName = `${assignment.teacherName || assignment.teacherUsername} 선생님`;
+
+  async function change(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const normalized = code.trim();
+    if (!/^\d{6}$/.test(normalized)) {
+      setError('초대 코드는 숫자 6자리예요.');
+      return;
+    }
+    if (
+      !window.confirm(
+        `담임 선생님을 바꿀까요?\n\n` +
+          `· ${currentName}께 보낸 상담 중 아직 끝나지 않은 상담은 취소돼요.\n` +
+          '· 지난 상담 기록은 내 상담 목록에 그대로 남고, 새 선생님에게는 보이지 않아요.\n' +
+          '· 마음 날씨와 사전상담 카드는 새 선생님이 보게 돼요.',
+      )
+    )
+      return;
+    setBusy(true);
+    try {
+      const data = await changeStudentAssignment({ inviteCode: normalized });
+      await onAssignmentChanged(data);
+      onSuccess(`${data.teacherName || data.teacherUsername} 선생님으로 담임을 바꿨어요.`);
+      setCode('');
+      go('');
+    } catch (err) {
+      setError(resolveErrorMessage(err, '담임 선생님을 바꾸지 못했습니다.'));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <form onSubmit={change} noValidate className="flex flex-col gap-3">
+      <Block
+        title="담임 선생님 바꾸기"
+        footer="새 학년이 되어 담임 선생님이 바뀌었다면, 새 선생님께 받은 초대 코드를 입력하세요."
+      >
+        <Field label="새 선생님 초대 코드" error={error}>
+          <Input
+            value={code}
+            onChange={(event) => {
+              setCode(event.target.value.replace(/\D/g, '').slice(0, 6));
+              setError(null);
+            }}
+            inputMode="numeric"
+            autoComplete="off"
+            placeholder="123456"
+            maxLength={6}
+            disabled={busy}
+            className="text-center font-mono text-lg tracking-[0.4em]"
+          />
+        </Field>
+        <Button type="submit" className="mt-3 w-full" loading={busy} disabled={code.length !== 6}>
+          담임 바꾸기
+        </Button>
+      </Block>
     </form>
   );
 }

@@ -110,3 +110,20 @@ export interface StudentAttention {
   urgent: boolean;
   reasons: AttentionReason[];
 }
+
+/** BN ClassStudentResponseDTO — 담임과 연결된 학생 */
+export interface ClassStudent {
+  studentUsername: string;
+  studentName: string | null;
+  grade: number | null;
+  classNumber: number | null;
+  assignedAt: string;
+}
+
+/** BN ClassReleaseResponseDTO — 학급 연결 해제 결과 */
+export interface ClassReleaseResult {
+  releasedStudents: number;
+  cancelledCounselings: number;
+  /** 학급 전체 정리 때 새로 만든 초대 코드 */
+  newInviteCode: string | null;
+}
